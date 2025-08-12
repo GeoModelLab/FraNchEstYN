@@ -1,0 +1,24 @@
+Package: FraNchEstYN
+Title: FraNchEstYN
+Version: 0.0.0.9000
+Authors@R: c(
+    person("Simone", "Bregaglio", , "simone.bregaglio@gmail.com", role = c("aut", "cre")),
+    person("Roberto", "Ferrise", , "roberto.ferrise@unifi.it", role = "aut")
+  )
+Description: Framework for synchronous estimation of yield reduction
+License: MIT + file LICENSE
+URL: https://github.com/GeoModelLab/FraNchEstYN/
+BugReports: https://github.com/GeoModelLab/FraNchEstYN/issues
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports: 
+    dplyr,
+    lubridate,
+    readr
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Depends: 
+    R (>= 3.5)
+LazyData: true

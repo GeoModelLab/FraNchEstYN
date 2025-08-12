@@ -1,0 +1,23 @@
+{
+    "settings": {
+        "startYear": 1960,
+        "endYear": 2022,
+        "sites": [
+            "Indiana"
+        ],
+        "varieties": [ "Generic" ],
+        "isCalibration": "true",
+        "calibrationVariable": "disease",
+        "disease": "Septoria",
+        "simplexes":1,
+        "iterations":555,
+        "weatherTimeStep": "hourly"
+    },
+    "paths": {
+        "weatherDir": "files\\weather",
+        "referenceFilePaths": "files\\reference",
+        "paramFile": "files\\parameters\\franchestynParameters.csv",
+        "sowingFile": "files\\management\\sowing.csv"
+    }
+}
+
