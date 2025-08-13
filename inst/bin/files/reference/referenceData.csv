@@ -1,4 +1,4 @@
-sName,variety,Pyear,DOY,FINT,WGRN,WTOP,Septoria,site,year
+sName,variety,Pyear,DOY,FINT,WGRN,WTOP,thisDisease,site,year
 Indiana,Generic,1973,100,0,NA,NA,NA,Indiana,1973
 Indiana,Generic,1973,151,1,NA,NA,NA,Indiana,1973
 Indiana,Generic,1973,191,0.25,NA,NA,NA,Indiana,1973

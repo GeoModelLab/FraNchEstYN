@@ -11,7 +11,7 @@
       "Generic"
     ],
     "simplexes": 1,
-    "disease": "Septoria",
+    "disease": "thisDisease",
     "iterations": 300,
     "weatherTimeStep": "daily"
   },

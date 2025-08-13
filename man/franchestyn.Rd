@@ -10,7 +10,7 @@ franchestyn(
   reference_data = NULL,
   cropParameters = NULL,
   diseaseParameters = NULL,
-  calibration = "crop",
+  calibration = "disease",
   disease = "Septoria",
   start_end = c(2000, 2025),
   ...

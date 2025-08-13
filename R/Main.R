@@ -111,7 +111,6 @@
 franchestyn <- function(weather_data, management_data, reference_data = NULL,
                         cropParameters = NULL, diseaseParameters = NULL,
                         calibration  = 'disease',
-                        disease = "Septoria",  # always has a default
                         start_end = c(2000,2025),...)
 {
   #VALIDATION----
@@ -144,7 +143,7 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
   # check if reference_data is required
   # Parse calibration argument
   calibration <- tolower(calibration)
-  disease     <- trimws(disease)  # ensure it's a clean string
+  disease     <- 'thisDisease'
 
   # Determine mode
   mode <- if (calibration == "none") "simulation" else "calibration"
@@ -158,22 +157,29 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
   }
 
   # Check requirements for calibration
-  if (mode == "calibration") {
+  if (calibration != "none") {
     if (is.null(reference_data)) {
       stop("🦇 'reference_data' must be provided for calibration.")
     }
-    if (calibrationModel %in% c("disease", "all")) {
-      if (!(disease %in% colnames(reference_data))) {
-        stop(sprintf("🦇 Disease column '%s' is missing from reference_data.", disease))
-      }
+  } else {
+    if (is.null(reference_data)) {
+      # create fake reference data for C#
+      reference_data <- data.frame(
+        crop    = "thisCrop",
+        Disease = 0,
+        doy     = 300,
+        year    = start_year,
+        stringsAsFactors = FALSE
+      )
     }
   }
 
-  pkg_path <- system.file("", package = "FraNchEstYN")
-  exe_path <- system.file("bin", "FraNchEstYN.exe", package = "FraNchEstYN")
 
-  pkg_path <- paste0(getwd(),"\\inst\\bin")
-  exe_path <- list.files(pkg_path, pattern = "^FraNchEstYN\\.exe$", recursive = TRUE, full.names = TRUE)
+  #pkg_path <- system.file("", package = "FraNchEstYN")
+  #exe_path <- system.file("bin", "FraNchEstYN.exe", package = "FraNchEstYN")
+  pkg_path <- file.path(getwd(), "inst")
+  exe_path <- file.path(pkg_path, "bin", "FraNchEstYN.exe")
+
 
   # cat("🔍 Git root:", pkg_path, "\n")
   # cat("⚙️ Executable found at:", exe_path, "\n")
@@ -247,11 +253,66 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
   dir.create(input_management_dir, recursive = TRUE, showWarnings = FALSE)
 
   # Path to write the reference file
+
+  # ---- normalize/validate columns when calibration == "disease" ----
+  # Create a numeric column named exactly `disease_name`
+  # using values from a known disease severity alias.
+  prepare_reference_data <- function(reference_data,
+                                     calibration,
+                                     disease_name = "thisDisease",
+                                     verbose = TRUE) {
+    # Normalize calibration
+    calib <- tolower(trimws(as.character(calibration)))
+
+    # Only run when calibration is 'disease' or 'all'
+    # if (!(calib %in% c("disease", "all"))) {
+    #   return(reference_data)
+    # }
+
+    # Trim spaces from column names
+    names(reference_data) <- trimws(names(reference_data))
+
+    # Accepted aliases (case-insensitive)
+    disease_aliases <- c("diseaseseverity", "dissev", "disease")
+
+    nms <- names(reference_data)
+    low <- tolower(nms)
+
+    # Find first matching alias
+    hit <- match(disease_aliases, low, nomatch = 0)
+    hit <- hit[hit > 0]
+
+    if (length(hit) == 0) {
+      stop(
+        sprintf(
+          "When calibration is '%s', reference_data must contain a disease column named one of: %s.\nColumns present: %s",
+          calib,
+          paste(c("DiseaseSeverity", "dissev", "disease"), collapse = ", "),
+          paste(nms, collapse = ", ")
+        ),
+        call. = FALSE
+      )
+    }
+
+    # Rename the first match
+    idx <- hit[1]
+    old_name <- nms[idx]
+    names(reference_data)[idx] <- disease_name
+
+    reference_data
+  }
+
+
   ref_file <- file.path(input_reference_dir, "referenceData.csv")
-  reference_data$site <- sites
+
+  reference_data$site    <- sites
   reference_data$variety <- "Generic"
 
-  # Write the synthetic file
+  # Make the column named exactly "thisDisease"
+  reference_data <- prepare_reference_data(reference_data,
+                                           calibration = calibration,
+                                           disease_name = "thisDisease")
+
   write.table(
     reference_data,
     file = ref_file,
@@ -500,14 +561,14 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
       TotalPrec = sum(Prec, na.rm = TRUE),
       TotalRad = sum(Rad, na.rm = TRUE),
       TotalLW = sum(LW),
-      AUDPC = audpc_calc(DisSev*100, DaysAfterSowing),
-      DisSev = max(DisSev),
-      YieldAttainable = max(Yield),
-      YieldActual = max(YieldHealthy),
+      AUDPC = audpc_calc(DiseaseSeverity*100, DaysAfterSowing),
+      DiseaseSeverity = max(DiseaseSeverity),
+      YieldAttainable = max(YieldAttainable),
+      YieldActual = max(YieldActual),
       YieldLossRaw = YieldAttainable - YieldActual,
       YieldLossPerc = YieldLossRaw/YieldAttainable*100,
-      AGB = max(AGB),
-      AGBAttainable = max(AGBHealthy),
+      AGBAttainable = max(AGBattainable),
+      AGBActual = max(AGBactual),
       .groups = "drop"
     ) |>
     dplyr::filter(!is.na(YieldLossPerc))
@@ -735,8 +796,9 @@ compute_error_metrics <- function(outputs_df,
 
   pairs <- list(
     LightInterception = c("LightInterception", "LightInterceptionRef"),
-    DisSev            = c("DisSev",            "DisSevRef"),
-    Yield             = c("Yield",             "YieldRef")
+    DisSev            = c("DiseaseSeverity",            "DiseaseSeverityRef"),
+    YieldAttainable             = c("YieldAttainable",             "YieldAttainableRef"),
+    YieldActual             = c("YieldActual",             "YieldActualRef")
   )
 
   present_pairs <- Filter(function(x) all(x %in% names(outputs_df)), pairs)

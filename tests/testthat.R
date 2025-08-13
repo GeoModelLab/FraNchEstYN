@@ -8,11 +8,11 @@
 
 library(testthat)
 library(tidyverse)
-
-   # remove.packages('FraNchEstYN')
-   # devtools::document()
-   # devtools::install()
-   # library(FraNchEstYN)
+#
+# remove.packages('FraNchEstYN')
+# devtools::document()
+# devtools::install()
+# library(FraNchEstYN)
 
 
 weather_data<-read.csv(paste0(getwd(),'\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\weather\\daily\\Indiana.csv'))
@@ -27,21 +27,22 @@ management_data <- read.csv(paste0(getwd(),'\\src_csharp\\FraNchEstYN\\FraNchEst
   select(-site)
 
 reference_data<-read.csv(paste0(getwd(),"\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\reference\\Indiana.csv")) |>
-  filter(FINT != 0.50 | Septoria>0)
+  filter(FINT != 0.50 | Septoria>0) |>
+  rename(Disease = Septoria)
 reference_data$site <- 'Indiana'
 reference_data$year <- reference_data$Pyear
+#reference_data$yieldActual<-3000
 
 cropParameters<-FraNchEstYN::cropParameters
 diseaseParameters <- FraNchEstYN::diseaseParameters
 
 start_year<-1960
 end_year<-2022
-disease='Septoria'
 iterations <- 1
 
 
 
- thisCropParam <- cropParameters$wheat
+thisCropParam <- cropParameters$wheat
 thisCropParam$TbaseCrop$value<-1
 thisCropParam$TbaseCrop$calibration<-T
 thisCropParam$RadiationUseEfficiency$calibration<-F
@@ -52,22 +53,22 @@ thisCropParam$CycleLength$calibration<-F
 
 
 thisDiseaseParam<-diseaseParameters$septoria
-thisDiseaseParam$IsSplashBorne$value<-0
+thisDiseaseParam$IsSplashBorne$value<-1
 thisDiseaseParam$SenescenceAccelerationMax$calibration<-T
 thisDiseaseParam$virtualVisualLesion$calibration<-T
-thisDiseaseParam$virtualVisualLesion$min<-0.1
-thisDiseaseParam$virtualVisualLesion$max<-0.3
+thisDiseaseParam$virtualVisualLesion$min<-0.5
+thisDiseaseParam$virtualVisualLesion$max<-2
 thisDiseaseParam$SenescenceAccelerationMax$value<-0
 thisDiseaseParam$virtualVisualLesion$min<-.1
 thisDiseaseParam$virtualVisualLesion$max<-2
-thisDiseaseParam$HydroThermalTimeOnset$min<-10
+thisDiseaseParam$HydroThermalTimeOnset$min<-4
 thisDiseaseParam$HydroThermalTimeOnset$max<-20
-thisDiseaseParam$CyclePercentageOnset$min<-5
-thisDiseaseParam$CyclePercentageOnset$max<-40
+thisDiseaseParam$CyclePercentageOnset$min<-20
+thisDiseaseParam$CyclePercentageOnset$max<-60
 thisDiseaseParam$Topt$min<-15
-thisDiseaseParam$Tmax$min<-33
+thisDiseaseParam$Tmax$min<-30
 thisDiseaseParam$OuterInoculum$max<-0.14
-thisDiseaseParam$OuterInoculum$min<-0.001
+thisDiseaseParam$OuterInoculum$min<-0.0001
 thisDiseaseParam$Rain50Detachment$calibration<-T
 
 
@@ -86,7 +87,7 @@ thisDiseaseParam$Rain50Detachment$calibration<-T
 #   tz = "UTC"
 # )
 # ggplot(hourly_ag)+geom_line(aes(x=datetime,y=T2M))
-library(FraNchEstYN)
+#library(FraNchEstYN)
 start_end = c(1950,2010)
 timestep='daily'
 thisMode = 'dsadsa'
@@ -97,35 +98,50 @@ df<-franchestyn(weather_data = weather_data,
             management_data = management_data,
             reference_data = reference_data,
             cropParameters = cropParameters$wheat,
-            diseaseParameters = diseaseParameters$septoria,
+            diseaseParameters = thisDiseaseParam,
             calibration="all",
-            disease = "Septoria",
             start_end = start_end,
-            iterations=100)
+            iterations=300)
 
 outputs<-df$outputs$simulation
 
 ggplot(outputs,
        aes(x=DaysAfterSowing)) +
-  geom_area(aes(y=Latent),fill='red',alpha=.3)+
+  geom_area(aes(y=Latent),fill='blue',alpha=.3)+
   geom_area(aes(y=Sporulating),fill='brown',alpha=.3)+
+  #geom_col(aes(y=Prec/40))+
   geom_line(aes(y=LightInterception))+
   geom_line(aes(y=Susceptible),col='grey33',size=.5)+
-  geom_line(aes(y=Affected),col='black')+
-  geom_area(aes(y=Dead),col='blue',alpha=3)+
-  #geom_line(aes(y=htTimeS/60),col='red2',size=2)+
-  geom_line(aes(y=LightIntHealthy),col='green3',size=1)+
-  geom_point(aes(y=LightInterceptionRef))+
-  #geom_line(aes(y=yield),col='red')+
-  geom_line(aes(y=DisSev),col='blue',size=1)+
-  geom_point(aes(y=as.numeric(DisSevRef)),col='blue',shape=21,size=3)+
+  # geom_line(aes(y=Affected),col='black')+
+  # #geom_area(aes(y=Dead),col='blue',alpha=3)+
+  # #geom_line(aes(y=htTimeS/60),col='red2',size=2)+
+   geom_line(aes(y=LightIntHealthy),col='green3',size=1)+
+  # geom_point(aes(y=LightInterceptionRef))+
+  # #geom_line(aes(y=Yield),col='red')+
+   geom_line(aes(y=DiseaseSeverity),col='blue',size=1)+
+  # geom_line(aes(y=YieldAttainable/6000),col='red')+
+  # geom_line(aes(y=YieldActual/6000),col='red',linetype=2)+
+  # geom_point(aes(y=YieldActualRef/6000),col='red',size=3)+
+   geom_point(aes(y=as.numeric(DiseaseSeverityRef)),col='blue',shape=21,size=3)+
   facet_wrap(~GrowingSeason,ncol=6)+
   theme_bw()+
   xlim(0,320)
 
+metrics <- df$diagnostics$metrics
+
+
 #save calibrated parameters
 calibCrop<-df$parameters$crop
+calibCrop$HalfIntSenescence$value<-80
+
 calibDisease<-df$parameters$disease
+
+calibDisease$OuterInoculum$value<-.05
+calibDisease$PathogenSpread$value<-0.01
+calibDisease$IsSplashBorne$value<-0
+calibDisease$WetnessDurationMinimum$value<-18
+calibDisease$virtualVisualLesion$value<-0.9
+
 management_data$resistance<-0
 
 dfValid<-franchestyn(weather_data = weather_data,
@@ -150,9 +166,11 @@ ggplot(outputs,
   #geom_line(aes(y=htTimeS/60),col='red2',size=2)+
    geom_line(aes(y=LightIntHealthy),col='green3',size=1)+
      geom_point(aes(y=LightInterceptionRef))+
-  #geom_line(aes(y=yield),col='red')+
-   geom_line(aes(y=DisSev),col='blue',size=1)+
-   geom_point(aes(y=as.numeric(DisSevRef)),col='blue',shape=21,size=3)+
+  #geom_line(aes(y=YieldAttainable/6000),col='red')+
+  #geom_line(aes(y=YieldActual/6000),col='red',linetype=2)+
+  #geom_point(aes(y=YieldActualRef/6000),col='red',size=3)+
+   geom_line(aes(y=DiseaseSeverity),col='blue',size=1)+
+   geom_point(aes(y=as.numeric(DiseaseSeverityRef)),col='blue',shape=21,size=3)+
   facet_wrap(~GrowingSeason,ncol=6)+
   theme_bw()+
   xlim(0,320)
@@ -176,6 +194,7 @@ ggplot(outputs,
   stat_summary(geom='line',aes(y=LightIntHealthy),col='green3',size=1)+
   stat_summary(geom='point', aes(y=LightInterceptionRef))+
   #geom_line(aes(y=yield),col='red')+
+
   stat_summary(geom='line',aes(y=DisSev),col='blue',size=1)+
   stat_summary(geom='point', aes(y=as.numeric(DisSevRef)),col='blue',shape=21,size=3)+
   theme_bw()+

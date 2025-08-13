@@ -1,32 +1,32 @@
 Model,Parameter,Description,unit,min,max,value,calibration
-crop,TbaseCrop,base temperature for crop growth and development,°C,-1,5,3.3521542904965997,x
+crop,TbaseCrop,base temperature for crop growth and development,°C,-1,5,1.8833417125489393,x
 crop,ToptCrop,optimum temperature for crop growth and development,°C,20,28,24,
 crop,TmaxCrop,maximum temperature for crop growth and development,°C,32,37,35,
 crop,CycleLength,crop cycle length,degree days,800,3000,2500,
 crop,FloweringStart,percentage of the crop cycle when flowering occurs,% crop cycle,50,85,50,
-crop,HalfIntGrowth,percentage of the crop cycle when light interception is halved (growth phase),unitless,20,35,34.9772276989157,x
-crop,HalfIntSenescence,percentage of the crop cycle when light interception is halved (senescence phase),unitless,50,99,67.47127000413242,x
-crop,SlopeGrowth,slope of light interception growth phase,unitless,0.001,0.02,0.008011554491606149,x
-crop,SlopeSenescence,slope of light interception senescence phase,unitless,0.001,0.07,0.03126895503834819,x
+crop,HalfIntGrowth,percentage of the crop cycle when light interception is halved (growth phase),unitless,20,35,28.220599712076208,x
+crop,HalfIntSenescence,percentage of the crop cycle when light interception is halved (senescence phase),unitless,50,99,80,x
+crop,SlopeGrowth,slope of light interception growth phase,unitless,0.001,0.02,0.01576884093893704,x
+crop,SlopeSenescence,slope of light interception senescence phase,unitless,0.001,0.07,0.03962066125266793,x
 crop,RadiationUseEfficiency,maximum radiation use efficiency,g MJ-1,1,3.5,3,
-crop,PartitioningMaximum,maximum partitioning to storage organs,unitless,0.8,1,0.9603231678369925,x
-disease,IsSplashBorne,0 or 1 and if 1 the pathogen is dispersed by rain only,unitless,0,1,1,
-disease,OuterInoculum,pathogen inoculum from external sources,unitless,0.001,0.14,0.0742922351023512,x
-disease,PathogenSpread,percentage of canopy cover state infected by the pathogen by sporulation,unitless,0.01,0.5,0.2640447954884021,x
-disease,WetnessDurationOptimum,optimum leaf wetness duration for pathogen infection,hours,10,20,15.112539131712275,x
-disease,WetnessDurationMinimum,minimum leaf wetness duration for pathogen infection,hours,3,10,3.5258340087818136,x
-disease,DryCriticalInterruption,interruption leaf dry critical for pathogen infection,hours,1,10,6.515410696064414,x
-disease,Tmin,tmin for pathogen processes,°C,3,15,7.325781891178268,x
-disease,Topt,topt for pathogen processes,°C,15,32,21.588146563123573,x
-disease,Tmax,tmax for pathogen processes,°C,33,40,37.17738807381645,x
-disease,RelativeHumidityCritical,critical relative humidity for pathogen processes,unitless,50,70,64.4857284790205,x
-disease,Rain50Detachment,50% spore detachment by rain,unitless,0.1,20,6.856823345494642,x
-disease,RelativeHumidityNotLimiting,non limiting relative humidity for pathogen processes,unitless,70,95,91.13243712190264,x
-disease,HydroThermalTimeOnset,threshold of hydro-thermal time to determine disease onset,hydrodegree days,1,20,10.07594101288476,x
-disease,CyclePercentageOnset,crop cycle to determine disease onset,hydrodegree days,5,40,15.714334610347969,x
-disease,LatencyDuration,minimum duration of the latency phase,days,7,17,9.334115023843461,x
-disease,SporulationDuration,maximum duration of the sporulation phase,days,15,35,34.91304684218995,x
-disease,virtualVisualLesion,damage mechanism of light stealers (virtual visual lesion ratio),unitless,0.5,2,0.7434412678265451,x
-disease,RUEreductionFactor,damage mechanism of photosynthetic reducers,fraction,0,2,0.27222122131111515,x
-disease,SenescenceAccelerationMax,damage mechanism of senescence accelerators,%,0,40,0,
-disease,AssimilateSappersMax,damage mechanism of assimilate sappers,g m-2,0,40,6.128414980770014,x
+crop,PartitioningMaximum,maximum partitioning to storage organs,unitless,0.8,1,0.9411849647689738,x
+disease,IsSplashBorne,0 or 1 and if 1 the pathogen is dispersed by rain only,unitless,0,1,0,
+disease,OuterInoculum,pathogen inoculum from external sources,unitless,1e-4,0.14,0.05,x
+disease,PathogenSpread,percentage of canopy cover state infected by the pathogen by sporulation,unitless,0.01,0.5,0.01,x
+disease,WetnessDurationOptimum,optimum leaf wetness duration for pathogen infection,hours,10,20,14.305704419332663,x
+disease,WetnessDurationMinimum,minimum leaf wetness duration for pathogen infection,hours,3,10,18,x
+disease,DryCriticalInterruption,interruption leaf dry critical for pathogen infection,hours,1,10,6.7504293910353175,x
+disease,Tmin,tmin for pathogen processes,°C,3,15,8.184291487426037,x
+disease,Topt,topt for pathogen processes,°C,15,32,18.710247236865698,x
+disease,Tmax,tmax for pathogen processes,°C,30,40,34.003323919261845,x
+disease,RelativeHumidityCritical,critical relative humidity for pathogen processes,unitless,50,70,58.39399467576372,x
+disease,Rain50Detachment,50% spore detachment by rain,unitless,0.1,20,15.775296419868729,x
+disease,RelativeHumidityNotLimiting,non limiting relative humidity for pathogen processes,unitless,70,95,83.38774070270782,x
+disease,HydroThermalTimeOnset,threshold of hydro-thermal time to determine disease onset,hydrodegree days,4,20,11.405035732431605,x
+disease,CyclePercentageOnset,crop cycle to determine disease onset,hydrodegree days,20,60,21.37991587575335,x
+disease,LatencyDuration,minimum duration of the latency phase,days,7,17,11.685798563005592,x
+disease,SporulationDuration,maximum duration of the sporulation phase,days,15,35,23.349683953166938,x
+disease,virtualVisualLesion,damage mechanism of light stealers (virtual visual lesion ratio),unitless,0.1,2,0.9,x
+disease,RUEreductionFactor,damage mechanism of photosynthetic reducers,fraction,0,2,0.5555190660123479,x
+disease,SenescenceAccelerationMax,damage mechanism of senescence accelerators,%,0,40,17.853193243711775,x
+disease,AssimilateSappersMax,damage mechanism of assimilate sappers,g m-2,0,40,17.93259713742212,x
