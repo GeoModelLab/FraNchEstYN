@@ -7,7 +7,7 @@ Authors@R: c(
   )
 Description: Framework for synchronous estimation of yield reduction
 License: MIT + file LICENSE
-URL: https://GeoModelLab.github.io/FraNchEstYN, https://github.com/GeoModelLab/FraNchEstYN
+URL: https://GeoModelLab.github.io/FraNchEstYN, https://github.com/GeoModelLab/FraNchEstYN, https://geomodellab.github.io/FraNchEstYN/
 BugReports: https://github.com/GeoModelLab/FraNchEstYN/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
