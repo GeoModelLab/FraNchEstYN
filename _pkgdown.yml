@@ -1,0 +1,40 @@
+
+url: https://GeoModelLab.github.io/FraNchEstYN
+title: FraNchEstYN
+template:
+  bootstrap: 5
+navbar:
+  structure:
+    left:  [reference, articles]
+    right: [github]
+  components:
+    reference:
+      text: Reference
+      href: reference/index.html
+    articles:
+      text: Articles
+      menu:
+        - text: Quick start
+          href: articles/quick-start.html
+        - text: Reference data format
+          href: articles/reference-format.html
+        - text: C# integration notes
+          href: articles/csharp-integration.html
+    github:
+      icon: fa-github
+      href: https://github.com/GeoModelLab/FraNchEstYN
+home:
+  links:
+    - text: GitHub repository
+      href: https://github.com/GeoModelLab/FraNchEstYN
+reference:
+  - title: Main functions
+    contents:
+      - franchestyn
+      - starts_with("read")
+  - title: Data & parameters
+    contents:
+      - cropParameters
+      - diseaseParameters
+
+

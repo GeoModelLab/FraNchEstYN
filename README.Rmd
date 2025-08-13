@@ -1,55 +1,167 @@
+# FraNchEstYN – Framework for syNchronous Yield reductioN
+
+<img src="docs/images/phenomenals_logo.png" alt="phenomenals logo" width="250" align="right"/>
+
+[![License: CC BY-NC 3.0](https://img.shields.io/badge/License-CC%20BY--NC%203.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/3.0/)
+[![Platform](https://img.shields.io/badge/platform-Windows--only-blue)](https://microsoft.com)  
+[![Language](https://img.shields.io/badge/language-R%20%7C%20C%23-purple)](https://cran.r-project.org/)  
+![Status](https://img.shields.io/badge/status-active-brightgreen)
+
 ---
-output: github_document
+
+## 📖 Overview
+FraNchEstYN is a hybrid R/C# modeling framework designed to quantify crop yield losses caused by plant diseases under varying environmental conditions.
+It couples a Radiation Use Efficiency (RUE) crop growth model with a generic epidemiological module that dynamically simulates daily disease severity based on weather-derived environmental suitability.
+
+The model is intended for:
+
+    Yield loss assessment under historical and future climate scenarios
+
+    Integration with crop model ensembles (e.g., AgMIP datasets)
+
+    Multi-disease simulation without the need for disease-specific model development
+
+    Scenario analysis for plant protection strategies
+
+> **Note:** FraNchEstYN is released as an **R package** with **C# routines** invoked from R. It is currently available only on **Windows**, but cross-platform compatibility is under development. 
+
 ---
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
+## Table of Contents
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "man/figures/README-",
-  out.width = "100%"
-)
-```
+- [Highlights](#highlights)
+- [Description](#description)
+- [Installation](#installation)
+- [Getting Started](#getting-started)
+  - [phenologyCalibration()](#phenologyCalibration())
+  - [runPhenomenals()](#runPhenomenals()) 
+- [Support](#support)
+- [License](#license)
+  
+---
 
-# FraNchEstYN
+## Highlights
 
-<!-- badges: start -->
-<!-- badges: end -->
+- 🌾 Generic crop and epidemiology model 
 
-The goal of FraNchEstYN is to ...
+- 🦠 Simulate healthy vs diseased wheat yields
+
+- 🌡️ Driven by real weather data — temperature, humidity, and leaf wetness decide your fate
+
+- 🔗 Crop–disease coupling via SEIR model and damage mechanisms
+
+- 💀 Cross–environment, multi–disease analysis… at scale
+
+- ⚙️ R interface + C# model core (Windows only, for now…)
+
+---
+
+## Description
+
+Plant diseases account for 20–40% yield losses in staple crops globally (Savary et al., 2019), with losses expected to increase due to climate change (Singh et al., 2023).
+While crop models simulate environmental effects on growth, they rarely incorporate dynamic disease processes. Conversely, epidemiological models often simulate disease progression in isolation, without quantifying yield loss.
+
+FraNchEstYN bridges this gap by:
+
+    Calculating daily infection suitability from temperature, humidity, and leaf wetness
+
+    Simulating epidemic progression via a generic infection model
+
+    Coupling severity to growth by reducing light interception proportional to diseased leaf area
+
+    Computing yield loss as the difference between simulated healthy and diseased crops
+    
+The model is intended for:
+
+    Yield loss assessment under historical and future climate scenarios
+
+    Integration with crop model ensembles (e.g., AgMIP datasets)
+
+    Multi-disease simulation without the need for disease-specific model development
+
+    Scenario analysis for plant protection strategies
+    
+---
 
 ## Installation
 
-You can install the development version of FraNchEstYN from [GitHub](https://github.com/) with:
+> ⚠️ **Platform notice:**  
+> FraNchEstYN currently runs **only on Windows** due to its use of compiled C# executable.  
+> Cross-platform support (macOS/Linux) is under active development.
 
-``` r
-# install.packages("pak")
-pak::pak("GeoModelLab/FraNchEstYN")
+### 1. Install R
+
+Make sure **R (version ≥ 4.0)** is installed:  
+🔗 [https://cran.r-project.org/](https://cran.r-project.org/)
+
+### 2. Install Required R Packages
+
+If your R environment does not already have **devtools**, install it first:
+
+```r
+install.packages("devtools")
 ```
 
-## Example
+### 3. Install FraNchEstYN from GitHub
 
-This is a basic example which shows you how to solve a common problem:
-
-```{r example}
-library(FraNchEstYN)
-## basic example code
+You can install the FraNchEstYN package directly using devtools:
+```r
+devtools::install_github("GeoModelLab/FraNchEstYN")
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+This will:
 
-```{r cars}
-summary(cars)
+    Download the FraNchEstYN R package
+    Compile and install it locally
+    Include the precompiled C# backend executable required for model execution (Windows only, cross-platform support under development)
+
+### Access Documentation    
+The core function franchestyn includes Roxygen-style documentation. You can access help directly from R:
+
+```r
+?franchestyn
+```
+Or use the RStudio help viewer by placing your cursor inside the function and pressing F1.
+
+The C# source code for the model core engine is included in the repository under the /src directory. A precompiled Windows .exe is also bundled under inst/extdata/Windows/.
+
+    📦 The R functions handle all the configuration and execution automatically by calling this backend executable.
+
+---
+
+## Getting Started
+
+
+---
+
+### phenologyCalibration()
+
+This function performs **calibration** of the PhenoMeNals phenology model using weather data and BBCH phenological observations.  
+It automatically prepares input files and calls the embedded C# engine — users do not need to handle configuration files manually.
+
+---
+
+#### **Example**
+
+```r
+result <- franchestyn(
+  weather_data    = weather_df,
+  management_data = mgmt_df,
+  reference_data  = ref_df,   # Optional if calibration = "none"
+  cropParameters  = cropParams,
+  diseaseParameters = disParams,
+  calibration     = "all",    # "disease", "none", "all"
+  start_end       = c(2000, 2025),
+  sites           = "all",
+  varieties       = "all"
+)
 ```
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this.
-
-You can also embed plots, for example:
-
-```{r pressure, echo = FALSE}
-plot(pressure)
+#### Outputs:
+```r
+result$outputs$simulation  # per-timestep outputs 
+result$outputs$summary    # season summaries (AUDPC, yields, etc.)
+result$diagnostics$metrics # RMSE, MAE, r, R2, NSE (if reference present)
+result$diagnostics$parameters # RMSE, MAE, r, R2, NSE (if reference present)
+result$parameters # calibrated crop and/or disease parameters
 ```
-
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.

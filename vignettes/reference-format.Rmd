@@ -1,0 +1,22 @@
+---
+title: "Reference data format"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Reference data format}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+**CSV columns (case-insensitive; underscores/spaces ignored):**
+
+- `year`, `doy`
+- `variety`, `site`
+- `FINT` (or `lightInterception`)
+- **YieldActual** (aliases: `YieldActual`, `YieldDiseased`, `YieldAct`, `yieldact`, `YieldLimited`, `WGRN`, `GrainYield`) — *optional*
+- **YieldAttainable** (aliases: `YieldAttainable`, `YieldUnlimited`, `YieldPotential`, `Yield`) — *optional*
+- Per-disease column named exactly the `disease` you pass (also matches `<disease>_sev`, `<disease>_severity` in the C# reader).
+
+```csv
+variety,site,year,doy,FINT,YieldActual,YieldAttainable,thisDisease
+Generic,SiteA,2010,200,0.62,5.1,6.2,0.15
+```

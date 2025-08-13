@@ -1,53 +1,77 @@
+<div align="center">
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
+**FraNchEstYN**  
+*Fra*ming *Nch* (Non-linear Crop–disease) *Est*imation in the *YN*ow
 
-# FraNchEstYN
+<img src="man/figures/logo.png" alt="FraNchEstYN logo" width="250" align="top"/>
 
-<!-- badges: start -->
+</div>	  
 
-<!-- badges: end -->
+[![License: CC BY-NC 3.0](https://img.shields.io/badge/License-CC%20BY--NC%203.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/3.0/)
+[![Platform](https://img.shields.io/badge/platform-Windows--only-blue)](https://microsoft.com)  
+[![Language](https://img.shields.io/badge/language-R%20%7C%20C%23-purple)](https://cran.r-project.org/)  
+![Status](https://img.shields.io/badge/status-active-brightgreen)
 
-The goal of FraNchEstYN is to …
+---
+
+## 📖 Overview
+**FraNchEstYN** is a hybrid **crop–disease simulation and calibration framework** that couples a **process-based C# model** with an **R interface** for input preparation, model launching, and result analysis.
+
+It integrates **phenology-driven crop growth**, **disease epidemiology**, and **eco-physiological processes** to predict yield, biomass, and disease impacts, with modes for **simulation** and **parameter calibration**.
+
+> **Note:** FraNchEstYN is currently **Windows-only** due to its C# computation core. Cross-platform support is in progress.
+
+---
+
+## Highlights
+
+- 🌱 Simulates crop growth and yield with **disease interactions**
+- 🦠 Calibrates crop and/or disease parameters (`crop`, `disease`, `all`)
+- 📊 Computes performance metrics (RMSE, MAE, NSE, R²) automatically
+- 🔍 Supports **carry-over effects** and **phase-specific analysis**
+- ⚙️ Hybrid architecture: **R interface + C# executable**
+- 🪟 **Windows-only** (Mac/Linux support under development)
+
+---
 
 ## Installation
 
-You can install the development version of FraNchEstYN from
-[GitHub](https://github.com/) with:
+From GitHub (Windows):
 
-``` r
-# install.packages("pak")
-pak::pak("GeoModelLab/FraNchEstYN")
+```r
+install.packages("devtools")
+devtools::install_github("GeoModelLab/FraNchEstYN")
 ```
 
-## Example
+## Getting Started
 
-This is a basic example which shows you how to solve a common problem:
-
-``` r
+Minimal run example:
+```
 library(FraNchEstYN)
-## basic example code
+
+res <- franchestyn(
+  weather_data      = weather_df,      # one site only
+  management_data   = mgmt_df,         # crop/variety/resistance/sowingDOY/year
+  reference_data    = ref_df,          # required if calibration != "none"
+  cropParameters    = cropParameters$Wheat,
+  diseaseParameters = diseaseParameters$Septoria,
+  calibration       = "all",           # "none", "crop", "disease", or "all"
+  start_end         = c(2010, 2020),
+  iterations        = 200
+)
+
+str(res$outputs$summary)
+
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`?
-You can include R chunks like so:
+## Documentation
+Full documentation and vignettes at:
+📚 https://geomodellab.github.io/FraNchEstYN
 
-``` r
-summary(cars)
-#>      speed           dist       
-#>  Min.   : 4.0   Min.   :  2.00  
-#>  1st Qu.:12.0   1st Qu.: 26.00  
-#>  Median :15.0   Median : 36.00  
-#>  Mean   :15.4   Mean   : 42.98  
-#>  3rd Qu.:19.0   3rd Qu.: 56.00  
-#>  Max.   :25.0   Max.   :120.00
-```
+## License
 
-You’ll still need to render `README.Rmd` regularly, to keep `README.md`
-up-to-date. `devtools::build_readme()` is handy for this.
+Creative Commons Attribution-NonCommercial 3.0 Unported (CC BY-NC 3.0)
 
-You can also embed plots, for example:
+Authors
 
-<img src="man/figures/README-pressure-1.png" width="100%" />
-
-In that case, don’t forget to commit and push the resulting figure
-files, so they display on GitHub and CRAN.
+Simone Bregaglio & Roberto Ferrise
