@@ -1,40 +1,47 @@
 url: https://geomodellab.github.io/FraNchEstYN/
-title: FraNchEstYN
+
 template:
   bootstrap: 5
+  bootswatch: darkly
+  bslib:
+    primary: "#8b0000"      # optional accent
+    secondary: "#ff4500"    # optional accent
+
 navbar:
   structure:
-    left:
-    - reference
-    - articles
-    right: github
+    left:  [home, reference, articles]
+    right: [github]
   components:
+    home:
+      text: "Home"
+      href: index.html
     reference:
-      text: Reference
+      text: "Reference"
       href: reference/index.html
     articles:
-      text: Articles
-      menu:
-      - text: Quick start
-        href: articles/quick-start.html
-      - text: Reference data format
-        href: articles/reference-format.html
-      - text: C# integration notes
-        href: articles/csharp-integration.html
+      text: "Articles"
+      href: articles/index.html
     github:
-      icon: fa-github
+      icon: fab fa-github
       href: https://github.com/GeoModelLab/FraNchEstYN
-home:
-  links:
-  - text: GitHub repository
-    href: https://github.com/GeoModelLab/FraNchEstYN
-reference:
-- title: Main functions
-  contents:
-  - franchestyn
-  - starts_with("read")
-- title: Data & parameters
-  contents:
-  - cropParameters
-  - diseaseParameters
 
+home:
+  title: "FraNchEstYN"
+  description: "Framework for synchronous estimation of crop–disease yield reduction"
+  links:
+    - text: GitHub repository
+      href: https://github.com/GeoModelLab/FraNchEstYN
+    - text: Report an issue
+      href: https://github.com/GeoModelLab/FraNchEstYN/issues
+
+reference:
+  - title: "Main Function"
+    contents:
+      - franchestyn
+  - title: "Parameter Sets"
+    contents:
+      - cropParameters
+      - diseaseParameters
+  - title: "Internal"
+    contents:
+      - compute_error_metrics

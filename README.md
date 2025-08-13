@@ -1,7 +1,9 @@
 <div align="center">
 
+
+
 **FraNchEstYN**  
-*Fra*ming *Nch* (Non-linear Crop–disease) *Est*imation in the *YN*ow
+*Fra*mework for sy*Nch*ronous *Est*imation of the *Y*ield reductio*N*
 
 <img src="man/figures/logo.png" alt="FraNchEstYN logo" width="250" align="top"/>
 
@@ -25,12 +27,11 @@ It integrates **phenology-driven crop growth**, **disease epidemiology**, and **
 
 ## Highlights
 
-- 🌱 Simulates crop growth and yield with **disease interactions**
+- 🧟 Simulates crop growth and yield with **disease interactions**
 - 🦠 Calibrates crop and/or disease parameters (`crop`, `disease`, `all`)
-- 📊 Computes performance metrics (RMSE, MAE, NSE, R²) automatically
-- 🔍 Supports **carry-over effects** and **phase-specific analysis**
-- ⚙️ Hybrid architecture: **R interface + C# executable**
-- 🪟 **Windows-only** (Mac/Linux support under development)
+- 🦇 Computes performance metrics (RMSE, MAE, NSE, R²) automatically
+- 👹 Hybrid architecture: **R interface + C# executable**
+- 🕸 **Windows-only** (Mac/Linux support under development)
 
 ---
 
@@ -69,9 +70,7 @@ Full documentation and vignettes at:
 📚 https://geomodellab.github.io/FraNchEstYN
 
 ## License
-
 Creative Commons Attribution-NonCommercial 3.0 Unported (CC BY-NC 3.0)
 
-##Authors
-
+## Authors
 Simone Bregaglio & Roberto Ferrise

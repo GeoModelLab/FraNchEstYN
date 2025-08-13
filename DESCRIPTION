@@ -1,28 +1,18 @@
 Package: FraNchEstYN
-Title: FraNchEstYN
-Version: 0.0.0.9000
+Type: Package
+Title: Crop–Disease Simulation and Calibration
+Version: 0.1.0
 Authors@R: c(
-    person("Simone", "Bregaglio", , "simone.bregaglio@gmail.com", role = c("aut", "cre")),
-    person("Roberto", "Ferrise", , "roberto.ferrise@unifi.it", role = "aut")
-  )
-Description: Framework for synchronous estimation of yield reduction
-License: MIT + file LICENSE
-URL: https://GeoModelLab.github.io/FraNchEstYN, https://github.com/GeoModelLab/FraNchEstYN, https://geomodellab.github.io/FraNchEstYN/
-BugReports: https://github.com/GeoModelLab/FraNchEstYN/issues
+    person("Simone", "Bregaglio", email = "simone.bregaglio@crea.gov.it", role = c("aut", "cre")),
+    person("Roberto", "Ferrise", email = "roberto.ferrise@unifi.it", role = "aut"))
+Description: Runs the FraNchEstYN C# crop–disease model from R.
+License: CC BY-NC 3.0
 Encoding: UTF-8
-Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
-Imports: 
-    dplyr,
-    lubridate,
-    readr
-Suggests: 
-    knitr,
-    pkgdown,
-    rmarkdown,
-    testthat (>= 3.0.0)
-Config/testthat/edition: 3
-Depends: 
-    R (>= 3.5)
 LazyData: true
+Depends: R (>= 3.5)
+Imports: dplyr, lubridate, readr
+Suggests: knitr, pkgdown, rmarkdown, testthat
+Config/testthat/edition: 3
 VignetteBuilder: knitr
+URL: https://geomodellab.github.io/FraNchEstYN, https://github.com/GeoModelLab/FraNchEstYN
+BugReports: https://github.com/GeoModelLab/FraNchEstYN/issues
