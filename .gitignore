@@ -5,5 +5,4 @@
 .DS_Store
 .quarto
 src_csharp
-docs
 inst/doc
