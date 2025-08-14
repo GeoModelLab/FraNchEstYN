@@ -111,7 +111,10 @@
 franchestyn <- function(weather_data, management_data, reference_data = NULL,
                         cropParameters = NULL, diseaseParameters = NULL,
                         calibration  = 'disease',
-                        start_end = c(2000,2025),...)
+                        start_end = c(2000,2025),
+                        apikey = NULL,                 # optional API key
+                        franchy_message = FALSE,
+                        ...)# whether to request spooky LLM summary)
 {
   #VALIDATION----
 
@@ -174,11 +177,11 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
     }
   }
 
-
-  #pkg_path <- system.file("", package = "FraNchEstYN")
-  #exe_path <- system.file("bin", "FraNchEstYN.exe", package = "FraNchEstYN")
-  pkg_path <- file.path(getwd(), "inst")
-  exe_path <- file.path(pkg_path, "bin", "FraNchEstYN.exe")
+  #TODO PATHS!!!
+  pkg_path <- system.file("", package = "FraNchEstYN")
+  exe_path <- system.file("bin", "FraNchEstYN.exe", package = "FraNchEstYN")
+  # pkg_path <- file.path(getwd(), "inst")
+  # exe_path <- file.path(pkg_path, "bin", "FraNchEstYN.exe")
 
 
   # cat("🔍 Git root:", pkg_path, "\n")
@@ -774,6 +777,79 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
         disease = updatedDiseaseParameters
       )
   }
+
+  # --- OPTIONAL SPOOKY MESSAGE ---------------------------------------------
+  if (isTRUE(franchy_message)) {
+    if (is.null(apikey)) {
+      warning("☠️ Franchy message requested but no API key provided — skipping.")
+    } else {
+      try({
+        library(httr)
+        library(jsonlite)
+
+        # Prepare year-by-year summary
+        yearly_summary <- summary_df %>%
+          dplyr::group_by(GrowingSeason) %>%
+          dplyr::summarise(
+            avg_severity = round(mean(DiseaseSeverity, na.rm = TRUE) * 100, 1),
+            yield_attainable = round(mean(YieldAttainable, na.rm = TRUE), 1),
+            yield_actual = round(mean(YieldActual, na.rm = TRUE), 1),
+            yield_loss = round(mean(YieldLossPerc, na.rm = TRUE), 1),
+            .groups = "drop"
+          )
+
+        # Turn into a text block for the prompt
+        yearly_text <- paste0(
+          apply(yearly_summary, 1, function(row) {
+            paste0(
+              "Year ", row[["GrowingSeason"]], ": ",
+              row[["avg_severity"]], "% severity, ",
+              row[["yield_actual"]], " kg/ha actual yield, ",
+              row[["yield_loss"]], "% yield loss."
+            )
+          }),
+          collapse = "\n"
+        )
+
+        prompt <- paste0(
+          "You are FraNchEstYN, the monster wheat growth model from Transylvania.\n",
+          "Write a short summary in scientific style of this wheat rust simulation.\n",
+          "Describe in a single paragraph (max 4 sentences) the current simulation.\n\n",
+          yearly_text,
+          "\nEnd with a creepy agricultural proverb."
+        )
+
+        res <- POST(
+          url = "https://openrouter.ai/api/v1/chat/completions",
+          add_headers(
+            Authorization = paste("Bearer", apikey),
+            "Content-Type" = "application/json"
+          ),
+          body = toJSON(list(
+            model = "z-ai/glm-4.5-air:free",
+            messages = list(list(role = "user", content = prompt))
+          ), auto_unbox = TRUE)
+        )
+
+        parsed <- content(res, as = "parsed")
+
+        if (!is.null(parsed$choices[[1]]$message$content)) {
+          output <- parsed$choices[[1]]$message$content
+          cat("\n================= 🌾💀 FRANCHY RESPONSE 💀🌾 =================\n\n")
+          for (line in strsplit(output, "\n")[[1]]) {
+            if (nchar(trimws(line)) > 0) {
+              cat(sample(c("🧟", "🦇", "👻", "💀", "🎃"), 1), line, "\n")
+            }
+          }
+          cat("\n=================================================================\n")
+          result$spooky_message <- output
+        }
+
+      }, silent = TRUE)
+    }
+  }
+
+
 
   # ---- RETURN EVERYTHING -------------------------------------------------------
   return(result)

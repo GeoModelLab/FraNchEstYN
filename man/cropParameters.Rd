@@ -6,25 +6,25 @@
 \title{Crop parameter sets for FraNchEstYN}
 \format{
 A named list of lists of lists:
-\code{cropParameters[[set]][[parameter]]} → parameter details list.
+  \code{cropParameters[[set]][[parameter]]} → parameter details list.
 }
 \usage{
 cropParameters
 }
 \description{
 A named list of predefined crop parameter sets used in the FraNchEstYN model.
-The top-level names correspond to crop types (e.g., \code{"Wheat"}, \code{"Maize"}).
+The top-level names correspond to crop types (e.g., `"Wheat"`, `"Maize"`).
 }
 \details{
 Each set is itself a named list of parameters.
 Each parameter entry contains:
 \itemize{
-\item \code{description} Description of the parameter
-\item \code{unit} Unit of measurement
-\item \code{min} Minimum allowed value
-\item \code{max} Maximum allowed value
-\item \code{value} Default value
-\item \code{calibration} Logical flag indicating if the parameter is used in calibration
+  \item \code{description} Description of the parameter
+  \item \code{unit} Unit of measurement
+  \item \code{min} Minimum allowed value
+  \item \code{max} Maximum allowed value
+  \item \code{value} Default value
+  \item \code{calibration} Logical flag indicating if the parameter is used in calibration
 }
 }
 \examples{

@@ -16,3 +16,4 @@ Config/testthat/edition: 3
 VignetteBuilder: knitr
 URL: https://geomodellab.github.io/FraNchEstYN, https://github.com/GeoModelLab/FraNchEstYN
 BugReports: https://github.com/GeoModelLab/FraNchEstYN/issues
+RoxygenNote: 7.3.2

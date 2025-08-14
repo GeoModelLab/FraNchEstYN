@@ -6,25 +6,25 @@
 \title{Disease parameter sets for FraNchEstYN}
 \format{
 A named list of lists of lists:
-\code{diseaseParameters[[set]][[parameter]]} → parameter details list.
+  \code{diseaseParameters[[set]][[parameter]]} → parameter details list.
 }
 \usage{
 diseaseParameters
 }
 \description{
 A named list of predefined disease parameter sets used in the FraNchEstYN model.
-The top-level names correspond to diseases (e.g., \code{"Septoria"}, \code{"WheatRust"}).
+The top-level names correspond to diseases (e.g., `"Septoria"`, `"WheatRust"`).
 }
 \details{
 Each set is itself a named list of parameters.
 Each parameter entry contains:
 \itemize{
-\item \code{description} Description of the parameter
-\item \code{unit} Unit of measurement
-\item \code{min} Minimum allowed value
-\item \code{max} Maximum allowed value
-\item \code{value} Default value
-\item \code{calibration} Logical flag indicating if the parameter is used in calibration
+  \item \code{description} Description of the parameter
+  \item \code{unit} Unit of measurement
+  \item \code{min} Minimum allowed value
+  \item \code{max} Maximum allowed value
+  \item \code{value} Default value
+  \item \code{calibration} Logical flag indicating if the parameter is used in calibration
 }
 }
 \examples{

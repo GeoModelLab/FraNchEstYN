@@ -5,7 +5,7 @@
 # Learn more about the roles of various files in:
 # * https://r-pkgs.org/testing-design.html#sec-tests-files-overview
 # * https://testthat.r-lib.org/articles/special-files.html
-
+setwd("C:\\GitHub\\FraNchEstYN")
 library(testthat)
 library(tidyverse)
 #
@@ -52,24 +52,24 @@ thisCropParam$CycleLength$value <- 3200
 thisCropParam$CycleLength$calibration<-F
 
 
-thisDiseaseParam<-diseaseParameters$septoria
-thisDiseaseParam$IsSplashBorne$value<-1
-thisDiseaseParam$SenescenceAccelerationMax$calibration<-T
-thisDiseaseParam$virtualVisualLesion$calibration<-T
-thisDiseaseParam$virtualVisualLesion$min<-0.5
-thisDiseaseParam$virtualVisualLesion$max<-2
-thisDiseaseParam$SenescenceAccelerationMax$value<-0
-thisDiseaseParam$virtualVisualLesion$min<-.1
-thisDiseaseParam$virtualVisualLesion$max<-2
-thisDiseaseParam$HydroThermalTimeOnset$min<-4
-thisDiseaseParam$HydroThermalTimeOnset$max<-20
-thisDiseaseParam$CyclePercentageOnset$min<-20
-thisDiseaseParam$CyclePercentageOnset$max<-60
-thisDiseaseParam$Topt$min<-15
-thisDiseaseParam$Tmax$min<-30
-thisDiseaseParam$OuterInoculum$max<-0.14
-thisDiseaseParam$OuterInoculum$min<-0.0001
-thisDiseaseParam$Rain50Detachment$calibration<-T
+ thisDiseaseParam<-diseaseParameters$septoria
+ thisDiseaseParam$IsSplashBorne$value<-0
+# thisDiseaseParam$SenescenceAccelerationMax$calibration<-T
+# thisDiseaseParam$virtualVisualLesion$calibration<-T
+# thisDiseaseParam$virtualVisualLesion$min<-0.5
+# thisDiseaseParam$virtualVisualLesion$max<-2
+# thisDiseaseParam$SenescenceAccelerationMax$value<-0
+# thisDiseaseParam$virtualVisualLesion$min<-.1
+# thisDiseaseParam$virtualVisualLesion$max<-2
+# thisDiseaseParam$HydroThermalTimeOnset$min<-4
+# thisDiseaseParam$HydroThermalTimeOnset$max<-20
+# thisDiseaseParam$CyclePercentageOnset$min<-20
+# thisDiseaseParam$CyclePercentageOnset$max<-60
+# thisDiseaseParam$Topt$min<-15
+# thisDiseaseParam$Tmax$min<-30
+# thisDiseaseParam$OuterInoculum$max<-0.14
+# thisDiseaseParam$OuterInoculum$min<-0.0001
+# thisDiseaseParam$Rain50Detachment$calibration<-T
 
 
 # library(nasapower)
@@ -93,16 +93,21 @@ timestep='daily'
 thisMode = 'dsadsa'
 calibration="crop"
 source("R\\Main.R")
+apikey  <- "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"
 
 df<-franchestyn(weather_data = weather_data,
             management_data = management_data,
             reference_data = reference_data,
             cropParameters = cropParameters$wheat,
             diseaseParameters = thisDiseaseParam,
-            calibration="all",
+            calibration="all", #'all', 'crop', 'disease'
             start_end = start_end,
-            iterations=300)
+            apikey = apikey,
+            franchy_message = F,
+            iterations=500)
 
+df$diagnostics$calibration$plots
+parameters<-df$diagnostics$calibration$plots
 outputs<-df$outputs$simulation
 
 ggplot(outputs,
@@ -112,10 +117,10 @@ ggplot(outputs,
   #geom_col(aes(y=Prec/40))+
   geom_line(aes(y=LightInterception))+
   geom_line(aes(y=Susceptible),col='grey33',size=.5)+
-  # geom_line(aes(y=Affected),col='black')+
-  # #geom_area(aes(y=Dead),col='blue',alpha=3)+
+  #geom_line(aes(y=Affected),col='black',size=1)+
+  geom_area(aes(y=Dead),fill='blue',alpha=.5)+
   # #geom_line(aes(y=htTimeS/60),col='red2',size=2)+
-   geom_line(aes(y=LightIntHealthy),col='green3',size=1)+
+  # geom_line(aes(y=LightIntHealthy),col='green3',size=1)+
   # geom_point(aes(y=LightInterceptionRef))+
   # #geom_line(aes(y=Yield),col='red')+
    geom_line(aes(y=DiseaseSeverity),col='blue',size=1)+
@@ -125,22 +130,28 @@ ggplot(outputs,
    geom_point(aes(y=as.numeric(DiseaseSeverityRef)),col='blue',shape=21,size=3)+
   facet_wrap(~GrowingSeason,ncol=6)+
   theme_bw()+
-  xlim(0,320)
+  xlim(0,300)
 
 metrics <- df$diagnostics$metrics
+summary<-df$outputs$summary
+
 
 
 #save calibrated parameters
 calibCrop<-df$parameters$crop
-calibCrop$HalfIntSenescence$value<-80
-
+# calibCrop$HalfIntSenescence$value<-80
+#
 calibDisease<-df$parameters$disease
-
-calibDisease$OuterInoculum$value<-.05
-calibDisease$PathogenSpread$value<-0.01
-calibDisease$IsSplashBorne$value<-0
-calibDisease$WetnessDurationMinimum$value<-18
-calibDisease$virtualVisualLesion$value<-0.9
+#
+calibDisease$OuterInoculum$value<-.01
+ # calibDisease$PathogenSpread$value<-0.01
+ # calibDisease$HydroThermalTimeOnset$value<-14
+ # calibDisease$CyclePercentageOnset$value<-35
+ # calibDisease$SporulationDuration$value<-6
+ # calibDisease$LatencyDuration$value<-20
+# calibDisease$IsSplashBorne$value<-0
+# calibDisease$WetnessDurationMinimum$value<-18
+# calibDisease$virtualVisualLesion$value<-0.9
 
 management_data$resistance<-0
 
@@ -155,25 +166,27 @@ dfValid<-franchestyn(weather_data = weather_data,
                 iterations=300)
 
 outputs<-dfValid$outputs$simulation
-ggplot(outputs,
+ggplot(outputs |> filter(GrowingSeason==1975),
        aes(x=DaysAfterSowing)) +
-   geom_area(aes(y=Latent),fill='red',alpha=.3)+
-   geom_area(aes(y=Sporulating),fill='brown',alpha=.3)+
-   geom_line(aes(y=LightInterception))+
-  geom_line(aes(y=Susceptible),col='grey33',size=.5)+
-  geom_line(aes(y=Affected),col='black')+
-  geom_area(aes(y=Dead),col='blue',alpha=3)+
-  #geom_line(aes(y=htTimeS/60),col='red2',size=2)+
-   geom_line(aes(y=LightIntHealthy),col='green3',size=1)+
-     geom_point(aes(y=LightInterceptionRef))+
-  #geom_line(aes(y=YieldAttainable/6000),col='red')+
-  #geom_line(aes(y=YieldActual/6000),col='red',linetype=2)+
-  #geom_point(aes(y=YieldActualRef/6000),col='red',size=3)+
+  geom_area(aes(y=Latent),fill='blue',alpha=.3)+
+  geom_area(aes(y=Sporulating),fill='brown',alpha=.3)+
+  #geom_col(aes(y=Prec/40))+
+  #geom_line(aes(y=LightInterception))+
+  #geom_line(aes(y=Susceptible),col='grey33',size=.5)+
+  geom_line(aes(y=Affected),col='black',size=1)+
+  geom_area(aes(y=Dead),fill='blue',alpha=.5)+
+  #geom_area(aes(y=HTtimeR),fill='gold',alpha=.4)+
+  # geom_line(aes(y=LightIntHealthy),col='green3',size=1)+
+  # geom_point(aes(y=LightInterceptionRef))+
+  # #geom_line(aes(y=Yield),col='red')+
    geom_line(aes(y=DiseaseSeverity),col='blue',size=1)+
-   geom_point(aes(y=as.numeric(DiseaseSeverityRef)),col='blue',shape=21,size=3)+
+  # geom_line(aes(y=YieldAttainable/6000),col='red')+
+  # geom_line(aes(y=YieldActual/6000),col='red',linetype=2)+
+  # geom_point(aes(y=YieldActualRef/6000),col='red',size=3)+
+  # geom_point(aes(y=as.numeric(DiseaseSeverityRef)),col='blue',shape=21,size=3)+
   facet_wrap(~GrowingSeason,ncol=6)+
   theme_bw()+
-  xlim(0,320)
+  xlim(0,300)
 
 summary<-df$outputs$summary
 df$calibration$plots
