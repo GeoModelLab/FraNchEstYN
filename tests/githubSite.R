@@ -14,9 +14,9 @@ repo    <- basename(getwd())       # repo name = current folder
 # --- 1) Basic pkgdown scaffolding ---
 #usethis::use_pkgdown()             # adds starter _pkgdown.yml (if missing)
 # --- 4) Build locally (sanity check) ---
-install.packages("pkgdown")
+#install.packages("pkgdown")
 pkgdown::build_site()  # writes to ./docs
-g#pkgdown::build_site(preview = interactive())
+#pkgdown::build_site(preview = interactive())
 
 # --- 5) Set up GitHub + Pages via Actions ---
 # If the repo isn't on GitHub yet, uncomment the next line and follow prompts:

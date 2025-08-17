@@ -35,5 +35,6 @@ split_sets <- function(df, model) {
 
 cropParameters    <- split_sets(df, "crop")
 diseaseParameters <- split_sets(df, "disease")
+fungicideParameters <- split_sets(df, "fungicide")
 
-usethis::use_data(cropParameters, diseaseParameters, overwrite = TRUE)
+usethis::use_data(cropParameters, diseaseParameters, fungicideParameters, overwrite = TRUE)

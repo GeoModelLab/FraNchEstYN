@@ -1,50 +1,86 @@
 #' Crop parameter sets for FraNchEstYN
 #'
 #' A named list of predefined crop parameter sets used in the FraNchEstYN model.
-#' The top-level names correspond to crop types (e.g., `"Wheat"`, `"Maize"`).
+#' The top-level names correspond to crop types (e.g., `"wheat"`, `"rice"`).
 #'
-#' Each set is itself a named list of parameters.
-#' Each parameter entry contains:
+#' \strong{Structure of each crop set:}
 #' \itemize{
-#'   \item \code{description} Description of the parameter
-#'   \item \code{unit} Unit of measurement
-#'   \item \code{min} Minimum allowed value
-#'   \item \code{max} Maximum allowed value
-#'   \item \code{value} Default value
-#'   \item \code{calibration} Logical flag indicating if the parameter is used in calibration
+#'   \item Each set is a named list of parameters.
+#'   \item Each parameter is itself a list with fields:
+#'     \itemize{
+#'       \item \code{description} — description of the parameter
+#'       \item \code{unit} — unit of measurement
+#'       \item \code{min}, \code{max} — allowed bounds
+#'       \item \code{value} — default value
+#'       \item \code{calibration} — logical; if \code{TRUE}, the parameter can be optimized during calibration
+#'     }
 #' }
 #'
-#' @format A named list of lists of lists:
-#'   \code{cropParameters[[set]][[parameter]]} → parameter details list.
+#' @format A named list of crop parameter sets:
+#'   \code{cropParameters[[crop]][[parameter]]} → parameter details list.
+#'
 #' @examples
 #' data(cropParameters)
 #' names(cropParameters)             # available crop sets
-#' names(cropParameters$Wheat)       # parameters in Wheat set
-#' cropParameters$Wheat$TbaseCrop    # details for a single parameter
+#' names(cropParameters$wheat)       # parameters in Wheat set
+#' cropParameters$wheat$TbaseCrop    # details for a single parameter
 "cropParameters"
 
 
 #' Disease parameter sets for FraNchEstYN
 #'
 #' A named list of predefined disease parameter sets used in the FraNchEstYN model.
-#' The top-level names correspond to diseases (e.g., `"Septoria"`, `"WheatRust"`).
+#' The top-level names correspond to diseases (e.g., `"brown_rust"`, `"black_rust"`,`"yellow_rust"`, `"septoria"`).
 #'
-#' Each set is itself a named list of parameters.
-#' Each parameter entry contains:
+#' \strong{Structure of each disease set:}
 #' \itemize{
-#'   \item \code{description} Description of the parameter
-#'   \item \code{unit} Unit of measurement
-#'   \item \code{min} Minimum allowed value
-#'   \item \code{max} Maximum allowed value
-#'   \item \code{value} Default value
-#'   \item \code{calibration} Logical flag indicating if the parameter is used in calibration
+#'   \item Each set is a named list of parameters.
+#'   \item Each parameter is itself a list with fields:
+#'     \itemize{
+#'       \item \code{description} — description of the parameter
+#'       \item \code{unit} — unit of measurement
+#'       \item \code{min}, \code{max} — allowed bounds
+#'       \item \code{value} — default value
+#'       \item \code{calibration} — logical; if \code{TRUE}, the parameter can be optimized during calibration
+#'     }
 #' }
 #'
-#' @format A named list of lists of lists:
-#'   \code{diseaseParameters[[set]][[parameter]]} → parameter details list.
+#' @format A named list of disease parameter sets:
+#'   \code{diseaseParameters[[disease]][[parameter]]} → parameter details list.
+#'
 #' @examples
 #' data(diseaseParameters)
 #' names(diseaseParameters)               # available disease sets
-#' names(diseaseParameters$Septoria)      # parameters in Septoria set
-#' diseaseParameters$Septoria$Tmin        # details for a single parameter
+#' names(diseaseParameters$septoria)      # parameters in Septoria set
+#' diseaseParameters$septoria$Tmin        # details for a single parameter
 "diseaseParameters"
+
+
+#' Fungicide parameter sets for FraNchEstYN
+#'
+#' A named list of predefined fungicide parameter sets used in the FraNchEstYN model.
+#' The top-level names correspond to fungicide modes or classes (e.g., `"protectant"`).
+#'
+#' \strong{Structure of each fungicide set:}
+#' \itemize{
+#'   \item Each set is a named list of parameters.
+#'   \item Each parameter is itself a list with fields:
+#'     \itemize{
+#'       \item \code{description} — description of the parameter
+#'       \item \code{unit} — unit of measurement
+#'       \item \code{min}, \code{max} — allowed bounds
+#'       \item \code{value} — default value
+#'       \item \code{calibration} — logical; if \code{TRUE}, the parameter can be optimized during calibration
+#'     }
+#' }
+#'
+#' @format A named list of fungicide parameter sets:
+#'   \code{fungicideParameters[[set]][[parameter]]} → parameter details list.
+#'
+#' @examples
+#' data(fungicideParameters)
+#' names(fungicideParameters)                   # available fungicide sets
+#' names(fungicideParameters$protectant)        # parameters in the protectant set
+#' fungicideParameters$protectant$InitialDose   # details for a single parameter
+"fungicideParameters"
+

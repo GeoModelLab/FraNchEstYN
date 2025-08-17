@@ -1,24 +1,24 @@
 {
-    "settings": {
-        "startYear": 2007,
-        "endYear": 2019,
-        "sites": [
-            "38.2489257812496_7.20612541522402"
-        ],
-        "isCalibration": "true",
-        "calibrationVariable": "all",
-        "varieties": [
-            "Generic"
-        ],
-        "simplexes": 1,
-        "disease": "thisDisease",
-        "iterations": 300,
-        "weatherTimeStep": "daily"
-    },
+  "settings": {
+    "startYear": 1950,
+    "endYear": 2020,
+    "sites": [
+        "Sharkiya"
+    ],
+    "isCalibration": "true",
+    "calibrationVariable": "all",
+    "varieties": [
+      "Generic"
+    ],
+    "simplexes":3,
+    "disease": "thisDisease",
+    "iterations": 111,
+    "weatherTimeStep": "daily"
+  },
     "paths": {
         "weatherDir": "C:\\Program Files\\R\\R-4.4.2\\library\\FraNchEstYN\\bin\\files\\weather",
         "referenceFilePaths": "C:\\Program Files\\R\\R-4.4.2\\library\\FraNchEstYN\\bin\\files\\reference",
-        "paramFile": "C:\\Program Files\\R\\R-4.4.2\\library\\FraNchEstYN\\bin\\files\\parameters\\franchestynParameters.csv",
-        "sowingFile": "C:\\Program Files\\R\\R-4.4.2\\library\\FraNchEstYN\\bin\\files\\management\\sowing.csv"
+        "paramFile": "..\\..\\..\\files\\parameters\\franchestynParameters.csv",
+        "sowingFile": "..\\..\\..\\files\\management\\sowing.csv"
     }
 }

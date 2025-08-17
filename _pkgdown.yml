@@ -4,8 +4,8 @@ template:
   bootstrap: 5
   bootswatch: darkly
   bslib:
-    primary: "#8b0000"      # optional accent
-    secondary: "#ff4500"    # optional accent
+    primary: "#8b0000"      # deep red accent
+    secondary: "#ff4500"    # orange accent
 
 navbar:
   structure:
@@ -24,6 +24,7 @@ navbar:
     github:
       icon: fab fa-github
       href: https://github.com/GeoModelLab/FraNchEstYN
+      aria-label: "FraNchEstYN GitHub repository"   # accessibility fix
 
 home:
   title: "FraNchEstYN"
@@ -38,10 +39,20 @@ reference:
   - title: "Main Function"
     contents:
       - franchestyn
+
   - title: "Parameter Sets"
     contents:
       - cropParameters
       - diseaseParameters
-  - title: "Internal"
+      - fungicideParameters   # added here
+
+  - title: "Calibration Utilities"
+    contents:
+      - calibration_toggles   # grouped doc topic if you keep it
+      - enable_calibration_only
+      - disable_all_calibration
+      - set_calibration_flags
+
+  - title: "Internal Utilities"
     contents:
       - compute_error_metrics

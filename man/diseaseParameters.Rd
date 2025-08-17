@@ -5,32 +5,34 @@
 \alias{diseaseParameters}
 \title{Disease parameter sets for FraNchEstYN}
 \format{
-A named list of lists of lists:
-  \code{diseaseParameters[[set]][[parameter]]} → parameter details list.
+A named list of disease parameter sets:
+  \code{diseaseParameters[[disease]][[parameter]]} → parameter details list.
 }
 \usage{
 diseaseParameters
 }
 \description{
 A named list of predefined disease parameter sets used in the FraNchEstYN model.
-The top-level names correspond to diseases (e.g., `"Septoria"`, `"WheatRust"`).
+The top-level names correspond to diseases (e.g., `"brown_rust"`, `"black_rust"`,`"yellow_rust"`, `"septoria"`).
 }
 \details{
-Each set is itself a named list of parameters.
-Each parameter entry contains:
+\strong{Structure of each disease set:}
 \itemize{
-  \item \code{description} Description of the parameter
-  \item \code{unit} Unit of measurement
-  \item \code{min} Minimum allowed value
-  \item \code{max} Maximum allowed value
-  \item \code{value} Default value
-  \item \code{calibration} Logical flag indicating if the parameter is used in calibration
+  \item Each set is a named list of parameters.
+  \item Each parameter is itself a list with fields:
+    \itemize{
+      \item \code{description} — description of the parameter
+      \item \code{unit} — unit of measurement
+      \item \code{min}, \code{max} — allowed bounds
+      \item \code{value} — default value
+      \item \code{calibration} — logical; if \code{TRUE}, the parameter can be optimized during calibration
+    }
 }
 }
 \examples{
 data(diseaseParameters)
 names(diseaseParameters)               # available disease sets
-names(diseaseParameters$Septoria)      # parameters in Septoria set
-diseaseParameters$Septoria$Tmin        # details for a single parameter
+names(diseaseParameters$septoria)      # parameters in Septoria set
+diseaseParameters$septoria$Tmin        # details for a single parameter
 }
 \keyword{datasets}
