@@ -179,3 +179,24 @@ enable_calibration_only <- function(params,
                      match = match, ignore_case = ignore_case,
                      warn_if_missing = warn_if_missing)
 }
+
+#' Convert a nested parameter list back into a tidy data.frame
+#'
+#' @param param_list A nested parameter list (whole model, or a single set)
+#' @return A tidy data.frame with columns:
+#'   Parameter, Description, Unit, Min, Max, Value, Calibration
+#' @export
+parameters_to_df <- function(param_list) {
+  stopifnot(is.list(param_list), !is.null(names(param_list)))
+
+  data.frame(
+    Parameter   = names(param_list),
+    Description = vapply(param_list, function(x) x$description, character(1)),
+    Unit        = vapply(param_list, function(x) x$unit, character(1)),
+    Min         = vapply(param_list, function(x) x$min, numeric(1)),
+    Max         = vapply(param_list, function(x) x$max, numeric(1)),
+    Value       = vapply(param_list, function(x) x$value, numeric(1)),
+    Calibration = vapply(param_list, function(x) x$calibration, logical(1)),
+    stringsAsFactors = FALSE
+  )
+}

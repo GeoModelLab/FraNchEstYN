@@ -2,7 +2,11 @@ pandoc: '3.4'
 pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
+  estimating_yield_loss: estimating_yield_loss.html
   fitting_disease_severity: fitting_disease_severity.html
   quick-start: quick-start.html
   reference-format: reference-format.html
-last_built: 2025-08-18T10:11Z
+last_built: 2025-08-18T16:57Z
+urls:
+  reference: https://geomodellab.github.io/FraNchEstYN/reference
+  article: https://geomodellab.github.io/FraNchEstYN/articles

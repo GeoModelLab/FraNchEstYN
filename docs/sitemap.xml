@@ -1,6 +1,7 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://geomodellab.github.io/FraNchEstYN/404.html</loc></url>
 <url><loc>https://geomodellab.github.io/FraNchEstYN/articles/csharp-integration.html</loc></url>
+<url><loc>https://geomodellab.github.io/FraNchEstYN/articles/estimating_yield_loss.html</loc></url>
 <url><loc>https://geomodellab.github.io/FraNchEstYN/articles/fitting_disease_severity.html</loc></url>
 <url><loc>https://geomodellab.github.io/FraNchEstYN/articles/index.html</loc></url>
 <url><loc>https://geomodellab.github.io/FraNchEstYN/articles/quick-start.html</loc></url>
@@ -17,6 +18,8 @@
 <url><loc>https://geomodellab.github.io/FraNchEstYN/reference/fungicideParameters.html</loc></url>
 <url><loc>https://geomodellab.github.io/FraNchEstYN/reference/index.html</loc></url>
 <url><loc>https://geomodellab.github.io/FraNchEstYN/reference/management_data.html</loc></url>
+<url><loc>https://geomodellab.github.io/FraNchEstYN/reference/parameters_to_df.html</loc></url>
+<url><loc>https://geomodellab.github.io/FraNchEstYN/reference/reference_egypt.html</loc></url>
 <url><loc>https://geomodellab.github.io/FraNchEstYN/reference/reference_indiana.html</loc></url>
 <url><loc>https://geomodellab.github.io/FraNchEstYN/reference/validate_parameter_ranges.html</loc></url>
 <url><loc>https://geomodellab.github.io/FraNchEstYN/reference/weather_indiana.html</loc></url>

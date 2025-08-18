@@ -135,7 +135,7 @@ Key settings:
 
 This returns a model object df containing diagnostics, parameters, and simulation outputs.
 
-```{r calibration, eval=T, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, results='hide'}
+```{r calibration, eval=T, echo=TRUE, message=FALSE, warning=FALSE, results='hide'}
 start_end <- c(1971, 1992)
 api_key <- "xxx"         # not used here for LLM
 franchy_message <- FALSE

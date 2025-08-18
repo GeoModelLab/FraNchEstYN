@@ -46,18 +46,20 @@ reference:
       - diseaseParameters
       - fungicideParameters
 
-  - title: "Calibration Utilities"
+  - title: "Utilities"
     contents:
       - calibration_toggles
       - enable_calibration_only
       - disable_all_calibration
       - set_calibration_flags
+      - parameters_to_df
 
   - title: "Datasets"
     contents:
       - weather_indiana
       - reference_indiana
       - management_data
+      - reference_egypt
 
   - title: "Internal Utilities"
     contents:
