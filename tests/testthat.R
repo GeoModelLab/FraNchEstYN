@@ -10,9 +10,9 @@ library(testthat)
 library(tidyverse)
 
 setwd("C:\\GitHub\\FraNchEstYN")
-# remove.packages('FraNchEstYN')
-# devtools::document()
-# devtools::install()
+remove.packages('FraNchEstYN')
+devtools::document()
+devtools::install()
 
 
 weather_data<-read.csv(paste0(getwd(),'\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\weather\\daily\\Indiana.csv'))
@@ -22,15 +22,12 @@ weather_data$site <- 'Indiana'
 #   mutate(PRECTOTCORR = ifelse(PRECTOTCORR>.5,PRECTOTCORR,0))
 
 
-management_data <- read.csv(paste0(getwd(),'\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\management\\sowing.csv'))
+management_data <- read.csv(paste0(getwd(),'\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\management\\mgt_indiana.csv'))
 
 
 reference_data<-read.csv(paste0(getwd(),"\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\reference\\Indiana.csv")) |>
-  dplyr::filter(FINT != 0.50 | Septoria>0) |>
-  dplyr::rename(Disease = Septoria)
+  dplyr::rename(Disease = thisDisease)
 
-reference_data$site <- 'Indiana'
-reference_data$year <- reference_data$Pyear
 #reference_data$yieldActual<-3000
 
 cropParameters<-FraNchEstYN::cropParameters
@@ -38,131 +35,102 @@ diseaseParameters <- FraNchEstYN::diseaseParameters
 
 start_year<-1960
 end_year<-2022
-iterations <- 1
+iterations <- 666
 
 
 
 thisCropParam <- cropParameters$wheat
-thisCropParam$TbaseCrop$value<-1
-thisCropParam$TbaseCrop$calibration<-T
-thisCropParam$RadiationUseEfficiency$calibration<-F
-thisCropParam$RadiationUseEfficiency$value<-3
-thisCropParam$CycleLength$max<-2500
-thisCropParam$CycleLength$min <- 1500
-thisCropParam$CycleLength$calibration<-T
 
-
- thisDiseaseParam<-diseaseParameters$septoria
- thisDiseaseParam$IsSplashBorne$value<-1
- thisDiseaseParam$OuterInoculumShapeRelease$value<-1
- thisDiseaseParam$OuterInoculumMax$value<-.2
- thisDiseaseParam$RelativeHumidityCritical$min<-50
- thisDiseaseParam$RelativeHumidityNotLimiting$min<-80
- thisDiseaseParam$SporulationDuration$max<-35
- thisDiseaseParam$SporulationDuration$min<-15
-
-# thisDiseaseParam$SenescenceAccelerationMax$calibration<-T
-# thisDiseaseParam$virtualVisualLesion$calibration<-T
-# thisDiseaseParam$virtualVisualLesion$min<-0.5
-# thisDiseaseParam$virtualVisualLesion$max<-2
-# thisDiseaseParam$SenescenceAccelerationMax$value<-0
-# thisDiseaseParam$virtualVisualLesion$min<-.1
-# thisDiseaseParam$virtualVisualLesion$max<-2
-# thisDiseaseParam$HydroThermalTimeOnset$min<-4
-# thisDiseaseParam$HydroThermalTimeOnset$max<-20
-# thisDiseaseParam$CyclePercentageOnset$min<-20
-# thisDiseaseParam$CyclePercentageOnset$max<-60
-# thisDiseaseParam$Topt$min<-15
-# thisDiseaseParam$Tmax$min<-30
-# thisDiseaseParam$OuterInoculum$max<-0.14
-# thisDiseaseParam$OuterInoculum$min<-0.0001
-# thisDiseaseParam$Rain50Detachment$calibration<-T
-
-
-# library(nasapower)
-# hourly_ag <- get_power(
-#   community = "ag",
-#   lonlat = c(2, 45),
-#   pars = c( "T2M","RH2M","PRECTOTCORR"),
-#   dates = c("2002-01-01", "2010-12-31"),
-#   temporal_api = "hourly"
-# )
-# write.csv(hourly_ag,'testWeatherHourly.csv')
-#
-# hourly_ag$datetime <- as.POSIXct(
-#   sprintf("%04d-%02d-%02d %02d:00:00", hourly_ag$YEAR, hourly_ag$MO, hourly_ag$DY, hourly_ag$HR),
-#   tz = "UTC"
-# )
-# ggplot(hourly_ag)+geom_line(aes(x=datetime,y=T2M))
-#library(FraNchEstYN)
+thisDiseaseParam<-diseaseParameters$septoria
 start_end = c(1950,2010)
+
 timestep='daily'
-thisMode = 'dsadsa'
-calibration="crop"
-#library(FraNchEstYN)
 
 source("R\\Main.R")
 apikey  <- ""
 
 
-thisDiseaseParam$OuterInoculumShapeRelease<-1
-thisDiseaseParam$Tmax$min<-27
-thisDiseaseParam$Tmax$max<-36
-thisDiseaseParam$Rain50Detachment$max<-25
-thisDiseaseParam$LightStealerDamage$max<-1.5
-
-thisDiseaseParam$OuterInoculumMax$max<-0.25
-thisDiseaseParam$LatencyDuration$min<-5
-thisDiseaseParam$CyclePercentageOnset$min<-5
-thisDiseaseParam$WetnessDurationMinimum$min<-4
-thisDiseaseParam$WetnessDurationOptimum$min<-18
-
-weather_data<-weather_data |>
-  dplyr::mutate(lat = 45)
-
-management_data<-management_data |>
-  dplyr::select(-site)
-
-
-management_data$treatment<-list(c('12 Dec', "28 Feb"))
-
 library(FraNchEstYN)
 
 source("R\\Main.R")
+#load default parameters for wheat
+thisCropParam<-cropParameters$wheat
+# we do not need to calibrate the crop model here, but we have light interception data so we will disable all parameters related to cardinal temperatures and biomass and yield formation and we keep the ones regulating the shape of light interception (canopy dynamics)
+thisCropParam<-disable_all_calibration(thisCropParam)
+thisCropParam<-set_calibration_flags(thisCropParam,
+                                        disable=c('PartitioningMaximum',
+                                                  'TbaseCrop', 'TmaxCrop', 'ToptCrop',
+                                                  'FloweringStart',
+                                                  'RadiationUseEfficiency'))
+
+#load default parameters for septoria
+thisDiseaseParam<-diseaseParameters$septoria
+# we do not need to simulate yield losses here, just disease severity --> disable all parameters related to damage mechanisms
+thisDiseaseParam<-set_calibration_flags(thisDiseaseParam,
+                                        disable=c('RUEreducerDamage',
+                                                  'LightStealerDamage',
+                                                  'SenescenceAcceleratorDamage',
+                                                  'AssimilateSappersDamage'))
+
+start_end = c(1971,1992)
+api_key = 'xxx' #not used here for LLM
+franchy_message = F
+iterations = 666 #the devil number!
+calibration = 'all' #we calibrate the crop and disease model together
+
 df<-franchestyn(weather_data = weather_data,
             management_data = management_data,
             reference_data = reference_data,
             cropParameters = thisCropParam,
             diseaseParameters = thisDiseaseParam,
-            fungicideParameters = FraNchEstYN::fungicideParameters,
-            calibration="none", #'all', 'crop', 'disease'
             start_end = start_end,
-            apikey = "sk-or-v1-",
-            franchy_message = T,
-            iterations=100)
+            calibration = calibration,
+            apikey = api_key,
+            franchy_message = franchy_message,
+            iterations=1)
 
 df$diagnostics$calibration$plots
-parameters<-df$diagnostics$calibration$plots
+df$diagnostics$metrics |>
+  filter(Variable=='DisSev')
+df$parameters$crop
+df$parameters$disease
+
+summary<-df$outputs$summary
 outputs<-df$outputs$simulation
 
-library(ggplot2)
-ggplot(outputs,
-       aes(x=DaysAfterSowing)) +
-  geom_area(aes(y=Latent),fill='blue',alpha=.3)+
-  geom_area(aes(y=Sporulating),fill='brown',alpha=.3)+
-  #geom_col(aes(y=Prec/40))+
-  geom_line(aes(y=LightInterception))+
-  geom_line(aes(y=Susceptible),col='grey33',size=.5)+
-  #geom_line(aes(y=Affected),col='black',size=1)+
-  geom_area(aes(y=Dead),fill='blue',alpha=.5)+
-  # #geom_line(aes(y=htTimeS/60),col='red2',size=2)+
-   geom_line(aes(y=LightIntHealthy),col='green3',size=1)+
-  # geom_point(aes(y=LightInterceptionRef))+
+ggplot(outputs, aes(x=as.Date(Date,format='%m/%d/%Y'))) +
+  geom_area(aes(y=HTtimeRinoculum),fill='yellow4',size=.2,alpha=.3)+
+  geom_area(aes(y=Latent),fill='gold',alpha=.7)+
+  geom_area(aes(y=Sporulating),fill='orange',alpha=.7)+
+  geom_line(aes(y=Susceptible),col='green4',size=.5)+
+  geom_line(aes(y=Affected),col='red',size=1)+
+  geom_line(aes(y=Dead),fill='red4',alpha=.5)+
+  geom_line(aes(y=LightInterception),col='black',size=1)+
+  geom_line(aes(y=LightIntHealthy),col='green4',size=1)+
+  geom_point(aes(y=LightInterceptionRef),size=1)+
+  geom_line(aes(y=DiseaseSeverity),col='blue',size=1)+
+  geom_point(aes(y=as.numeric(DiseaseSeverityRef)),col='blue',shape=21,size=3)+
+  facet_wrap(~GrowingSeason,ncol=6,scales='free_x')+
+  theme_bw()+
+  xlab('Date')
+
+
+
+
+ggplot(outputs, aes(x=DaysAfterSowing)) +
+  geom_area(aes(y=HTtimeRinfection),fill='yellow',size=.2,alpha=.3)+
+  geom_area(aes(y=Latent),fill='orange',alpha=.3)+
+  geom_area(aes(y=Sporulating),fill='orange3',alpha=.3)+
+  geom_line(aes(y=Susceptible),col='green4',size=.5)+
+  geom_line(aes(y=Affected),col='red',size=1)+
+  geom_line(aes(y=Dead),fill='red4',alpha=.5)+
+   geom_line(aes(y=LightIntHealthy),col='green4',size=1)+
+   geom_point(aes(y=LightInterceptionRef),size=1)+
   # #geom_line(aes(y=Yield),col='red')+
    geom_line(aes(y=DiseaseSeverity),col='blue',size=1)+
-  geom_line(aes(y=FungicideEfficacy),col='blue',size=1)+
-  # geom_line(aes(y=YieldAttainable/6000),col='red')+
-  # geom_line(aes(y=YieldActual/6000),col='red',linetype=2)+
+  # geom_line(aes(y=FungicideEfficacy),col='blue',size=1)+
+   # geom_line(aes(y=YieldAttainable),col='red')+
+   # geom_line(aes(y=YieldActual),col='red',linetype=2)+
   # geom_point(aes(y=YieldActualRef/6000),col='red',size=3)+
    geom_point(aes(y=as.numeric(DiseaseSeverityRef)),col='blue',shape=21,size=3)+
   facet_wrap(~GrowingSeason,ncol=6)+

@@ -39,7 +39,7 @@ enable_calibration_only(
 )
 }
 \arguments{
-\item{params}{A nested parameter list (one set), e.g. `cropParameters$Wheat`.
+\item{params}{A nested parameter list (one set), e.g. `cropParameters$wheat`.
 You may also pass an entire collection (e.g., `cropParameters`), in which
 case the operation is applied to each set.}
 
@@ -66,11 +66,11 @@ A modified copy of `params` with updated `calibration` flags.
 \description{
 Utilities to quickly disable all calibration flags, enable only a subset,
 or set calibration flags in bulk for nested parameter lists used by
-\strong{FraNchEstYN} (e.g., `cropParameters$Wheat`, `diseaseParameters$Septoria`).
+\strong{FraNchEstYN} (e.g., `cropParameters$wheat`, `diseaseParameters$septoria`).
 
 These helpers enable or disable the `calibration` flag on **leaf** parameters
-in the nested lists used by FraNchEstYN (e.g., `cropParameters$Wheat`,
-`diseaseParameters$Septoria`, or `fungicideParameters$protectant`).
+in the nested lists used by FraNchEstYN (e.g., `cropParameters$wheat`,
+`diseaseParameters$septoria`, or `fungicideParameters$protectant`).
 }
 \details{
 Parameter lists are nested lists where each \strong{leaf} has at least:
@@ -88,7 +88,7 @@ A leaf parameter is a list that contains the fields:
 
 \examples{
 # Disable all, then re-enable a few:
-p <- cropParameters$Wheat
+p <- cropParameters$wheat
 p <- disable_all_calibration(p)
 p <- enable_calibration_only(
   p,
@@ -105,7 +105,7 @@ p <- set_calibration_flags(
 # Non-running examples:
 \dontrun{
 # Disable all parameters for calibration in a disease set
-d <- disable_all_calibration(diseaseParameters$Septoria)
+d <- disable_all_calibration(diseaseParameters$septoria)
 
 # Re-enable a few by exact name
 d2 <- enable_calibration_only(
@@ -114,28 +114,26 @@ d2 <- enable_calibration_only(
 )
 
 # Enable an entire family of parameters using a regex pattern
-w <- cropParameters$Wheat
+w <- cropParameters$wheat
 t_keys <- grep("^T(min|opt|max)Crop$", names(w), value = TRUE)
 w2 <- set_calibration_flags(w, enable = t_keys)
 }
-\dontrun{
-# Disable all parameters for calibration in a disease set
-d <- disable_all_calibration(diseaseParameters$Septoria)
+# Disable all parameters for calibration in a disease set (not run)
+# d <- disable_all_calibration(diseaseParameters$septoria)
 
-# Re-enable a few by exact name
-d2 <- enable_calibration(d, c("RelativeHumidityCritical", "Rain50Detachment"))
+# Re-enable a few by exact name (not run)
+# d2 <- enable_calibration(d, c("RelativeHumidityCritical", "Rain50Detachment"))
 
-# Alternatively: enable only a subset (disables all others)
-d3 <- enable_calibration_only(
-  diseaseParameters$Septoria,
-  keys = c("RelativeHumidityCritical", "Rain50Detachment")
-)
+# Enable only a subset (disables all others) (not run)
+# d3 <- enable_calibration_only(
+#   diseaseParameters$septoria,
+#   keys = c("RelativeHumidityCritical", "Rain50Detachment")
+# )
 
-# Use regex to enable whole families
-c2 <- enable_calibration(
-  cropParameters$Wheat,
-  keys = c("^T(min|opt|max)Crop$"),
-  match = "regex"
-)
-}
+# Use regex to enable whole families (not run)
+# c2 <- enable_calibration(
+#   cropParameters$wheat,
+#   keys = c("^T(min|opt|max)Crop$"),
+#   match = "regex"
+# )
 }

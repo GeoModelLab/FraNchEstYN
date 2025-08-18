@@ -1,0 +1,338 @@
+---
+title: "Fitting disease severity for *Septoria* in Indiana"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Fitting disease severity for Septoria in Indiana}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+css: vignette.css   # <--- add this line
+---
+
+<style>
+/* make content wider (optional) */
+.main-container { max-width: 1200px !important; }
+
+/* shrink table font */
+table, .table, .table-condensed {
+  font-size: 85% !important;
+}
+</style>
+
+<style>
+caption {
+  white-space: nowrap;
+}
+</style>
+
+## 🎯 Goal
+
+This vignette walks through the process of fitting Septoria tritici blotch severity data in Indiana using FraNchEstYN. We will use the example datasets bundled with the package:
+
+- **`weather_indiana`**: daily weather data (NASA POWER)  
+- **`reference_indiana`**: digitized disease observations from [Shaner & Buechley (1995)](https://www.apsnet.org/publications/plantdisease/backissues/Documents/1995Articles/PlantDisease79n09_928.PDF)   
+- **`management_data`**: sowing and crop management metadata from the same article.
+
+```{r  setup, include = F}
+knitr::opts_chunk$set(
+  collapse = TRUE, comment = "#>", fig.width = 7, fig.height = 4,
+  message = FALSE, warning = FALSE
+)
+
+```
+
+## 📦 Packages
+We load the FraNchEstYN package plus some helper libraries for data handling, tables, and plotting.
+
+```{r  franchLoad}
+library(FraNchEstYN) 
+library(tidyverse)
+library(kableExtra)
+library(plotly)
+```
+
+## 📥 Data loading
+The three Indiana datasets are included with the package. Below we load them and preview a few rows to illustrate their structure.
+
+```{r data_loading}
+data(weather_indiana)
+data(reference_indiana)
+data(management_data)
+```
+
+```{r data_showing, echo=FALSE, message=FALSE, warning=FALSE}
+# Minimal preview: first 6 rows of the most relevant columns
+kable(
+  weather_indiana %>%
+    select(site, year, month, day, tx, tn, p, rad) %>%
+    slice_head(n = 3),
+  caption = "weather_indiana — daily weather (first rows)"
+)
+
+kable(
+  reference_indiana %>%
+    select(site, year, DOY, FINT, Disease) %>%
+    slice_head(n = 3),
+  caption = "reference_indiana — disease observations"
+)
+
+kable(
+  management_data %>%
+    select(site, crop, variety, year, sowingDOY) %>%
+    slice_head(n = 3),
+  caption = "management_data — management metadata (first 6 rows)"
+)
+```
+
+## ⚙️ Parameters
+
+In FraNchEstYN, **crop** and **disease** processes are controlled by parameter sets referred to  physiological and epidemiological traits.  
+
+In this vignette we are only interested in **canopy light interception and disease severity**, not yield formation.
+
+- For wheat: start from defaults, disable calibration of traits unrelated to light interception, and keep canopy dynamics active.
+
+- For Septoria: start from defaults, and disable calibration of yield-loss damage mechanisms.
+Therefore, we:
+
+```{r parameters}
+# Load default parameters for wheat
+thisCropParam <- cropParameters$wheat
+
+# Disable all calibration, then selectively re-enable light interception
+thisCropParam <- set_calibration_flags(
+  thisCropParam,
+  disable = c("PartitioningMaximum",
+              "TbaseCrop", "TmaxCrop", "ToptCrop",
+              "FloweringStart",
+              "RadiationUseEfficiency")
+)
+
+# Load default parameters for Septoria
+thisDiseaseParam <- diseaseParameters$septoria
+
+# Disable calibration for yield-loss damage mechanisms
+thisDiseaseParam <- set_calibration_flags(
+  thisDiseaseParam,
+  disable = c("RUEreducerDamage",
+              "LightStealerDamage",
+              "SenescenceAcceleratorDamage",
+              "AssimilateSappersDamage")
+)
+```
+
+## 🔧 Calibration model call
+
+With data and parameters prepared, we can call the **FraNchEstYN calibration
+engine**. Here we fit both crop and disease model parameters simultaneously,
+using the Indiana datasets.
+
+Key settings:
+- **start_end**: simulation period (1971–1992 in this example)  
+- **api_key**: required for external API calls, but *not used here*  
+- **franchy_message**: set to `FALSE` to silence fun messages 😉  
+- **iterations**: number of optimization iterations (`666` here, the devil’s number 👹)  
+- **calibration**: scope of calibration (`"all"` means crop + disease)  
+
+This returns a model object df containing diagnostics, parameters, and simulation outputs.
+
+```{r calibration, eval=T, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, results='hide'}
+start_end <- c(1971, 1992)
+api_key <- "xxx"         # not used here for LLM
+franchy_message <- FALSE
+iterations <- 100        # the more iterations, the longer it takes but results are safer
+calibration <- "all"     # calibrate both crop and disease
+
+df <- franchestyn(
+  weather_data      = weather_indiana,
+  management_data   = management_data,
+  reference_data    = reference_indiana,
+  cropParameters    = thisCropParam,
+  diseaseParameters = thisDiseaseParam,
+  start_end         = start_end,
+  calibration       = calibration,
+  apikey            = api_key,
+  franchy_message   = franchy_message,
+  iterations        = iterations
+)
+```
+
+## 📊 Outputs & results
+
+### ⚖️ Parameter plots
+
+Plots show parameter ranges, defaults, and calibrated values:
+
+- **Black / grey lines** = allowable parameter ranges  
+- 🔵 **Blue vertical line** = default value  
+- 🔴 **Red dot** = calibrated value (if calibration was enabled)  
+
+Note: crop parameters here remain at defaults (blue line only), while disease parameters include calibrated values.
+
+```{r diagnostics, eval=T,fig.width =10, fig.height=7}
+df$diagnostics$calibration$plots$crop
+df$diagnostics$calibration$plots$disease
+```
+
+### 📏 Calibration metrics (Disease Severity)
+We summarise calibration accuracy for disease severity across seasons using Bias, MAE, RMSE, correlation, R², and NSE.
+
+```{r metrics, eval=T, echo=FALSE, message=FALSE, warning=FALSE}
+
+metrics_ds <- df$diagnostics$metrics %>%
+  filter(Variable == "DisSev") %>%
+  select(GrowingSeason, n, Bias, MAE, RMSE, r, R2, NSE) %>%
+  arrange(GrowingSeason) %>%
+  mutate(across(where(is.numeric), ~round(.x, 3)))
+
+# Overall row (mean across seasons; n is total obs)
+
+kable(metrics_ds,
+      caption = "Calibration metrics for disease severity (DisSev)",
+      align = "lrrrrrrr") %>%
+  kable_styling(full_width = FALSE, font_size = 11, bootstrap_options = c("striped", "condensed")) %>%
+  row_spec(nrow(metrics_ds), bold = TRUE)  # highlight Overall row
+
+```  
+
+## 📈 Simulation outputs
+
+### 🗂️ Season summary
+A compact table of disease severity outcomes for each growing season: final severity, peak, timing, and area-under-curve.
+```{r summary-table, echo=FALSE, message=FALSE, warning=FALSE}
+summary <- df$outputs$summary
+
+summary %>%
+  arrange(GrowingSeason) %>%
+  select(-c(Variety, YieldAttainable:AGBActual)) |> 
+  mutate(dplyr::across(where(is.numeric), ~round(.x, 3))) %>%
+  kable(caption = "summary of simulated disease severity") %>%
+  kable_styling(full_width = FALSE, font_size = 11, bootstrap_options = c("striped","condensed"))
+```
+
+### 🗺️️ Multi-season overview (static)
+Facetted plots across seasons showing dynamics of inoculum, latent and sporulating tissue, canopy light interception, and disease severity vs. observations.
+```{r chart1, echo=FALSE, message=FALSE, warning=FALSE,fig.width =10, fig.height=7}
+outputs <- df$outputs$simulation
+
+ggplot(outputs, aes(x = as.Date(Date, format = "%m/%d/%Y"))) +
+  geom_area(aes(y = HTtimeRinoculum, fill = "HTtimeRinoculum"), alpha = .3) +
+  geom_area(aes(y = Latent,          fill = "Latent"), alpha = .7) +
+  geom_area(aes(y = Sporulating,     fill = "Sporulating"), alpha = .7) +
+  geom_line(aes(y = Susceptible,      color = "Susceptible"), size = .5) +
+  geom_line(aes(y = Affected,         color = "Affected"), size = 1) +
+  geom_line(aes(y = Dead,             color = "Dead"), alpha = .5) +
+  geom_line(aes(y = LightInterception, color = "LightInterception"), size = 1) +
+  geom_line(aes(y = LightIntHealthy,   color = "LightIntHealthy"), size = 1) +
+  geom_point(aes(y = LightInterceptionRef, color = "LightInterceptionRef"), size = 0.8) +
+  geom_line(aes(y = DiseaseSeverity,      color = "DiseaseSeverity"), size = 1) +
+  geom_point(aes(y = as.numeric(DiseaseSeverityRef), color = "DiseaseSeverityRef"),
+             shape = 21, size = 2.2) +
+  facet_wrap(~ GrowingSeason, ncol = 6, scales = "free_x") +
+  labs(x = "Date", y = "State variable / Severity", color = "Legend", fill = "Legend") +
+  scale_fill_manual(values = c(
+    "HTtimeRinoculum" = "yellow4",
+    "Latent"          = "gold",
+    "Sporulating"     = "orange"
+  )) +
+  scale_color_manual(values = c(
+    "Susceptible"          = "green4",
+    "Affected"             = "red",
+    "Dead"                 = "red4",
+    "LightInterception"    = "black",
+    "LightIntHealthy"      = "green4",
+    "LightInterceptionRef" = "black",
+    "DiseaseSeverity"      = "blue",
+    "DiseaseSeverityRef"   = "blue"
+  )) +
+  theme_bw() +
+  theme(legend.position = "bottom",
+        legend.box = "vertical",
+        legend.text = element_text(size = 8))
+```
+
+
+### 🎯 1972 deep-dive (interactive)
+An interactive plot of the 1972 season lets us hover over state variables and observed values.
+```{r chart2, echo=FALSE, message=FALSE, warning=FALSE,fig.width =10, fig.height=7}
+season_outputs <- outputs %>% dplyr::filter(GrowingSeason == 1972)
+
+p <- ggplot(season_outputs, aes(x = as.Date(Date, format = "%m/%d/%Y"))) +
+  geom_area(aes(y = HTtimeRinoculum, fill = "HTtimeRinoculum"), alpha = .3) +
+  geom_area(aes(y = Latent,          fill = "Latent"), alpha = .7) +
+  geom_area(aes(y = Sporulating,     fill = "Sporulating"), alpha = .7) +
+  geom_line(aes(y = Susceptible,      color = "Susceptible"), size = .5) +
+  geom_line(aes(y = Affected,         color = "Affected"), size = 1) +
+  geom_line(aes(y = Dead,             color = "Dead"), alpha = .5) +
+  geom_line(aes(y = LightInterception, color = "LightInterception"), size = 1) +
+  geom_line(aes(y = LightIntHealthy,   color = "LightIntHealthy"), size = 1) +
+  geom_point(aes(y = LightInterceptionRef, color = "LightInterceptionRef"), size = 1) +
+  geom_line(aes(y = DiseaseSeverity,      color = "DiseaseSeverity"), size = 1) +
+  geom_point(aes(y = as.numeric(DiseaseSeverityRef), color = "DiseaseSeverityRef"),
+             shape = 21, size = 3) +
+  labs(
+    x = "Date", y = "State variable / Severity",
+    title = "1972 Season",
+    color = "Legend", fill = "Legend"
+  ) +
+  scale_fill_manual(values = c(
+    "HTtimeRinoculum" = "yellow4",
+    "Latent"          = "gold",
+    "Sporulating"     = "orange"
+  )) +
+  scale_color_manual(values = c(
+    "Susceptible"          = "green4",
+    "Affected"             = "red",
+    "Dead"                 = "red4",
+    "LightInterception"    = "black",
+    "LightIntHealthy"      = "green4",
+    "LightInterceptionRef" = "black",
+    "DiseaseSeverity"      = "blue",
+    "DiseaseSeverityRef"   = "blue"
+  )) +
+  theme_bw() +
+  theme(
+    legend.position = "bottom",
+    legend.box = "vertical",
+    legend.text = element_text(size = 8)
+  )
+
+# Convert to plotly and fix legend placement
+plotly::ggplotly(p) %>%
+  plotly::layout(
+    legend = list(
+      orientation = "h",   # horizontal legend
+      x = 0,               # align left
+      y = -0.3             # move below plot
+    )
+  )
+
+
+```
+
+## 📝 Key take-home messages
+
+- FraNchEstYN successfully calibrated disease severity for Septoria tritici in Indiana across two decades of observations.
+
+- Crop parameters were mostly fixed (default values) — only canopy light interception was active, while disease parameters were calibrated.
+
+- The framework provides diagnostics, metrics, parameter estimates, and simulations in a consistent structure, ready for analysis or visualization.
+
+
+## 🚀 Next steps
+
+This vignette showed how to calibrate Septoria tritici blotch severity in Indiana using bundled datasets. From here, you might want to:
+
+🌎 Explore other environments: replace weather_indiana, reference_indiana, and management_data with datasets from different sites or years.
+
+🌾 Switch crops or pathogens: try other parameter sets available in cropParameters and diseaseParameters.
+
+🎛️ Experiment with calibration scope:
+
+"all" → calibrate both crop and disease models
+
+"crop" or "disease" → focus on one component only
+
+📊 Analyze uncertainty: increase the number of iterations or run multiple calibration replicates to assess stability of parameter estimates.
+
+🛠️ Extend the pipeline: integrate with your own management practices or link outputs to yield-loss models.
+.

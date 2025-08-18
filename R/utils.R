@@ -1,13 +1,13 @@
 #' Toggle calibration flags on nested FraNchEstYN parameter lists
 #'
 #' These helpers enable or disable the `calibration` flag on **leaf** parameters
-#' in the nested lists used by FraNchEstYN (e.g., `cropParameters$Wheat`,
-#' `diseaseParameters$Septoria`, or `fungicideParameters$protectant`).
+#' in the nested lists used by FraNchEstYN (e.g., `cropParameters$wheat`,
+#' `diseaseParameters$septoria`, or `fungicideParameters$protectant`).
 #'
 #' A leaf parameter is a list that contains the fields:
 #' `min`, `max`, `value`, and `calibration`.
 #'
-#' @param params A nested parameter list (one set), e.g. `cropParameters$Wheat`.
+#' @param params A nested parameter list (one set), e.g. `cropParameters$wheat`.
 #'   You may also pass an entire collection (e.g., `cropParameters`), in which
 #'   case the operation is applied to each set.
 #' @param keys Character vector of parameter names to enable/disable.
@@ -21,36 +21,39 @@
 #' @return A modified copy of `params` with updated `calibration` flags.
 #'
 #' @examples
-#' \dontrun{
-#' # Disable all parameters for calibration in a disease set
-#' d <- disable_all_calibration(diseaseParameters$Septoria)
+#' # Disable all parameters for calibration in a disease set (not run)
+#' # d <- disable_all_calibration(diseaseParameters$septoria)
 #'
-#' # Re-enable a few by exact name
-#' d2 <- enable_calibration(d, c("RelativeHumidityCritical", "Rain50Detachment"))
+#' # Re-enable a few by exact name (not run)
+#' # d2 <- enable_calibration(d, c("RelativeHumidityCritical", "Rain50Detachment"))
 #'
-#' # Alternatively: enable only a subset (disables all others)
-#' d3 <- enable_calibration_only(
-#'   diseaseParameters$Septoria,
-#'   keys = c("RelativeHumidityCritical", "Rain50Detachment")
-#' )
+#' # Enable only a subset (disables all others) (not run)
+#' # d3 <- enable_calibration_only(
+#' #   diseaseParameters$septoria,
+#' #   keys = c("RelativeHumidityCritical", "Rain50Detachment")
+#' # )
 #'
-#' # Use regex to enable whole families
-#' c2 <- enable_calibration(
-#'   cropParameters$Wheat,
-#'   keys = c("^T(min|opt|max)Crop$"),
-#'   match = "regex"
-#' )
-#' }
+#' # Use regex to enable whole families (not run)
+#' # c2 <- enable_calibration(
+#' #   cropParameters$wheat,
+#' #   keys = c("^T(min|opt|max)Crop$"),
+#' #   match = "regex"
+#' # )
 #' @name calibration_toggles
 NULL
 
-# Internal: identify a parameter leaf
+# --- internals ---------------------------------------------------------------
+
+# Identify a parameter leaf
 .is_param_leaf <- function(x) {
   is.list(x) && all(c("min", "max", "value", "calibration") %in% names(x))
 }
 
-# Internal: recursively map a function over a nested params structure
-.param_recurse <- function(x, f_leaf, f_branch = identity, name = NULL) {
+# Identity that accepts an unused name arg
+.identity_with_name <- function(x, name = NULL) x
+
+# Recursively apply functions to a nested params structure
+.param_recurse <- function(x, f_leaf, f_branch = .identity_with_name, name = NULL) {
   if (.is_param_leaf(x)) {
     f_leaf(x, name = name)
   } else if (is.list(x)) {
@@ -67,14 +70,30 @@ NULL
   }
 }
 
+# Collect leaf names for diagnostics
+.collect_leaf_names <- function(x) {
+  out <- list()
+  .param_recurse(
+    x,
+    f_leaf   = function(leaf, name) { out[[length(out) + 1]] <<- name; leaf },
+    f_branch = .identity_with_name
+  )
+  out
+}
+
+# fallback `%||%`
+`%||%` <- function(a, b) if (!is.null(a)) a else b
+
+# --- exported helpers --------------------------------------------------------
+
 #' Disable calibration for all parameters
 #' @rdname calibration_toggles
 #' @export
 disable_all_calibration <- function(params) {
   .param_recurse(
     params,
-    f_leaf = function(leaf, name) { leaf$calibration <- FALSE; leaf },
-    f_branch = identity
+    f_leaf   = function(leaf, name) { leaf$calibration <- FALSE; leaf },
+    f_branch = .identity_with_name
   )
 }
 
@@ -86,7 +105,7 @@ enable_calibration <- function(params,
                                match = c("exact", "regex", "starts_with"),
                                ignore_case = TRUE,
                                warn_if_missing = TRUE) {
-  match <- match[1]
+  match <- match.arg(match)
 
   # build matcher
   make_matcher <- function(keys, match, ignore_case) {
@@ -110,16 +129,13 @@ enable_calibration <- function(params,
           any(startsWith(name, keys))
         }
       }
-    } else if (match == "regex") {
-      # precompile regex
+    } else { # regex
       flags <- if (ignore_case) "(?i)" else ""
       pats  <- paste0(flags, "(", keys, ")")
       function(name) {
         if (is.null(name)) return(FALSE)
         any(vapply(pats, function(p) grepl(p, name, perl = TRUE), logical(1)))
       }
-    } else {
-      stop("Unknown 'match' mode: ", match)
     }
   }
 
@@ -135,18 +151,15 @@ enable_calibration <- function(params,
       }
       leaf
     },
-    f_branch = identity
+    f_branch = .identity_with_name
   )
 
-  if (warn_if_missing) {
-    # unfound keys by the selected matching rule (approximate check for exact mode)
-    if (match == "exact") {
-      nms <- unique(na.omit(unlist(.collect_leaf_names(params))))
-      missing_keys <- setdiff(tolower(keys), tolower(found))
-      if (length(missing_keys)) {
-        warning("Some keys did not match any parameter: ",
-                paste(sort(unique(missing_keys)), collapse = ", "))
-      }
+  if (isTRUE(warn_if_missing) && match == "exact") {
+    leaf_names <- unique(na.omit(unlist(.collect_leaf_names(params))))
+    missing_keys <- setdiff(tolower(keys), tolower(found))
+    if (length(missing_keys)) {
+      warning("Some keys did not match any parameter: ",
+              paste(sort(unique(missing_keys)), collapse = ", "))
     }
   }
 
@@ -161,22 +174,8 @@ enable_calibration_only <- function(params,
                                     match = c("exact", "regex", "starts_with"),
                                     ignore_case = TRUE,
                                     warn_if_missing = TRUE) {
-  params %>%
-    disable_all_calibration() %>%
-    enable_calibration(keys, match = match, ignore_case = ignore_case,
-                       warn_if_missing = warn_if_missing)
+  params2 <- disable_all_calibration(params)
+  enable_calibration(params2, keys,
+                     match = match, ignore_case = ignore_case,
+                     warn_if_missing = warn_if_missing)
 }
-
-# Internal: collect leaf names for diagnostics
-.collect_leaf_names <- function(x) {
-  out <- list()
-  .param_recurse(
-    x,
-    f_leaf = function(leaf, name) { out[[length(out) + 1]] <<- name; leaf },
-    f_branch = identity
-  )
-  out
-}
-
-# fallback for `%||%`
-`%||%` <- function(a, b) if (!is.null(a)) a else b

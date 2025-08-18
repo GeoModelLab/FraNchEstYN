@@ -16,31 +16,23 @@
 #'
 #'   \emph{Mandatory:}
 #'   \itemize{
-#'     \item Daily inputs: \code{tmax} (max temperature, °C), \code{tmin} (min temperature, °C), \code{precipitation} (mm d-1).
-#'     \item Hourly inputs: \code{temp} (air temperature, °C), \code{precipitation} (mm d-1).
+#'     \item Daily inputs: \code{tmax} or {tx} or {t2mmax} or {maxtemp} (max temperature, °C), \code{tmin} or {tn} or {t2mmin} or {mintemp} (min temperature, °C), \code{precipitation} or {prec} or {p} or {rainfall} or {rain} (mm d-1).
+#'     \item Hourly inputs: \code{temp} or {temperature} or {t2m} (air temperature, °C), \code{precipitation} or {prec} or {precip} or {prectotcorr} or {rainfall} or {rain}(mm d-1).
 #'   }
 #'
 #'   \emph{Radiation or Latitude (one required):}
 #'   \itemize{
-#'     \item Radiation (\code{rad}, \code{solar}, \code{solarrad}, …) [MJ m⁻² d⁻¹]
-#'     \item Latitude (\code{lat}, \code{latitude}, \code{phi}) [decimal degrees]
+#'     \item Radiation (\code{rad}, \code{solar}, \code{solarrad}) [MJ m⁻² d⁻¹]
+#'     \item Latitude (\code{lat}, \code{latitude}, \code{site_lat}) [decimal degrees]
 #'   }
 #'   If radiation is missing, it will be estimated from latitude and day length.
 #'
 #'   \emph{Optional variables (used if present, estimated otherwise):}
 #'   \itemize{
 #'     \item Relative humidity:
-#'       \code{rh}, \code{humidity}, \code{relhumidity}, \code{relativehumidity} (hourly),
+#'       \code{rh}/\code{humidity}/\code{relhumidity}/\code{relativehumidity} (hourly),
 #'       \code{rhmax}/\code{rhx} and \code{rhmin}/\code{rhn} (daily)
 #'     \item Leaf wetness: not required — computed internally from humidity > 90\% or rainfall ≥ 0.2 mm/h.
-#'   }
-#'
-#'   \strong{Unit expectations:}
-#'   \itemize{
-#'     \item Temperature: °C
-#'     \item Radiation: MJ m⁻² d⁻¹; if missing, estimated
-#'     \item Precipitation: mm d⁻¹ (daily) or mm h⁻¹ (hourly)
-#'     \item Humidity: \% (0–100)
 #'   }
 #'
 #' @param management_data A data frame with management information for the \strong{same site}
@@ -73,8 +65,7 @@
 #'           When \code{year == "All"} or missing, the treatments are computed for all simulated years.
 #'   }
 #'
-#'
-#' @param reference_data An **optional** data frame with observations; **required when**
+#' @param reference_data An \strong{optional} data frame with observations; **required when**
 #'   \code{calibration != "none"}. Column names are matched case-insensitively and
 #'   trimmed of spaces; common aliases are accepted (see below).
 #'
@@ -141,7 +132,7 @@
 #'   }
 #'
 #' @param franchy_message Logical. If \code{TRUE}, the function will attempt to
-#'   generate a Frankenstein-themed ("Franchestyn-flavored") commentary at the end
+#'   generate a commentary at the end
 #'   of the run using a Large Language Model (LLM).
 #'   Requires a valid \code{apikey} from \url{https://openrouter.ai/}.
 #'   Default is \code{FALSE}.
@@ -209,16 +200,15 @@
 #' franchestyn(
 #'   weather_data        = weather_df,
 #'   management_data     = mgmt_df,
-#'   reference_data      = ref_df,
-#'   cropParameters      = cropParameters$Wheat,
-#'   diseaseParameters   = diseaseParameters$Septoria,
-#'   fungicideParameters = fungicideParameters$protectant,
-#'   calibration         = "all",
-#'   disease             = "Septoria",
+#'   reference_data      = ref_df,# optional if calibration is 'none'
+#'   cropParameters      = cropParameters$wheat,
+#'   diseaseParameters   = diseaseParameters$septoria,
+#'   fungicideParameters = fungicideParameters$protectant, # optional
+#'   calibration         = 'all', # options: 'crop', 'disease', 'all'
 #'   start_end           = c(2010, 2020),
-#'   apikey              = "your-openrouter-api-key", #start with sk-or-v1-xxxxxxxxxxxxxxxxxxx....
-#'   franchy_message     = TRUE,
-#'   iterations          = 200
+#'   apikey              = "your-openrouter-api-key", # optional, start with sk-or-v1-xxxxxxxxxxxxxxxxxxx...
+#'   franchy_message     = TRUE, # optional
+#'   iterations          = 200 # optional
 #' )
 #' }
 #' @export
@@ -230,8 +220,6 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
                         franchy_message = FALSE,
                         ...)# whether to request spooky LLM summary)
 {
-  #VALIDATION----
-
   # --- capture advanced args ---
   dots <- list(...)
   iterations <- dots$iterations %||% 100  # default to 100 if not provided
@@ -255,7 +243,6 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
     timestep <- "daily"
     message("🐍 No hourly column detected; assuming daily weather data.")
   }
-
 
   # check if reference_data is required
   # Parse calibration argument
@@ -297,11 +284,6 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
   # pkg_path <- file.path(getwd(), "inst")
   # exe_path <- file.path(pkg_path, "bin", "FraNchEstYN.exe")
 
-
-  # cat("🔍 Git root:", pkg_path, "\n")
-  # cat("⚙️ Executable found at:", exe_path, "\n")
-
-
   if (!file.exists(exe_path)) stop("❌ Executable not found.")
 
   list_files_out <- list.files(
@@ -335,14 +317,12 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
   if (!is.list(cropParameters)) stop("🕸 'cropParameters' must be a nested list.")
   if (!is.list(diseaseParameters)) stop("🕸 'diseaseParameters' must be a nested list.")
 
-
   # Run the check:
   validate_parameter_ranges(
     cropParameters = cropParameters,
     diseaseParameters = diseaseParameters,
     fungicideParameters = fungicideParameters
   )
-
 
   # Check years
   # --- validate start_end ---
@@ -363,8 +343,6 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
 
   # CONFIGURATION----
   # Path to the EXE
-  #TODO: uncomment
-  #exe_path <- system.file("bin", "FraNchEstYN.exe", package = "FraNchEstYN")
   if (!file.exists(exe_path)) stop("🧛 Executable not found.")
 
   # Subfolders
@@ -379,21 +357,12 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
   dir.create(input_management_dir, recursive = TRUE, showWarnings = FALSE)
 
   # Path to write the reference file
-
-  # ---- normalize/validate columns when calibration == "disease" ----
-  # Create a numeric column named exactly `disease_name`
-  # using values from a known disease severity alias.
   prepare_reference_data <- function(reference_data,
                                      calibration,
                                      disease_name = "thisDisease",
                                      verbose = TRUE) {
     # Normalize calibration
     calib <- tolower(trimws(as.character(calibration)))
-
-    # Only run when calibration is 'disease' or 'all'
-    # if (!(calib %in% c("disease", "all"))) {
-    #   return(reference_data)
-    # }
 
     # Trim spaces from column names
     names(reference_data) <- trimws(names(reference_data))
@@ -428,9 +397,9 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
     reference_data
   }
 
-
   ref_file <- file.path(input_reference_dir, "referenceData.csv")
 
+  #required columns for c#
   reference_data$site    <- sites
   reference_data$variety <- "Generic"
 
@@ -512,7 +481,7 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
     # keep as character when "All" is present
   }
 
-  # --- NEW: if a 'treatment' column is present, parse dates into DOY treatment_1..n ---
+  # if a 'treatment' column is present, parse dates into DOY treatment_1..n
   if ("treatment" %in% names(management_data)) {
     fallback_year <- 2021L  # used when year == "All" or missing
 
@@ -574,9 +543,7 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
     quote = FALSE
   )
 
-
   # WRITE WEATHER FILE ----
-  # Handle 'all' sites logic
   # Validate required columns
   if (!"Site" %in% names(weather_data)) stop("Missing 'Site' column in weather_data")
 
@@ -584,8 +551,6 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
 
   # WRITE PARAMETERS FILE----
   # Detect a leaf parameter node
-  # helper: detect a leaf node
-  # helper: detect a leaf node
   .is_param_leaf <- function(x) {
     is.list(x) && all(c("min","max","value","calibration") %in% names(x))
   }
@@ -690,8 +655,6 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
   write.table(weather_data, out_file, sep = ",",
               row.names = FALSE, col.names = TRUE, quote = FALSE)
 
-
-
   # BUILD JSON ----
   config <- list(
     settings = list(
@@ -740,7 +703,6 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
     disease
   ))
 
-
   # --- run EXE with live streaming -------------------------------------------
   if (!requireNamespace("processx", quietly = TRUE)) {
     stop("Please install the 'processx' package to stream progress: install.packages('processx')")
@@ -749,7 +711,6 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
   # Extract quoted pieces: exe and args
   exe <- exe_path
   args <- c(config_path)
-
 
   p <- processx::process$new(exe, args, stdout = "|", stderr = "|")
 
@@ -786,8 +747,7 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
   list_files_out <- list.files(paste0(dirname(exe_path),"\\outputs"),
                                pattern = "\\.csv$", full.names = TRUE)
 
-  # Leggi tutti i file in una lista di data.frame
-  # Leggi e combina in un unico data frame
+  # read all files in a single dataframe
   outputs_df <- do.call(rbind, lapply(list_files_out, function(f) {
     df <- read.csv(f, stringsAsFactors = FALSE)
     df$file <- basename(f)  # aggiunge colonna con nome file
@@ -838,9 +798,7 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
   result$outputs$summary <- summary_df
   result$diagnostics$metrics <- metrics_df
 
-
-
-    #parameter files
+  #parameter files
   if (calibration != "none") {
     # ---- load calibrated parameter files --------------------------------------
     list_files_out_param <- list.files(
@@ -855,7 +813,6 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
         df
       }))
     } else data.frame()
-
 
     # ---- apply calibrated values back to param lists --------------------------
     update_param_list <- function(param_list, calib_df, clamp = TRUE) {
@@ -883,8 +840,6 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
     updatedCropParameters    <- update_param_list(cropParameters,    param_df)
     updatedDiseaseParameters <- update_param_list(diseaseParameters, param_df)
 
-    # ---- build bounds table (with unit + Model) --------------------------------
-    ## ---- FLATTEN PARAMETER LISTS (incl. calibration flag) ----------------------
     ## ---- FLATTEN PARAMETER LISTS (incl. calibration flag) ----------------------
     .is_param_leaf <- function(x)
       is.list(x) && all(c("min","max","value","calibration") %in% names(x))
@@ -924,10 +879,7 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
       dplyr::group_by(Model,Parameter) |>
       dplyr::slice_head()
 
-
     ## ---- LOAD CALIBRATED PARAM CSVs --------------------------------------------
-
-
     merged<-bounds_df |>
       dplyr::left_join(param_df ,
                        by=c('Model'="model",
@@ -957,42 +909,18 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
       # two layers with position nudges to avoid overlap
 
       ggplot2::ggplot(df, ggplot2::aes(x = 1)) +
-        ggplot2::geom_hline(
-          ggplot2::aes(yintercept = min, color = "Min"),
-          linewidth = 1.5
-        ) +
-        ggplot2::geom_hline(
-          ggplot2::aes(yintercept = max, color = "Max"),
-          linewidth = 1.5
-        ) +
-        # Calibration value
+        ggplot2::geom_hline(ggplot2::aes(yintercept = min,  color = "Min"),  linewidth = 1.5) +
+        ggplot2::geom_hline(ggplot2::aes(yintercept = max,  color = "Max"),  linewidth = 1.5) +
+        ggplot2::geom_hline(ggplot2::aes(yintercept = default, color = "Default"), linewidth = 1.2) +
         ggplot2::geom_point(
-          ggplot2::aes(y = value, color = "Calibration", shape = "Calibration"),
-          size = 4, na.rm = TRUE
-        ) +
-        # Default value
-        ggplot2::geom_point(
-          ggplot2::aes(y = default, color = "Default", shape = "Default"),
-          size = 2.8, na.rm = TRUE
+          ggplot2::aes(y = value, color = "Calibration"),
+          shape = 16, size = 4, na.rm = TRUE
         ) +
         ggplot2::coord_flip() +
         ggplot2::scale_color_manual(
           name = "Legend",
-          values = c(
-            "Min" = "black",
-            "Max" = "grey50",
-            "Calibration" = "red",
-            "Default" = "blue"
-          ),
+          values = c("Min" = "black", "Max" = "grey50", "Calibration" = "red", "Default" = "blue"),
           breaks = c("Min", "Max", "Calibration", "Default")
-        ) +
-        ggplot2::scale_shape_manual(
-          name = "Legend",
-          values = c(
-            "Calibration" = 16,  # solid circle
-            "Default" = 2        # triangle
-          ),
-          breaks = c("Calibration", "Default")
         ) +
         ggplot2::theme_classic(base_size = 12) +
         ggplot2::theme(
@@ -1001,11 +929,12 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
           axis.ticks.y = ggplot2::element_blank()
         ) +
         ggplot2::facet_wrap(~facet_label, scales = "free")
+
+
     }
 
     crop_plot    <- plot_params_facets(crop_dat,    "CROP parameters: calibrated vs default vs bounds")
     disease_plot <- plot_params_facets(disease_dat, "DISEASE parameters: calibrated vs default vs bounds")
-
 
       # expose in your final result (no early return)
       if (!exists("result")) result <- list()
@@ -1713,16 +1642,9 @@ You may mention 'infection windows' if appropriate. Be concise and scientific.",
     }, silent = TRUE)
   }
 
-
-
-
-
-
   # ---- RETURN EVERYTHING -------------------------------------------------------
   return(result)
 }
-
-
 
 #' Compute error metrics for model vs reference variables (internal)
 #'

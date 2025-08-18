@@ -3,7 +3,7 @@
     "startYear": 1950,
     "endYear": 2020,
     "sites": [
-        "Sharkiya"
+        "Indiana"
     ],
     "isCalibration": "true",
     "calibrationVariable": "all",
@@ -16,9 +16,9 @@
     "weatherTimeStep": "daily"
   },
     "paths": {
-        "weatherDir": "C:\\Program Files\\R\\R-4.4.2\\library\\FraNchEstYN\\bin\\files\\weather",
-        "referenceFilePaths": "C:\\Program Files\\R\\R-4.4.2\\library\\FraNchEstYN\\bin\\files\\reference",
+        "weatherDir": "..\\..\\..\\files\\weather",
+        "referenceFilePaths": "..\\..\\..\\files\\reference",
         "paramFile": "..\\..\\..\\files\\parameters\\franchestynParameters.csv",
-        "sowingFile": "..\\..\\..\\files\\management\\sowing.csv"
+        "sowingFile": "..\\..\\..\\files\\management\\mgt_indiana.csv"
     }
 }

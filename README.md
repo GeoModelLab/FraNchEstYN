@@ -1,7 +1,7 @@
 <div align="center">
 
 **FraNchEstYN**  
-*Fra*mework for sy*Nch*ronous *Est*imation of the *Y*ield reductio*N*
+*Fra*mework for sy*Nch*ronous *Est*imates of *Y*ield reductio*N*
 
 <img src="man/figures/logo.png" alt="FraNchEstYN logo" width="250" align="top"/>
 
@@ -15,7 +15,7 @@
 ---
 
 ## 📖 Overview
-**FraNchEstYN** is a **hybrid crop–disease–fungicide simulation and calibration framework**, designed to support **quantitative plant disease epidemiology and crop modeling research**.  
+**FraNchEstYN** is a **crop–disease–fungicide simulation and calibration framework**, designed to support **quantitative plant disease epidemiology and crop modeling research**.  
 
 It combines a **process-based crop–disease model in C#** with an **R interface** for data preprocessing, experiment setup, and automated post-analysis.  
 
@@ -26,7 +26,7 @@ The framework integrates:
 - **Calibration routines** for crop, disease, and fungicide parameters  
 - 🔮 *Optional*: a **Large Language Model (LLM) post-processor** that generates **narrative summaries** of outputs (`franchy_message = TRUE`), using an API key from [OpenRouter](https://openrouter.ai/)  
 
-The result is a flexible tool for **understanding and quantifying yield losses** caused by plant diseases under different management and climatic scenarios.  
+The result is a flexible tool for **dynamic simulation of disease severity to quantify yield losses** caused by plant diseases under different management and climatic scenarios.  
 
 > **Note:** FraNchEstYN is currently **Windows-only** due to its C# computation core. Cross-platform support is in progress.
 

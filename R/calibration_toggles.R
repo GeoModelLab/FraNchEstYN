@@ -2,7 +2,7 @@
 #'
 #' Utilities to quickly disable all calibration flags, enable only a subset,
 #' or set calibration flags in bulk for nested parameter lists used by
-#' \strong{FraNchEstYN} (e.g., `cropParameters$Wheat`, `diseaseParameters$Septoria`).
+#' \strong{FraNchEstYN} (e.g., `cropParameters$wheat`, `diseaseParameters$septoria`).
 #'
 #' Parameter lists are nested lists where each \strong{leaf} has at least:
 #' `description`, `unit`, `min`, `max`, `value`, and `calibration` (logical).
@@ -18,7 +18,7 @@
 #'
 #' @examples
 #' # Disable all, then re-enable a few:
-#' p <- cropParameters$Wheat
+#' p <- cropParameters$wheat
 #' p <- disable_all_calibration(p)
 #' p <- enable_calibration_only(
 #'   p,
@@ -35,7 +35,7 @@
 #' # Non-running examples:
 #' \dontrun{
 #' # Disable all parameters for calibration in a disease set
-#' d <- disable_all_calibration(diseaseParameters$Septoria)
+#' d <- disable_all_calibration(diseaseParameters$septoria)
 #'
 #' # Re-enable a few by exact name
 #' d2 <- enable_calibration_only(
@@ -44,7 +44,7 @@
 #' )
 #'
 #' # Enable an entire family of parameters using a regex pattern
-#' w <- cropParameters$Wheat
+#' w <- cropParameters$wheat
 #' t_keys <- grep("^T(min|opt|max)Crop$", names(w), value = TRUE)
 #' w2 <- set_calibration_flags(w, enable = t_keys)
 #' }

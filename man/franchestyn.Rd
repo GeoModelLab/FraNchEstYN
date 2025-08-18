@@ -31,31 +31,23 @@ franchestyn(
 
   \emph{Mandatory:}
   \itemize{
-    \item Daily inputs: \code{tmax} (max temperature, °C), \code{tmin} (min temperature, °C), \code{precipitation} (mm d-1).
-    \item Hourly inputs: \code{temp} (air temperature, °C), \code{precipitation} (mm d-1).
+    \item Daily inputs: \code{tmax} or {tx} or {t2mmax} or {maxtemp} (max temperature, °C), \code{tmin} or {tn} or {t2mmin} or {mintemp} (min temperature, °C), \code{precipitation} or {prec} or {p} or {rainfall} or {rain} (mm d-1).
+    \item Hourly inputs: \code{temp} or {temperature} or {t2m} (air temperature, °C), \code{precipitation} or {prec} or {precip} or {prectotcorr} or {rainfall} or {rain}(mm d-1).
   }
 
   \emph{Radiation or Latitude (one required):}
   \itemize{
-    \item Radiation (\code{rad}, \code{solar}, \code{solarrad}, …) [MJ m⁻² d⁻¹]
-    \item Latitude (\code{lat}, \code{latitude}, \code{phi}) [decimal degrees]
+    \item Radiation (\code{rad}, \code{solar}, \code{solarrad}) [MJ m⁻² d⁻¹]
+    \item Latitude (\code{lat}, \code{latitude}, \code{site_lat}) [decimal degrees]
   }
   If radiation is missing, it will be estimated from latitude and day length.
 
   \emph{Optional variables (used if present, estimated otherwise):}
   \itemize{
     \item Relative humidity:
-      \code{rh}, \code{humidity}, \code{relhumidity}, \code{relativehumidity} (hourly),
+      \code{rh}/\code{humidity}/\code{relhumidity}/\code{relativehumidity} (hourly),
       \code{rhmax}/\code{rhx} and \code{rhmin}/\code{rhn} (daily)
     \item Leaf wetness: not required — computed internally from humidity > 90\% or rainfall ≥ 0.2 mm/h.
-  }
-
-  \strong{Unit expectations:}
-  \itemize{
-    \item Temperature: °C
-    \item Radiation: MJ m⁻² d⁻¹; if missing, estimated
-    \item Precipitation: mm d⁻¹ (daily) or mm h⁻¹ (hourly)
-    \item Humidity: \% (0–100)
   }}
 
 \item{management_data}{A data frame with management information for the \strong{same site}
@@ -88,7 +80,7 @@ franchestyn(
           When \code{year == "All"} or missing, the treatments are computed for all simulated years.
   }}
 
-\item{reference_data}{An **optional** data frame with observations; **required when**
+\item{reference_data}{An \strong{optional} data frame with observations; **required when**
   \code{calibration != "none"}. Column names are matched case-insensitively and
   trimmed of spaces; common aliases are accepted (see below).
 
@@ -155,7 +147,7 @@ Matching is case-insensitive.}
   }}
 
 \item{franchy_message}{Logical. If \code{TRUE}, the function will attempt to
-  generate a Frankenstein-themed ("Franchestyn-flavored") commentary at the end
+  generate a commentary at the end
   of the run using a Large Language Model (LLM).
   Requires a valid \code{apikey} from \url{https://openrouter.ai/}.
   Default is \code{FALSE}.
@@ -229,16 +221,15 @@ manage paths or config files manually.
 franchestyn(
   weather_data        = weather_df,
   management_data     = mgmt_df,
-  reference_data      = ref_df,
-  cropParameters      = cropParameters$Wheat,
-  diseaseParameters   = diseaseParameters$Septoria,
-  fungicideParameters = fungicideParameters$protectant,
-  calibration         = "all",
-  disease             = "Septoria",
+  reference_data      = ref_df,# optional if calibration is 'none'
+  cropParameters      = cropParameters$wheat,
+  diseaseParameters   = diseaseParameters$septoria,
+  fungicideParameters = fungicideParameters$protectant, # optional
+  calibration         = 'all', # options: 'crop', 'disease', 'all'
   start_end           = c(2010, 2020),
-  apikey              = "your-openrouter-api-key", #start with sk-or-v1-xxxxxxxxxxxxxxxxxxx....
-  franchy_message     = TRUE,
-  iterations          = 200
+  apikey              = "your-openrouter-api-key", # optional, start with sk-or-v1-xxxxxxxxxxxxxxxxxxx...
+  franchy_message     = TRUE, # optional
+  iterations          = 200 # optional
 )
 }
 }

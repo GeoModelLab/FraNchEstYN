@@ -6,3 +6,5 @@
 .quarto
 src_csharp
 inst/doc
+/doc/
+/Meta/
