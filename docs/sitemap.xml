@@ -6,6 +6,7 @@
 <url><loc>https://geomodellab.github.io/FraNchEstYN/articles/index.html</loc></url>
 <url><loc>https://geomodellab.github.io/FraNchEstYN/articles/quick-start.html</loc></url>
 <url><loc>https://geomodellab.github.io/FraNchEstYN/articles/reference-format.html</loc></url>
+<url><loc>https://geomodellab.github.io/FraNchEstYN/articles/wheat_blast_brazil.html</loc></url>
 <url><loc>https://geomodellab.github.io/FraNchEstYN/authors.html</loc></url>
 <url><loc>https://geomodellab.github.io/FraNchEstYN/index.html</loc></url>
 <url><loc>https://geomodellab.github.io/FraNchEstYN/LICENSE-text.html</loc></url>
@@ -13,12 +14,17 @@
 <url><loc>https://geomodellab.github.io/FraNchEstYN/reference/calibration_toggles.html</loc></url>
 <url><loc>https://geomodellab.github.io/FraNchEstYN/reference/compute_error_metrics.html</loc></url>
 <url><loc>https://geomodellab.github.io/FraNchEstYN/reference/cropParameters.html</loc></url>
+<url><loc>https://geomodellab.github.io/FraNchEstYN/reference/cropParameters_brazil.html</loc></url>
+<url><loc>https://geomodellab.github.io/FraNchEstYN/reference/df_to_parameters.html</loc></url>
 <url><loc>https://geomodellab.github.io/FraNchEstYN/reference/diseaseParameters.html</loc></url>
 <url><loc>https://geomodellab.github.io/FraNchEstYN/reference/franchestyn.html</loc></url>
 <url><loc>https://geomodellab.github.io/FraNchEstYN/reference/fungicideParameters.html</loc></url>
 <url><loc>https://geomodellab.github.io/FraNchEstYN/reference/index.html</loc></url>
+<url><loc>https://geomodellab.github.io/FraNchEstYN/reference/management_brazil.html</loc></url>
 <url><loc>https://geomodellab.github.io/FraNchEstYN/reference/management_data.html</loc></url>
+<url><loc>https://geomodellab.github.io/FraNchEstYN/reference/management_indiana.html</loc></url>
 <url><loc>https://geomodellab.github.io/FraNchEstYN/reference/parameters_to_df.html</loc></url>
+<url><loc>https://geomodellab.github.io/FraNchEstYN/reference/reference_brazil.html</loc></url>
 <url><loc>https://geomodellab.github.io/FraNchEstYN/reference/reference_egypt.html</loc></url>
 <url><loc>https://geomodellab.github.io/FraNchEstYN/reference/reference_indiana.html</loc></url>
 <url><loc>https://geomodellab.github.io/FraNchEstYN/reference/validate_parameter_ranges.html</loc></url>

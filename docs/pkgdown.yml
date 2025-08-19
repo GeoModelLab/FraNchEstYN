@@ -6,7 +6,8 @@ articles:
   fitting_disease_severity: fitting_disease_severity.html
   quick-start: quick-start.html
   reference-format: reference-format.html
-last_built: 2025-08-18T16:57Z
+  wheat_blast_brazil: wheat_blast_brazil.html
+last_built: 2025-08-19T17:46Z
 urls:
   reference: https://geomodellab.github.io/FraNchEstYN/reference
   article: https://geomodellab.github.io/FraNchEstYN/articles

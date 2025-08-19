@@ -200,3 +200,128 @@ parameters_to_df <- function(param_list) {
     stringsAsFactors = FALSE
   )
 }
+
+#' Convert parameter summary dataframe to FraNchEstYN parameter list
+#'
+#' This function converts a dataframe of parameter estimates into the nested
+#' list format used by FraNchEstYN (`cropParameters` or `diseaseParameters`).
+#'
+#' @param df A `data.frame` with at least columns `Parameter` and `value`.
+#' @param range_pct Numeric, optional. Percentage of the mean value to define
+#'   min/max ranges (default = 0.2, i.e. ±20%).
+#'
+#' @return
+#' A nested list of parameters. Each element contains:
+#' \itemize{
+#'   \item \code{min} — lower bound of the parameter (mean - range).
+#'   \item \code{max} — upper bound of the parameter (mean + range).
+#'   \item \code{value} — central value (mean).
+#'   \item \code{calibration} — logical flag, set to FALSE by default.
+#' }
+#'
+#' @description
+#' The function rebuilds a list-of-lists in the same format as
+#' \code{FraNchEstYN::diseaseParameters} or \code{FraNchEstYN::cropParameters}.
+#' This is useful for reusing averaged parameter estimates across simulations.
+#'
+#' @details
+#' The ranges are computed as \code{value * (1 ± range_pct)}. This ensures
+#' each parameter has a plausible min and max around the central estimate.
+#'
+#' @examples
+#' param_summary <- data.frame(
+#'   Parameter = c("RUEreducerDamage","LatentPeriod"),
+#'   value     = c(0.5, 120)
+#' )
+#' df_to_parameters(param_summary, range_pct = 0.1)
+#'
+#' @export
+df_to_parameters <- function(df,
+                             atomic_if_missing_meta = FALSE,
+                             range_pct = 0.10,
+                             zero_buffer = 1e-6) {
+  stopifnot(is.data.frame(df), nrow(df) > 0)
+
+  # normalize range_pct: allow 10 or 0.10
+  if (range_pct > 1 && range_pct <= 100) range_pct <- range_pct / 100
+  if (range_pct > 1) stop("`range_pct` > 100% is not allowed.")
+
+  find_col <- function(cands) {
+    nms <- tolower(names(df))
+    for (cand in cands) {
+      j <- which(nms == tolower(cand))
+      if (length(j)) return(names(df)[j[1]])
+    }
+    NULL
+  }
+
+  col_param <- find_col(c("Parameter","param","name"))
+  col_value <- find_col(c("Value","val"))
+  if (is.null(col_param) || is.null(col_value)) {
+    stop("`Parameter` and `Value` columns are required (case-insensitive).")
+  }
+
+  col_desc <- find_col(c("Description","desc"))
+  col_unit <- find_col(c("Unit","units"))
+  col_min  <- find_col(c("Min","minimum"))
+  col_max  <- find_col(c("Max","maximum"))
+  col_cal  <- find_col(c("Calibration","calibrated","calib"))
+
+  params <- df[[col_param]]
+
+  get_chr <- function(col) if (!is.null(col)) as.character(df[[col]]) else rep(NA_character_, nrow(df))
+  get_num <- function(col) if (!is.null(col)) suppressWarnings(as.numeric(df[[col]])) else rep(NA_real_, nrow(df))
+  get_lgl <- function(col) {
+    if (is.null(col)) return(rep(NA, nrow(df)))
+    x <- df[[col]]
+    if (is.logical(x)) return(x)
+    lx <- tolower(as.character(x))
+    out <- rep(NA, length(lx))
+    out[lx %in% c("true","t","1","yes","y")]  <- TRUE
+    out[lx %in% c("false","f","0","no","n")] <- FALSE
+    out
+  }
+
+  desc <- get_chr(col_desc)
+  unit <- get_chr(col_unit)
+  minv <- get_num(col_min)
+  maxv <- get_num(col_max)
+  val  <- get_num(col_value)
+  cal  <- get_lgl(col_cal)
+
+  # fill min/max when missing
+  for (i in seq_len(nrow(df))) {
+    if (!is.na(val[i]) && (is.na(minv[i]) || is.na(maxv[i]))) {
+      if (abs(val[i]) < .Machine$double.eps) {
+        # value ~ 0 → give a small buffer [0, zero_buffer]
+        minv[i] <- 0
+        maxv[i] <- zero_buffer
+      } else {
+        delta <- abs(val[i]) * range_pct
+        minv[i] <- val[i] - delta
+        maxv[i] <- val[i] + delta
+      }
+    }
+  }
+
+  out <- vector("list", length = nrow(df))
+  names(out) <- params
+
+  for (i in seq_len(nrow(df))) {
+    has_meta <- any(!is.na(c(desc[i], unit[i], minv[i], maxv[i], cal[i])))
+    if (atomic_if_missing_meta && !has_meta) {
+      out[[i]] <- val[i]
+    } else {
+      out[[i]] <- list(
+        description  = desc[i],
+        unit         = unit[i],
+        min          = minv[i],
+        max          = maxv[i],
+        value        = val[i],
+        calibration  = cal[i]
+      )
+    }
+  }
+
+  out
+}

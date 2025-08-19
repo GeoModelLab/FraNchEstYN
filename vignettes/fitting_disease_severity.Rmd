@@ -30,7 +30,7 @@ This vignette walks through the process of fitting Septoria tritici blotch sever
 
 - **`weather_indiana`**: daily weather data (NASA POWER)  
 - **`reference_indiana`**: digitized disease observations from [Shaner & Buechley (1995)](https://www.apsnet.org/publications/plantdisease/backissues/Documents/1995Articles/PlantDisease79n09_928.PDF)   
-- **`management_data`**: sowing and crop management metadata from the same article.
+- **`management_indiana`**: sowing and crop management metadata from the same article.
 
 ```{r  setup, include = F}
 knitr::opts_chunk$set(
@@ -56,7 +56,7 @@ The three Indiana datasets are included with the package. Below we load them and
 ```{r data_loading}
 data(weather_indiana)
 data(reference_indiana)
-data(management_data)
+data(management_indiana)
 ```
 
 ```{r data_showing, echo=FALSE, message=FALSE, warning=FALSE}
@@ -76,10 +76,10 @@ kable(
 )
 
 kable(
-  management_data %>%
+  management_indiana %>%
     select(site, crop, variety, year, sowingDOY) %>%
     slice_head(n = 3),
-  caption = "management_data — management metadata (first 6 rows)"
+  caption = "management_indiana — management metadata (first 6 rows)"
 )
 ```
 
@@ -144,7 +144,7 @@ calibration <- "all"     # calibrate both crop and disease
 
 df <- franchestyn(
   weather_data      = weather_indiana,
-  management_data   = management_data,
+  management_data   = management_indiana,
   reference_data    = reference_indiana,
   cropParameters    = thisCropParam,
   diseaseParameters = thisDiseaseParam,
@@ -322,7 +322,7 @@ plotly::ggplotly(p) %>%
 
 This vignette showed how to calibrate Septoria tritici blotch severity in Indiana using bundled datasets. From here, you might want to:
 
-🌎 Explore other environments: replace weather_indiana, reference_indiana, and management_data with datasets from different sites or years.
+🌎 Explore other environments: replace weather_indiana, reference_indiana, and management_indiana with datasets from different sites or years.
 
 🌾 Switch crops or pathogens: try other parameter sets available in cropParameters and diseaseParameters.
 

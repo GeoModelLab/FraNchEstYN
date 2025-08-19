@@ -8,8 +8,6 @@ weather_indiana<-weather_indiana |>
 
 usethis::use_data(weather_indiana, overwrite = TRUE)
 
-
-
 reference_indiana<-read.csv(paste0(getwd(),"\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\reference\\Indiana.csv")) |>
   dplyr::rename(Disease = thisDisease)
 
@@ -24,6 +22,6 @@ usethis::use_data(reference_indiana, overwrite = TRUE)
 
 
 
-management_data <- read.csv(paste0(getwd(),'\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\management\\mgt_indiana.csv'))
-usethis::use_data(management_data, overwrite = TRUE)
+management_indiana <- read.csv(paste0(getwd(),'\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\management\\mgt_indiana.csv'))
+usethis::use_data(management_indiana, overwrite = TRUE)
 

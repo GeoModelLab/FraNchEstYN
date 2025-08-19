@@ -1,6 +1,8 @@
 library(dplyr)
 library(usethis)
 
+setwd("C://GitHub//FraNchEstYN")
+
 df <- read.csv(
   "src_csharp/FraNchEstYN/FraNchEstYN/files/parameters/franchestynParametersForPackage.csv",
   stringsAsFactors = FALSE

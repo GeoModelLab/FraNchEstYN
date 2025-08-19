@@ -75,7 +75,7 @@
 #'
 #' @details
 #' Read from `files/management/mgt_indiana.csv` and stored in the package via
-#' `usethis::use_data(management_data, overwrite = TRUE)`.
+#' `usethis::use_data(management_indiana, overwrite = TRUE)`.
 #' Data were digitized from the original publication by Shaner & Buechley (1995).
 #'
 #' @source
@@ -91,5 +91,5 @@
 #' @examples
 #' data(management_data)
 #' head(management_data)
-"management_data"
+"management_indiana"
 

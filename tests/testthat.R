@@ -11,8 +11,8 @@ library(tidyverse)
 
 setwd("C:\\GitHub\\FraNchEstYN")
  remove.packages('FraNchEstYN')
- devtools::document()
- devtools::install()
+# devtools::document()
+ # devtools::install()
 
 
 weather_data<-read.csv(paste0(getwd(),'\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\weather\\daily\\Indiana.csv'))

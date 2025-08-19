@@ -1,0 +1,436 @@
+---
+title: "Estimating wheat yield losses from wheat blast in Brazil"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Estimating wheat yield losses from wheat blast in Brazil}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+css: vignette.css
+---
+
+<style>
+.main-container { max-width: 1200px !important; }
+table, .table, .table-condensed { font-size: 85% !important; }
+caption { white-space: nowrap; }
+</style>
+
+## 🎯 Goal
+
+This vignette demonstrates how to use **FraNchEstYN** to estimate wheat yield losses from *wheat head blast* in Brazil.
+
+The workflow follows three progressive steps:
+
+1. Disease calibration: fit epidemiological parameters on a subset of planting periods.
+2. Parameter averaging: derive robust mean disease parameters across planting periods.
+3. Validation: apply averaged disease parameters to all planting periods, and compare simulated vs observed disease severity and yield.
+
+We start from an already published Brazil wheat parameter set (Santos et al. 2023), use open access EPAMIG experimental data across 12 sowing dates × 6 years, and weather from NASA POWER.
+
+We use open access EPAMIG experiments (12 sowing dates × 6 years for cultivar
+*BRILHANTE*), weather data from NASA POWER, and a published Brazil wheat parameter set
+(Santos *et al.* 2023).
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE, comment = "#>", fig.width = 7, fig.height = 4,
+  message = FALSE, warning = FALSE
+)
+```
+
+## 📦 Packages
+We load FraNchEstYN plus helper libraries for wrangling, visualization, and reproducible tables.
+```{r libraries, include=T}
+library(FraNchEstYN)
+library(tidyverse)
+library(lubridate)
+library(scales)
+library(kableExtra)
+```
+
+## 📥 Data loading
+We use three sources:
+
+- weather_data: daily NASA POWER weather for Empresa de Pesquisa Agropecuária de Minas Gerais (EPAMIG) in the municipality of Patos de Minas, in the state of Minas Gerais, Brazil (18°31′04.0”S, 46°26′25.0”W)
+- management_data: basic agronomic metadata (crop, sowing DOY, etc.)
+- reference_data: measured yields and disease severity for one cultivar (BRILHANTE), six years and 12 sowing dates
+
+We rely on [**NASAPOWER**](https://github.com/ropensci/nasapower) package (maintained by Adam Sparks 🙏) to directly query daily weather data.  
+
+### 🛰 NASA Power data
+We request maximum and minimum temperature and precipitation from 2011–2020. 
+Data are tagged with location and date components to simplify later filtering.
+```{r weatherdata_loading}
+# --- Load libraries
+library(nasapower)
+library(dplyr)
+library(lubridate)
+
+# --- Retrieve daily data from NASA POWER
+weather_data <- nasapower::get_power(
+  community     = "ag",
+  lonlat        = c(-46.4403, -18.5178),
+  dates         = c("2011-01-01", "2020-12-31"),
+  temporal_api  = "daily",
+  pars          = c("T2M_MAX", "T2M_MIN", "PRECTOTCORR")
+) %>%
+  rename(
+    TMAX = T2M_MAX,
+    TMIN = T2M_MIN,
+    RAIN = PRECTOTCORR,
+    DATE = YYYYMMDD
+  ) %>%
+  mutate(
+    year  = year(DATE),
+    month = month(DATE),
+    day   = day(DATE),
+    Site  = "Sertaozinho",
+    lat   = -18.5178
+  ) %>%
+  select(Site, TMAX, TMIN, RAIN, year, month, day, lat)
+
+head(weather_data)
+```
+
+## 📑 Management and reference datasets
+For convenience, the package already includes the management and reference datasets, derived from the open-access EPAMIG wheat trials (cultivar BRILHANTE, multiple sowing dates and years).
+The original dataset is publicly available at [OSF repository](https://doi.org/10.1007/s10658-022-02614-7)
+
+```{r reference_loading}
+# comes with the package
+data("reference_brazil")
+data("management_brazil")
+```
+
+A preview of their structure is shown in the vignette.
+```{r showReference, echo=FALSE, message=FALSE, warning=FALSE}
+# quick check of structure + a tiny preview
+stopifnot(all(c("site","variety","year","DOY","disease","fint",
+                "yieldActual","yieldAttainable") %in% names(reference_egypt)))
+
+kable(
+  reference_brazil |>
+    dplyr::arrange(year, variety, doy) |>
+    dplyr::slice_head(n = 6),
+  caption = "reference_brazil — structure preview (first 6 rows)"
+) |> 
+  kableExtra::kable_styling(full_width = FALSE, bootstrap_options = c("striped","condensed"))
+
+stopifnot(all(c("site","variety","year","DOY","disease","fint",
+                "yieldActual","yieldAttainable") %in% names(reference_egypt)))
+
+kable(
+  management_brazil |>
+    dplyr::arrange(year, variety, sowingDOY) |>
+    dplyr::slice_head(n = 6),
+  caption = "management_brazil — structure preview (first 6 rows)"
+) |> 
+  kableExtra::kable_styling(full_width = FALSE, bootstrap_options = c("striped","condensed"))
+```
+
+## 🦠 Step 1 – Disease calibration on selected sowing dates
+
+We start from already optimized crop parameters and disable crop calibration so only
+disease parameters are adjusted.
+
+👉 The idea is:
+
+- Select a subset of sowing dates (here planting periods 1, 3, 5, 7, 9, 11) for calibration.
+- Run franchestyn separately for each planting period.
+- Collect the estimated disease parameters from each run.
+- Compute mean and standard deviation across experiments.
+- Rebuild a consistent list-of-lists parameter set using the averaged values using the custom function in the package.
+
+```{r crop-calibration, eval=TRUE, message=FALSE, warning=FALSE, results='hide'}
+# --------------------------------------------------------------
+# 📌 Step 1: Disease calibration on selected sowing dates
+# --------------------------------------------------------------
+
+# 1. Load a baseline crop parameter set for Brazil
+#    (already calibrated from literature, bundled as an .rds)
+data("cropParameters_brazil.rda")
+
+# 2. Disable calibration for crop parameters
+#    👉 we want to calibrate ONLY the disease model
+cropParameters_brazil <- FraNchEstYN::disable_all_calibration(cropParameters_brazil)
+#we load default parameters for wheat blast
+thisDiseaseParam<-diseaseParameters$wheat_blast
+
+# 3. Define the study period
+start_end <- c(2011, 2020)
+
+# 4. Choose a subset of sowing dates ("planting periods") for calibration
+#    These are representative experiments used to estimate disease parameters.
+#pps <- c(1, 3, 5, 7, 9, 11)
+pps <- c(1)
+
+# Container for disease parameters from each planting period
+all_parameters <- list()
+
+# 5. Loop over each planting period in the calibration set
+for (pp in pps) {
+  
+  # --- Run the model ---
+  df <- FraNchEstYN::franchestyn(
+    weather_data      = weather_data,
+    management_data   = management_brazil |> filter(planting_period == pp),
+    reference_data    = reference_brazil|> filter(planting_period == pp),
+    cropParameters    = cropParameters_brazil,
+    diseaseParameters = thisDiseaseParam,
+    calibration       = "disease",  # focus calibration on epidemiology
+    start_end         = start_end,
+    iterations        = 555         # MCMC iterations
+  )
+  
+  # --- Extract disease parameters from this calibration run ---
+  disease_df <- parameters_to_df(df$parameters$disease)
+  
+  # --- Store results, tagging by planting period ---
+  all_parameters[[length(all_parameters) + 1]] <- disease_df %>%
+    mutate(planting_period = pp)
+}
+
+# 6. Merge all planting period calibrations into one dataframe
+parameters_df <- dplyr::bind_rows(all_parameters, .id = "run_id")
+
+
+```
+
+We then average across planting periods:
+```{r param-average, eval=TRUE, message=FALSE, warning=FALSE, results='hide'}
+# 7. Summarise across planting periods
+#    👉 take the mean value, plus standard deviation and sample size
+param_summary <- parameters_df %>%
+  group_by(Parameter) %>%
+  summarise(
+    value    = mean(as.numeric(Value), na.rm = TRUE),
+    sd_value = sd(as.numeric(Value),   na.rm = TRUE),
+    n        = sum(!is.na(Value)),
+    .groups  = "drop"
+  )
+
+# 8. Rebuild a parameter list suitable for FraNchEstYN
+#    👉 use the averaged values, with a ±20% range
+calibDisease <- FraNchEstYN::df_to_parameters(param_summary, range_pct = 0.2)
+```
+
+
+This is the calibDisease df
+```{r calibDisease_df, eval=TRUE, echo=F, message=FALSE, warning=FALSE}
+
+# --------------------------------------------------------------
+# 📌 Preview of calibrated disease parameters
+# --------------------------------------------------------------
+
+# convert list-of-lists into a tidy tibble
+calibDisease_df <- parameters_to_df(calibDisease) |> 
+  select(-c(Description,Unit,Calibration,Min,Max))
+
+# show just the first 10 rows, nicely formatted
+calibDisease_df %>%
+  slice_head(n = 10) %>%
+  knitr::kable(caption = "Snapshot of calibrated disease parameters") %>%
+  kableExtra::kable_styling(full_width = FALSE, bootstrap_options = c("striped","condensed"))
+
+```
+At this stage, calibDisease contains the epidemiological parameters averaged across multiple sowing dates. This reduces noise from single calibrations and provides a robust baseline for validation on the remaining experiments.
+
+## 🌾 Step 2 — Batch validation
+
+We validate the averaged parameters across all sowing periods and years.
+
+The procedure is straightforward:
+
+1. **Loop across planting periods** recorded in the dataset.  
+2. **Run FraNchEstYN without further calibration**, using the averaged disease parameters (`calibDisease`).  
+3. **Collect simulation outputs** for each planting period.  
+4. **Bind everything into one tibble** for further analysis and plotting.  
+
+```{r batch-simulation, eval=TRUE, message=F, warning=FALSE, echo=F, results='hide'}
+# ==============================================================
+# 🌾 STEP 2 — Batch simulation with calibrated parameters
+# ==============================================================
+
+# Container for outputs
+all_outputs <- list()
+
+# Planting periods available in management data
+pps <- unique(management_brazil$planting_period)
+
+for (pp in pps) {
+  
+  # -- (1) Filter management and reference data for this planting period
+  thisManagementData <- management_brazil %>%
+    filter(planting_period == pp)
+  
+  thisReferenceData <- reference_brazil %>%
+    filter(planting_period == pp)
+  
+  message(sprintf("▶️ Running simulation for planting period: %s", pp))
+  
+  # -- (2) Run simulation WITHOUT calibration
+  res <- FraNchEstYN::franchestyn(
+    weather_data      = weather_data,
+    management_data   = thisManagementData,
+    reference_data    = thisReferenceData,
+    cropParameters    = cropParameters_brazil,
+    diseaseParameters = calibDisease,   # <- calibrated parameters from Step 1
+    calibration       = "none",         # <- pure validation, no fitting
+    start_end         = c(2011, 2020)
+  )
+  
+  # -- (3) Save results only if a simulation was produced
+  if (!is.null(res$outputs$simulation) &&
+      is.data.frame(res$outputs$simulation) &&
+      nrow(res$outputs$simulation) > 0) {
+    
+    out_df <- res$outputs$simulation %>%
+      mutate(planting_period = pp)
+    
+    all_outputs[[length(all_outputs) + 1]] <- out_df
+  } else {
+    message("⚠️ No simulation output for this planting period.")
+  }
+}
+
+# -- (4) Bind all results into a single tibble
+final_outputs <- dplyr::bind_rows(all_outputs, .id = "run_id")
+```
+
+## 📊Step 3 — Validation against experiments
+
+In this final step we bring together the model simulations and the field
+observations from EPAMIG.  
+We join the simulated outputs with the observed **disease severity (DisSev)**
+and **yield** per planting period, making sure that only the last record of each
+experimental group retains observed values (all intermediate time steps are set
+to `NA`).
+
+```{r final-plotting, eval=TRUE, message=TRUE, warning=FALSE, echo=F}
+final_outputs <- dplyr::bind_rows(all_outputs, .id = "run_id")
+
+epamig_data_plot <- reference_brazil |>
+  group_by(year, planting_period, variety) |>
+  filter(!is.na(Disease)) |> 
+  summarise(
+    DisSev   = mean(Disease),
+    Yield    = mean(yieldActual)
+  )
+
+final_outputs_joined <- final_outputs |>
+  left_join(epamig_data_plot)
+
+cols_to_keep_last <- c("DisSev", "Yield")
+
+final_outputs_joined <- final_outputs_joined %>%
+  group_by(Year, planting_period) %>%
+  mutate(across(
+    any_of(cols_to_keep_last),
+    ~ replace(., row_number() != dplyr::n(), NA)
+  )) %>%
+  ungroup()
+
+
+```
+
+## 🎨Visualization
+
+To compare simulations with experiments, we rescale yield onto the same axis (by dividing by a scaling factor) and facet the plot by year × planting experiment.
+
+The final plot shows:
+
+- Healthy light interception (green area)
+- Simulated light interception (dark green line)
+- Disease severity (blue line, points, and error bars)
+- Grain yield (black line, points, and error bars, rescaled)
+
+```{r last-plot, eval=TRUE, message=TRUE, warning=FALSE, echo=FALSE, fig.height=13, fig.width=8}
+
+yield_scale <- 4000
+
+plot_df <- final_outputs_joined %>%
+  mutate(
+    planting_period = as.integer(planting_period),
+    date = mdy(Date),
+    anno_plantingExperiment = paste0(GrowingSeason, "_sow_", planting_period)
+  ) %>%
+  arrange(GrowingSeason, planting_period) %>%
+  mutate(anno_plantingExperiment = fct_inorder(anno_plantingExperiment))
+
+ggplot(plot_df, aes(x = Doy)) +
+  geom_area(aes(y = LightIntHealthy, fill = "Healthy interception"),
+            alpha = 0.3, na.rm = TRUE) +
+  geom_line(aes(y = LightInterception, colour = "Light interception"),
+            linewidth = 0.5, na.rm = TRUE) +
+  geom_line(aes(y = DiseaseSeverity, colour = "Disease severity"),
+            linewidth = 0.5, na.rm = TRUE) +
+  geom_point(aes(y = DisSev/100, fill = "Disease severity"),
+             shape = 21, size = 2, stroke = 0.2, na.rm = TRUE) +
+  geom_line(aes(y = YieldActual / yield_scale, colour = "Yield"),
+            linewidth = 0.4, na.rm = TRUE) +
+  geom_point(aes(y = Yield / yield_scale, colour = "Yield"),
+             shape = 22, size = 2, stroke = 0.2, na.rm = TRUE) +
+  facet_wrap(~ anno_plantingExperiment,
+             scales = "free_x", strip.position = "top", ncol = 6) +
+  scale_y_continuous(
+    name = "Disease severity / Light interception (0–1)",
+    sec.axis = sec_axis(~ . * yield_scale, name = "Yield (kg/ha)")
+  ) +
+  scale_x_continuous(
+    breaks = seq(0, 366, by = 45),
+    labels = function(x) month.abb[ceiling(x/45)],
+    expand = c(0.1, 0.1)
+  ) +
+  scale_colour_manual(
+    name = NULL,
+    values = c("Disease severity" = "blue",
+               "Yield" = "black",
+               "Light interception" = "darkgreen")
+  ) +
+  scale_fill_manual(
+    name = NULL,
+    values = c("Disease severity" = "blue",
+               "Yield" = "black",
+               "Healthy interception" = "green3")
+  ) +
+  theme_classic(base_size = 12) +
+  theme(
+    strip.background = element_rect(fill = "white", colour = "grey80"),
+    strip.placement = "outside",
+    strip.text = element_text(size = 10),
+    legend.position = "top",
+    panel.spacing.x = unit(0.1, "lines"),
+    axis.text.x = element_text(size = 8),
+    axis.text.x.top = element_blank(),
+    axis.ticks.x.top = element_blank()
+  ) +
+  xlab("")
+
+```
+
+## 🌍 Interpretation and conclusion
+
+The plot above summarizes model simulations against observed data for six years
+and twelve sowing dates of cultivar *BRILHANTE* in Brazil.
+
+- ✅ **Healthy light interception** (green area) provides the baseline without disease.  
+- ✅ **Simulated interception** (dark green line) captures crop canopy dynamics.  
+- ✅ **Disease severity** (blue) is both simulated (line) and observed (points with error bars).  
+- ✅ **Yield** (black) shows observed vs simulated grain yield (scaled to fit).  
+
+Overall, the calibrated disease parameters reproduce the magnitude and seasonal
+patterns of wheat blast epidemics. The framework highlights how integrating
+**weather, management, and epidemiology** can provide robust estimates of yield
+losses.
+
+---
+
+## 📌 Key takeaway
+
+This vignette illustrated the **full calibration–validation cycle**:
+
+1. **Calibrate disease parameters** on a subset of experiments.  
+2. **Average** them into a robust epidemiological baseline.  
+3. **Validate** on independent experiments across years and sowing dates.  
+
+This workflow can be extended to other crops, pathosystems, and datasets
+using the same FraNchEstYN framework.
