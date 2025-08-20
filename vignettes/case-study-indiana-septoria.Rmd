@@ -1,8 +1,8 @@
 ---
-title: "Fitting disease severity for *Septoria* in Indiana"
+title: "Septoria on wheat in Indiana"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Fitting disease severity for Septoria in Indiana}
+  %\VignetteIndexEntry{Septoria on wheat in Indiana}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 css: vignette.css   # <--- add this line

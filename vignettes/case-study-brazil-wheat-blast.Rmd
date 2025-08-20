@@ -1,8 +1,8 @@
 ---
-title: "Estimating wheat yield losses from wheat blast in Brazil"
+title: "Wheat blast on wheat in Brazil"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Estimating wheat yield losses from wheat blast in Brazil}
+  %\VignetteIndexEntry{Wheat blast on wheat in Brazil}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 css: vignette.css
@@ -160,8 +160,7 @@ start_end <- c(2011, 2020)
 
 # 4. Choose a subset of sowing dates ("planting periods") for calibration
 #    These are representative experiments used to estimate disease parameters.
-#pps <- c(1, 3, 5, 7, 9, 11)
-pps <- c(1)
+pps <- c(1, 3, 5, 7, 9, 11)
 
 # Container for disease parameters from each planting period
 all_parameters <- list()

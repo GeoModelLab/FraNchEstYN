@@ -1,8 +1,8 @@
 ---
-title: "Estimating wheat yield losses from yellow rust in Egypt"
+title: "Yellow rust on wheat in Egypt"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Estimating wheat yield losses from yellow rust in Egypt}
+  %\VignetteIndexEntry{Yellow rust on wheat in Egypt}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 css: vignette.css

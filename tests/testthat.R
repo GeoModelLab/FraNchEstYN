@@ -11,7 +11,7 @@ library(tidyverse)
 
 setwd("C:\\GitHub\\FraNchEstYN")
 #remove.packages('FraNchEstYN')
-# devtools::document()
+ devtools::document()
  # devtools::install()
 
 

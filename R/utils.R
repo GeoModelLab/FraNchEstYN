@@ -208,26 +208,16 @@ parameters_to_df <- function(param_list) {
 #'
 #' @param df A `data.frame` with at least columns `Parameter` and `Value`.
 #' @param range_pct Numeric, optional. Percentage of the mean value to define
-#'   min/max ranges (default = 0.2, i.e. ±20%).
+#'   min/max ranges (default = 0.2, i.e. \eqn{\pm 20\%}).
 #' @param atomic_if_missing_meta Logical, optional. If `TRUE`, parameters
 #'   without metadata are stored as scalars instead of lists.
 #' @param zero_buffer Numeric, optional. Small positive buffer when value = 0
 #'   (default = 1e-6).
 #'
 #' @return A **named list** of parameters. Each element is either:
-#' \itemize{
-#'   \item A single numeric value (if `atomic_if_missing_meta = TRUE` and no
+#' A single numeric value (if `atomic_if_missing_meta = TRUE` and no
 #'         metadata are provided).
-#'   \item Otherwise, a list with elements:
-#'     \describe{
-#'       \item{description}{Character string with parameter description (if available).}
-#'       \item{unit}{Unit of measurement (if available).}
-#'       \item{min}{Lower bound of the parameter (mean - range).}
-#'       \item{max}{Upper bound of the parameter (mean + range).}
-#'       \item{value}{Central value (mean).}
-#'       \item{calibration}{Logical flag, set to `FALSE` by default.}
-#'     }
-#' }
+#' Otherwise, a list compatible `cropParameters` or `diseaseParameters`
 #'
 #' @details
 #' The ranges are computed as \code{value * (1 ± range_pct)}. This ensures
