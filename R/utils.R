@@ -206,32 +206,38 @@ parameters_to_df <- function(param_list) {
 #' This function converts a dataframe of parameter estimates into the nested
 #' list format used by FraNchEstYN (`cropParameters` or `diseaseParameters`).
 #'
-#' @param df A `data.frame` with at least columns `Parameter` and `value`.
+#' @param df A `data.frame` with at least columns `Parameter` and `Value`.
 #' @param range_pct Numeric, optional. Percentage of the mean value to define
 #'   min/max ranges (default = 0.2, i.e. ±20%).
+#' @param atomic_if_missing_meta Logical, optional. If `TRUE`, parameters
+#'   without metadata are stored as scalars instead of lists.
+#' @param zero_buffer Numeric, optional. Small positive buffer when value = 0
+#'   (default = 1e-6).
 #'
-#' @return
-#' A nested list of parameters. Each element contains:
+#' @return A **named list** of parameters. Each element is either:
 #' \itemize{
-#'   \item \code{min} — lower bound of the parameter (mean - range).
-#'   \item \code{max} — upper bound of the parameter (mean + range).
-#'   \item \code{value} — central value (mean).
-#'   \item \code{calibration} — logical flag, set to FALSE by default.
+#'   \item A single numeric value (if `atomic_if_missing_meta = TRUE` and no
+#'         metadata are provided).
+#'   \item Otherwise, a list with elements:
+#'     \describe{
+#'       \item{description}{Character string with parameter description (if available).}
+#'       \item{unit}{Unit of measurement (if available).}
+#'       \item{min}{Lower bound of the parameter (mean - range).}
+#'       \item{max}{Upper bound of the parameter (mean + range).}
+#'       \item{value}{Central value (mean).}
+#'       \item{calibration}{Logical flag, set to `FALSE` by default.}
+#'     }
 #' }
-#'
-#' @description
-#' The function rebuilds a list-of-lists in the same format as
-#' \code{FraNchEstYN::diseaseParameters} or \code{FraNchEstYN::cropParameters}.
-#' This is useful for reusing averaged parameter estimates across simulations.
 #'
 #' @details
 #' The ranges are computed as \code{value * (1 ± range_pct)}. This ensures
 #' each parameter has a plausible min and max around the central estimate.
+#' If `value` is 0, a buffer of `[0, zero_buffer]` is used.
 #'
 #' @examples
 #' param_summary <- data.frame(
 #'   Parameter = c("RUEreducerDamage","LatentPeriod"),
-#'   value     = c(0.5, 120)
+#'   Value     = c(0.5, 120)
 #' )
 #' df_to_parameters(param_summary, range_pct = 0.1)
 #'

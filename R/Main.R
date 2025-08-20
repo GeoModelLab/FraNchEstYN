@@ -363,40 +363,75 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
                                      verbose = TRUE) {
     # Normalize calibration
     calib <- tolower(trimws(as.character(calibration)))
-
+    
     # Trim spaces from column names
     names(reference_data) <- trimws(names(reference_data))
-
+    
     # Accepted aliases (case-insensitive)
     disease_aliases <- c("diseaseseverity", "dissev", "disease")
-
+    year_aliases    <- c("year")
+    doy_aliases     <- c("doy")
+    
     nms <- names(reference_data)
     low <- tolower(nms)
-
-    # Find first matching alias
-    hit <- match(disease_aliases, low, nomatch = 0)
-    hit <- hit[hit > 0]
-
-    if (length(hit) == 0) {
+    
+    # ---------------------------
+    # Check YEAR column
+    year_hit <- match(year_aliases, low, nomatch = 0)
+    year_hit <- year_hit[year_hit > 0]
+    if (length(year_hit) == 0) {
       stop(
-        sprintf(
-          "When calibration is '%s', reference_data must contain a disease column named one of: %s.\nColumns present: %s",
-          calib,
-          paste(c("DiseaseSeverity", "dissev", "disease"), collapse = ", "),
-          paste(nms, collapse = ", ")
-        ),
+        sprintf("reference_data must contain a 'year' column (accepted names: %s).\nColumns present: %s",
+                paste(year_aliases, collapse = ", "),
+                paste(nms, collapse = ", ")),
         call. = FALSE
       )
     }
-
-    # Rename the first match
-    idx <- hit[1]
-    old_name <- nms[idx]
-    names(reference_data)[idx] <- disease_name
-
+    
+    # Check DOY column
+    doy_hit <- match(doy_aliases, low, nomatch = 0)
+    doy_hit <- doy_hit[doy_hit > 0]
+    if (length(doy_hit) == 0) {
+      stop(
+        sprintf("reference_data must contain a 'doy' column (accepted names: %s).\nColumns present: %s",
+                paste(doy_aliases, collapse = ", "),
+                paste(nms, collapse = ", ")),
+        call. = FALSE
+      )
+    }
+    
+    # ---------------------------
+    # Locate potential disease column(s)
+    hit <- match(disease_aliases, low, nomatch = 0)
+    hit <- hit[hit > 0]
+    
+    if (calib == "crop") {
+      # Disease column is OPTIONAL
+      if (length(hit) > 0) {
+        idx <- hit[1]
+        names(reference_data)[idx] <- disease_name
+      }
+    } else {
+      # Disease column is REQUIRED
+      if (length(hit) == 0) {
+        stop(
+          sprintf(
+            "When calibration is '%s', reference_data must contain a disease column named one of: %s.\nColumns present: %s",
+            calib,
+            paste(c("DiseaseSeverity", "dissev", "disease"), collapse = ", "),
+            paste(nms, collapse = ", ")
+          ),
+          call. = FALSE
+        )
+      }
+      idx <- hit[1]
+      names(reference_data)[idx] <- disease_name
+    }
+    
     reference_data
   }
-
+  
+  
   ref_file <- file.path(input_reference_dir, "referenceData.csv")
 
   #required columns for c#
@@ -606,11 +641,11 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
   # --- WEATHER FILE WRITING ---
   # Aliases for date/time columns
   year_aliases  <- c("year", "yr", "yyyy")
-  month_aliases <- c("month", "mo", "mn")
+  month_aliases <- c("month", "mo", "mn", "mm")
   day_aliases   <- c("day", "dy", "dd")
   hour_aliases  <- c("hour", "hr", "hh")
 
-  rad_aliases <- c("rad", "radiation", "solar", "solarrad", "rs", "gsr")
+  rad_aliases <- c("rad", "radiation", "solar", "solarrad", "rs", "gsr", 'srad')
   lat_aliases <- c("lat", "latitude", "site_lat", "phi")
 
   nms <- tolower(names(weather_data))

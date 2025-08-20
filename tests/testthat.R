@@ -10,7 +10,7 @@ library(testthat)
 library(tidyverse)
 
 setwd("C:\\GitHub\\FraNchEstYN")
- remove.packages('FraNchEstYN')
+#remove.packages('FraNchEstYN')
 # devtools::document()
  # devtools::install()
 
