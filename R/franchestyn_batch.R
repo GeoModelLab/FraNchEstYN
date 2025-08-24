@@ -140,6 +140,17 @@ franchestyn_batch <- function(weather_data, management_data,
   # Detect calibration model
   calibrationModel <- "none"
 
+  # Check years
+  # --- validate start_end ---
+  if (!is.numeric(start_end) || length(start_end) != 2) {
+    stop("👹 'start_end' must be a numeric vector of length 2: c(start, end)")
+  }
+  start_year <- start_end[1]
+  end_year   <- start_end[2]
+
+  if (start_year > end_year) {
+    stop("👹 'start_end[1]' must be <= 'start_end[2]'")
+  }
 
 
   # Check requirements for calibration
@@ -198,17 +209,7 @@ franchestyn_batch <- function(weather_data, management_data,
     fungicideParameters = fungicideParameters
   )
 
-  # Check years
-  # --- validate start_end ---
-  if (!is.numeric(start_end) || length(start_end) != 2) {
-    stop("👹 'start_end' must be a numeric vector of length 2: c(start, end)")
-  }
-  start_year <- start_end[1]
-  end_year   <- start_end[2]
 
-  if (start_year > end_year) {
-    stop("👹 'start_end[1]' must be <= 'start_end[2]'")
-  }
 
   # Check timestep
   if (!timestep %in% c("daily", "hourly")) {
