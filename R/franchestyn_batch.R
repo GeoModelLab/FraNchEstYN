@@ -145,13 +145,12 @@ franchestyn_batch <- function(weather_data, management_data,
   # Check requirements for calibration
 
       # create fake reference data for C#
-    reference_data <- data.frame(
+      reference_data <- data.frame(
         crop    = "thisCrop",
         Disease = 0,
         doy     = 300,
         year    = start_year,
-        stringsAsFactors = FALSE
-
+        stringsAsFactors = FALSE)
 
   #TODO PATHS!!!
   pkg_path <- system.file("", package = "FraNchEstYN")
