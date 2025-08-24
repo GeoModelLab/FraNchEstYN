@@ -18,8 +18,6 @@
 ^.*\.user$
 ^.*\.csproj$
 ^.*\.sln$
-^.*\.dll$
-^.*\.exe$
 
 # RStudio project junk
 ^.*\.Rproj$
@@ -43,6 +41,3 @@
 ^.*\.Rproj$
 ^src_csharp/
 ^.*\.csv$
-^.*\.dll$
-^.*\.exe$
-

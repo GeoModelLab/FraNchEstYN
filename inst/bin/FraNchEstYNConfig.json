@@ -1,24 +1,24 @@
 {
-    "settings": {
-        "startYear": 1950,
-        "endYear": 2020,
-        "sites": [
-            "Indiana"
-        ],
-        "isCalibration": "true",
-        "calibrationVariable": "all",
-        "varieties": [
-            "Generic"
-        ],
-        "simplexes": 3,
-        "disease": "thisDisease",
-        "iterations": 111,
-        "weatherTimeStep": "daily"
-    },
-    "paths": {
-        "weatherDir": "..\\..\\..\\files\\weather",
-        "referenceFilePaths": "..\\..\\..\\files\\reference",
-        "paramFile": "..\\..\\..\\files\\parameters\\franchestynParameters.csv",
-        "sowingFile": "..\\..\\..\\files\\management\\mgt_indiana.csv"
-    }
+  "settings": {
+    "startYear": 1971,
+    "endYear": 1992,
+    "sites": [
+      "Indiana"
+    ],
+    "isCalibration": "true",
+    "calibrationVariable": "all",
+    "varieties": [
+      "Generic"
+    ],
+    "simplexes": 3,
+    "disease": "thisDisease",
+    "iterations": 1,
+    "weatherTimeStep": "daily"
+  },
+  "paths": {
+    "weatherDir": "C:\\GitHub\\FraNchEstYN\\inst\\bin\\files\\weather",
+    "referenceFilePaths": "C:\\GitHub\\FraNchEstYN\\inst\\bin\\files\\reference",
+    "paramFile": "C:\\GitHub\\FraNchEstYN\\inst\\bin\\files\\parameters\\franchestynParameters.csv",
+    "sowingFile": "C:\\GitHub\\FraNchEstYN\\inst\\bin\\files\\management\\sowing.csv"
+  }
 }

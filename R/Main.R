@@ -128,9 +128,10 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
                         calibration  = 'disease',
                         start_end = c(2000,2025),
                         apikey = NULL,                 # optional API key
-                        franchy_message = FALSE,
+                        franchy_message = FALSE,# whether to request spooky LLM summary)
                         ...,
-                        cleanup_outputs = TRUE)# whether to request spooky LLM summary)
+                        cleanup_outputs = TRUE,
+                        .__exe_dir__ = NULL)
 {
   # --- capture advanced args ---
   dots <- list(...)
@@ -190,16 +191,23 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
     }
   }
 
-  #TODO PATHS!!!
+  # --- Executable path resolution ---
   pkg_path <- system.file("", package = "FraNchEstYN")
-  exe_path <- system.file("bin", "FraNchEstYN.exe", package = "FraNchEstYN")
-  # pkg_path <- file.path(getwd(), "inst")
-  # exe_path <- file.path(pkg_path, "bin", "FraNchEstYN.exe")
+  exe_dir  <- if (!is.null(.__exe_dir__)) {
+    .__exe_dir__  # custom override (for local dev)
+  } else {
+    file.path(pkg_path, "bin")
+  }
+  exe_path <- file.path(exe_dir, "FraNchEstYN.exe")
 
-  if (!file.exists(exe_path)) stop("❌ Executable not found.")
+  if (!file.exists(exe_path)) {
+    stop("❌ Executable not found at: ", exe_path,
+         "\nHint: if testing locally, copy FraNchEstYN.exe into inst/bin/ or set .__exe_dir__ manually.")
+  }
+
 
   list_files_out <- list.files(
-    path = file.path(dirname(exe_path), "outputs"),
+    path = file.path(exe_dir, "outputs"),
     pattern = "\\.csv$",
     full.names = TRUE
   )
@@ -258,14 +266,14 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
   if (!file.exists(exe_path)) stop("🧛 Executable not found.")
 
   # Subfolders
-  input_weather_dir <- file.path(dirname(exe_path), "files", "weather", tolower(timestep))
-  input_parameters_dir   <- file.path(dirname(exe_path), "files", "parameters")
-  input_reference_dir     <- file.path(dirname(exe_path), "files", "reference")
-  input_management_dir     <- file.path(dirname(exe_path), "files", "management")
+  input_weather_dir    <- file.path(exe_dir, "files", "weather", tolower(timestep))
+  input_parameters_dir <- file.path(exe_dir, "files", "parameters")
+  input_reference_dir  <- file.path(exe_dir, "files", "reference")
+  input_management_dir <- file.path(exe_dir, "files", "management")
 
-  dir.create(input_weather_dir, recursive = TRUE, showWarnings = FALSE)
+  dir.create(input_weather_dir,    recursive = TRUE, showWarnings = FALSE)
   dir.create(input_parameters_dir, recursive = TRUE, showWarnings = FALSE)
-  dir.create(input_reference_dir, recursive = TRUE, showWarnings = FALSE)
+  dir.create(input_reference_dir,  recursive = TRUE, showWarnings = FALSE)
   dir.create(input_management_dir, recursive = TRUE, showWarnings = FALSE)
 
   # Path to write the reference file
@@ -624,10 +632,11 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
     )
   )
 
-  config_path <- file.path(dirname(exe_path), "FraNchEstYNConfig.json")
+  config_path <- file.path(exe_dir, "FraNchEstYNConfig.json")
   jsonlite::write_json(config, config_path, auto_unbox = TRUE, pretty = TRUE)
 
   cmd <- paste(shQuote(exe_path), shQuote(config_path))
+
 
   # random spooky icons for variety
   spooky_icons <- c("🧟", "🦇", "🕷", "🎃", "💀", "👻", "☠",  "🪓", "🩸",     # blood drop    # axe     # trap
@@ -691,8 +700,13 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
 
 
   #OUTPUTS----
-  list_files_out <- list.files(paste0(dirname(exe_path),"\\outputs"),
-                               pattern = "\\.csv$", full.names = TRUE)
+  outputs_dir <- file.path(exe_dir, "outputs")
+  list_files_out <- list.files(
+    outputs_dir,
+    pattern = "\\.csv$",
+    full.names = TRUE
+  )
+
 
   # read all files in a single dataframe
   outputs_df <- do.call(rbind, lapply(list_files_out, function(f) {
@@ -752,9 +766,11 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
   if (calibration != "none") {
     # ---- load calibrated parameter files --------------------------------------
     list_files_out_param <- list.files(
-      file.path(dirname(exe_path), "calibratedParameters"),
-      pattern = "\\.csv$", full.names = TRUE
+      file.path(exe_dir, "calibratedParameters"),
+      pattern = "\\.csv$",
+      full.names = TRUE
     )
+
 
     param_df <- if (length(list_files_out_param)) {
       do.call(rbind, lapply(list_files_out_param, function(f) {

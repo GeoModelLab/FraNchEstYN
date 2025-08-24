@@ -2,7 +2,7 @@
 #'
 #' @param jobs A list of jobs (each is a list of franchestyn() args).
 #' @param workers Number of parallel workers.
-#' @param cleanup If TRUE, remove sandbox dirs after run.
+#' @param cleanup If TRUE, remove sandbox dirs after run (default TRUE).
 #' @param cleanup_outputs If TRUE (default), remove output CSVs after reading;
 #'   if FALSE, CSVs remain in outputs/ (useful for large batch runs).
 #'
@@ -23,9 +23,14 @@ franchestyn_batch <- function(jobs,
     sandbox <- tempfile("franchestyn_run_")
     dir.create(sandbox, recursive = TRUE)
 
+    # copy exe into sandbox
+    exe_src <- system.file("bin", "FraNchEstYN.exe", package = "FraNchEstYN")
+    if (!file.exists(exe_src)) stop("❌ Package exe not found at ", exe_src)
+    file.copy(exe_src, file.path(sandbox, "FraNchEstYN.exe"))
+
     on.exit(if (cleanup) unlink(sandbox, recursive = TRUE, force = TRUE), add = TRUE)
 
-    # forward cleanup_outputs to franchestyn()
+    # forward sandbox exe_dir
     do.call(franchestyn, c(job, list(.__exe_dir__ = sandbox,
                                      cleanup_outputs = cleanup_outputs)))
   }

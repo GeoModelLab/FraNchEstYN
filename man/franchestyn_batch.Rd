@@ -16,7 +16,7 @@ franchestyn_batch(
 
 \item{workers}{Number of parallel workers.}
 
-\item{cleanup}{If TRUE, remove sandbox dirs after run.}
+\item{cleanup}{If TRUE, remove sandbox dirs after run (default TRUE).}
 
 \item{cleanup_outputs}{If TRUE (default), remove output CSVs after reading;
 if FALSE, CSVs remain in outputs/ (useful for large batch runs).}
