@@ -15,8 +15,7 @@ franchestyn(
   start_end = c(2000, 2025),
   apikey = NULL,
   franchy_message = FALSE,
-  ...,
-  cleanup_outputs = TRUE
+  ...
 )
 }
 \arguments{
@@ -112,8 +111,6 @@ Generated at \url{https://openrouter.ai/}.}
 
 \item{...}{Advanced options (hidden). Currently supports:
 \code{iterations} (integer; default 100).}
-
-\item{cleanup_outputs}{Logical. If TRUE, delete outputs after run. Default = TRUE.}
 }
 \value{
 A list with elements: \code{outputs}, \code{diagnostics},

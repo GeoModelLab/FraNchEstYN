@@ -2,28 +2,119 @@
 % Please edit documentation in R/franchestyn_batch.R
 \name{franchestyn_batch}
 \alias{franchestyn_batch}
-\title{Run multiple FraNchEstYN jobs in parallel, each with its own sandbox}
+\title{Run the FraNchEstYN crop–disease simulation or calibration}
 \usage{
 franchestyn_batch(
-  jobs,
-  workers = future::availableCores(),
-  cleanup = TRUE,
-  cleanup_outputs = TRUE
+  weather_data,
+  management_data,
+  cropParameters = NULL,
+  diseaseParameters = NULL,
+  fungicideParameters = NULL,
+  start_end = c(2000, 2025),
+  ...,
+  out_folder
 )
 }
 \arguments{
-\item{jobs}{A list of jobs (each is a list of franchestyn() args).}
+\item{weather_data}{A data frame of daily or hourly weather for \strong{one site only}.
+  The function will detect if input is daily or hourly.
+  Column names are matched case-insensitively, ignoring spaces, underscores, and dashes.
 
-\item{workers}{Number of parallel workers.}
+  \strong{Date columns (mandatory):}
 
-\item{cleanup}{If TRUE, remove sandbox dirs after run (default TRUE).}
+  Provide the combination of \code{year}, \code{month}, \code{day}
+  (and optionally \code{hour} for hourly data).
 
-\item{cleanup_outputs}{If TRUE (default), remove output CSVs after reading;
-if FALSE, CSVs remain in outputs/ (useful for large batch runs).}
+  \strong{Meteorological variables:}
+
+  \emph{Mandatory:}
+  \itemize{
+    \item Daily inputs: \code{tmax}, \code{tx}, \code{t2mmax}, \code{maxtemp}
+          (max temperature, °C),
+          \code{tmin}, \code{tn}, \code{t2mmin}, \code{mintemp}
+          (min temperature, °C),
+          \code{precipitation}, \code{prec}, \code{p}, \code{rainfall}, \code{rain}
+          (mm d\eqn{^{-1}}).
+    \item Hourly inputs: \code{temp}, \code{temperature}, \code{t2m}
+          (air temperature, °C),
+          \code{precipitation}, \code{prec}, \code{precip}, \code{prectotcorr},
+          \code{rainfall}, \code{rain} (mm h\eqn{^{-1}}).
+  }
+
+  \emph{Radiation or Latitude (one required):}
+  \itemize{
+    \item Radiation: \code{rad}, \code{solar}, \code{solarrad} [MJ m\eqn{^{-2}} d\eqn{^{-1}}]
+    \item Latitude: \code{lat}, \code{latitude}, \code{site_lat} [decimal degrees]
+  }
+  If radiation is missing, it will be estimated from latitude and day length.
+
+  \emph{Optional variables (used if present, estimated otherwise):}
+  \itemize{
+    \item Relative humidity:
+      \code{rh}, \code{humidity}, \code{relhumidity}, \code{relativehumidity} (hourly),
+      \code{rhmax}, \code{rhx} and \code{rhmin}, \code{rhn} (daily).
+    \item Leaf wetness: not required — computed internally from
+      humidity > 90\% or rainfall ≥ 0.2 mm/h.
+  }}
+
+\item{management_data}{A data frame with management information for the
+  \strong{same site} as \code{weather_data}. Column matching is case-insensitive;
+  spaces/underscores/dashes are ignored and normalized to snake_case.
+
+  \strong{Required columns:}
+  \itemize{
+    \item \code{crop} — character (e.g., "Wheat").
+    \item \code{sowingDOY} — integer DOY in \code{[1, 366]}.
+    \item \code{year} — either an ISO year (YYYY) or the string \code{"All"}.
+  }
+
+  \strong{Optional:}
+  \itemize{
+    \item \code{treatment} — character with one or more fungicide dates
+          separated by commas/semicolons (e.g., \code{"12 Feb; 28 Feb"}).
+  }}
+
+\item{cropParameters}{A named list of crop parameters
+(see \code{data(cropParameters)}).}
+
+\item{diseaseParameters}{A named list of disease parameters
+(see \code{data(diseaseParameters)}).}
+
+\item{fungicideParameters}{Optional list of fungicide parameters
+(see \code{data(fungicideParameters)}).}
+
+\item{start_end}{Numeric vector of length 2. Start and end years for simulation
+(default: \code{c(2000, 2025)}).}
+
+\item{out_folder}{output folder path}
 }
 \value{
-A list of franchestyn() results.
+A list with elements: \code{outputs}, \code{diagnostics},
+  \code{parameters}, \code{spooky_message}.
 }
 \description{
-Run multiple FraNchEstYN jobs in parallel, each with its own sandbox
+Runs the FraNchEstYN model. The function prepares inputs
+(weather, management, parameters, reference) and launches the executable.
+Users do not manage paths or config files manually.
+}
+\details{
+- Only one site per run.
+- Column names matched case-insensitively, tolerant to spaces, underscores, and dashes.
+}
+\examples{
+\dontrun{
+franchestyn(
+  weather_data        = weather_df,
+  management_data     = mgmt_df,
+  reference_data      = ref_df,
+  cropParameters      = cropParameters$wheat,
+  diseaseParameters   = diseaseParameters$septoria,
+  fungicideParameters = fungicideParameters$protectant,
+  calibration         = "all",
+  start_end           = c(2010, 2020),
+  apikey              = "sk-or-v1-xxxx",
+  franchy_message     = TRUE,
+  iterations          = 200
+)
+}
 }

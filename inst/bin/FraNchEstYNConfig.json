@@ -5,14 +5,14 @@
     "sites": [
       "Indiana"
     ],
-    "isCalibration": "true",
-    "calibrationVariable": "all",
+    "isCalibration": "false",
+    "calibrationVariable": "none",
     "varieties": [
       "Generic"
     ],
     "simplexes": 3,
     "disease": "thisDisease",
-    "iterations": 1,
+    "iterations": 666,
     "weatherTimeStep": "daily"
   },
   "paths": {
