@@ -1,0 +1,9 @@
+sName,fungicide,crop,variety,year,sowingDOY,treatment
+Hossana,no,wheat,All,2012,201,0
+Agecha,no,wheat,All,2012,204,0
+Hossana,2,wheat,All,2012,201,"Sep 23, Oct 23"
+Agecha,2,wheat,All,2012,204,"Oct 8, Nov 8"
+Hossana,3,wheat,All,2012,201,"Sep 16, Oct 6, Oct 26"
+Agecha,3,wheat,All,2012,204,"Oct 7, Oct 27, Nov 16"
+Hossana,7,wheat,All,2012,201,"Sep 3, Sep 13, Sep 23, Oct 3, Oct 13, Oct 23, Nov 2"
+Agecha,7,wheat,All,2012,204,"Sep 17, Sep 27, Oct 4, Oct 14, Oct 24, Nov 3"

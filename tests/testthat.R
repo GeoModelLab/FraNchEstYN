@@ -11,8 +11,11 @@ library(tidyverse)
 
 setwd("C:\\GitHub\\FraNchEstYN")
 #remove.packages('FraNchEstYN')
- devtools::document()
- # devtools::install()
+devtools::document()   # make sure roxygen → Rd is synced
+devtools::clean_dll()
+devtools::build(vignettes = FALSE)
+devtools::check(vignettes = FALSE)
+
 
 
 weather_data<-read.csv(paste0(getwd(),'\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\weather\\daily\\Indiana.csv'))
@@ -52,7 +55,7 @@ apikey  <- ""
 
 library(FraNchEstYN)
 
-source("R\\Main.R")
+#source("R\\Main.R")
 #load default parameters for wheat
 thisCropParam<-cropParameters$wheat
 # we do not need to calibrate the crop model here, but we have light interception data so we will disable all parameters related to cardinal temperatures and biomass and yield formation and we keep the ones regulating the shape of light interception (canopy dynamics)

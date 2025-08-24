@@ -152,8 +152,12 @@ data("cropParameters_brazil.rda")
 # 2. Disable calibration for crop parameters
 #    👉 we want to calibrate ONLY the disease model
 cropParameters_brazil <- FraNchEstYN::disable_all_calibration(cropParameters_brazil)
+
 #we load default parameters for wheat blast
 thisDiseaseParam<-diseaseParameters$wheat_blast
+thisDiseaseParam$AssimilateSappersDamage$calibration <- F
+thisDiseaseParam$AssimilateSappersDamage$value <- 0
+
 
 # 3. Define the study period
 start_end <- c(2011, 2020)

@@ -1,0 +1,346 @@
+---
+title: "Septoria fungicide trials in Ethiopia"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Septoria fungicide trials in Ethiopia}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+css: vignette.css
+---
+
+<style>
+.main-container { max-width: 1200px !important; }
+table, .table, .table-condensed { font-size: 85% !important; }
+caption { white-space: nowrap; }
+</style>
+
+## 🎯 Goal
+
+This vignette demonstrates how to use **FraNchEstYN** to simulate yield losses under different fungicide treatment for *Septoria tritici* in Ethiopia, using data from fungicide trials on three varieties and two locations in 2012.  
+
+The workflow has three main steps:
+
+1. **Crop and disease calibration**: adjust crop and disease parameters using the most susceptible variety.  
+2. **Adapt varietal resistance and fungicide scheduling**: simulate alternative fungicide schedules and varietal resistance levels.  
+
+Data are released with the package and were digitized from [trial reports](https://core.ac.uk/download/pdf/234661852.pdf) including weather (NASA POWER), reference disease observations, and management metadata.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE, comment = "#>", fig.width = 7, fig.height = 4,
+  message = FALSE, warning = FALSE
+)
+```
+
+## 📦 Packages
+We load FraNchEstYN plus helper libraries for wrangling and visualization.
+```{r libraries, include=T}
+library(FraNchEstYN)
+library(tidyverse)
+library(nasapower)
+library(scales)
+```
+
+## 📥 Data loading
+Hourly weather data were queried from NASA POWER for Agecha and Hossana sites.
+```{r load_weatherdata, include=T}
+data(weather_ethiopia)
+glimpse(weather_ethiopia)
+```
+
+## 📑 Disease and yield data
+
+Reference observations come from fungicide trials. We filter here for the Gambo variety in one site (Hossana
+) without fungicide (susceptible baseline). We will then apply the calibrated parameters on the other site (Agecha).
+
+```{r load_referencedata, include=T}
+data(reference_ethiopia)
+reference_data <- reference_ethiopia %>%
+  filter(variety == "Gambo", fungicide == "no", site == 'Hossana')
+head(reference_data)
+```
+
+## 🧰 Management data
+
+Basic management metadata (crop, sowing DOY, fungicide schedules) are included as management_ethiopia.
+
+```{r load_mandata, include=T}
+data(management_ethiopia)
+management_data<-management_ethiopia |> 
+  filter(site=='Hossana',fungicide=='no')
+
+head(management_ethiopia)
+```
+
+## 🌾🦠 Step 1 — Crop and disease calibration
+We first calibrate crop parameters (cycle length, base/optimum temperature, RUE) together with key disease parameters for Septoria (senescence acceleration, light stealer damage).
+Calibration is performed on Gambo without fungicide.
+
+```{r crop_disease_calib,  eval=TRUE, message=FALSE, warning=FALSE, results='hide'}
+thisCropParameters <- FraNchEstYN::disable_all_calibration(cropParameters$wheat)
+thisCropParameters$TbaseCrop$value <- 2
+thisCropParameters$ToptCrop$value  <- 21
+thisCropParameters$CycleLength$calibration <- TRUE
+thisCropParameters$CycleLength$min <- 2100
+thisCropParameters$CycleLength$max <- 2300
+thisCropParameters$RadiationUseEfficiency$calibration <- TRUE
+thisCropParameters$HalfIntSenescence$value<-90
+
+thisDiseaseParam <- diseaseParameters$septoria
+thisDiseaseParam$SenescenceAcceleratorDamage$calibration <- TRUE
+thisDiseaseParam$SenescenceAcceleratorDamage$max <- 0.1
+thisDiseaseParam$LightStealerDamage$min <- 0.1
+thisDiseaseParam$AssimilateSappersDamage$calibration<-F
+thisDiseaseParam$AssimilateSappersDamage$value<-0
+thisDiseaseParam$OuterInoculumShapeRelease$value<-1
+thisDiseaseParam$LightStealerDamage$min<-0
+thisDiseaseParam$LightStealerDamage$max<-.3
+thisDiseaseParam$HydroThermalTimeOnset$max<-5
+thisDiseaseParam$CyclePercentageOnset$max<-10
+thisDiseaseParam$CyclePercentageOnset$min<-0
+
+
+weather_ethiopia_singlesite <- weather_ethiopia |> 
+  filter(Site =='Hossana')
+
+df_calib <- franchestyn(
+  weather_data      = weather_ethiopia_singlesite,
+  management_data   = management_data,
+  reference_data    = reference_data,
+  cropParameters    = thisCropParameters,
+  diseaseParameters = thisDiseaseParam,
+  calibration       = "all",
+  start_end         = c(2012,2012),
+  iterations        = 999
+)
+
+sim <- df_calib$outputs$simulation
+```
+
+## 📊 Plot after calibration (single site = Hossana)
+```{r plot_hossana,  eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.height=5}
+yield_scale <- 4000
+
+ggplot(sim, aes(x = DaysAfterSowing)) +
+  # --- light interception dynamics ---
+  geom_line(aes(y = LightIntHealthy, colour = "Light interception (healthy)"),
+            alpha = 1, na.rm = TRUE) +
+  geom_line(aes(y = LightInterception, colour = "Light interception (diseased)"),
+            linewidth = 0.5, linetype = 2, na.rm = TRUE) +
+  
+  # --- fungicide efficacy (line + shaded area) ---
+  geom_line(aes(y = FungicideEfficacy, colour = "Fungicide efficacy"),
+            linewidth = 0.4, na.rm = TRUE) +
+  geom_area(aes(y = FungicideEfficacy, fill = "Fungicide efficacy"),
+            alpha = 0.5, na.rm = TRUE) +
+  
+  # --- disease severity (simulated + observed points) ---
+  geom_line(aes(y = DiseaseSeverity, colour = "Disease severity"),
+            linewidth = 0.8, na.rm = TRUE) +
+  geom_point(aes(y = DiseaseSeverityRef, colour = "Disease severity"),
+             shape = 21, size = 2.5, stroke = 0.2, na.rm = TRUE) +
+  
+  # --- yield (attainable vs actual, with ref points) ---
+  geom_line(aes(y = YieldAttainable / yield_scale, colour = "Yield attainable"),
+            linewidth = 0.4, linetype = 2, na.rm = TRUE) +
+  geom_point(aes(y = YieldRef / yield_scale, colour = "Yield attainable"),
+             shape = 22, size = 2.3, stroke = 0.2, na.rm = TRUE) +
+  geom_line(aes(y = YieldActual / yield_scale, colour = "Yield actual"),
+            linewidth = 0.8, na.rm = TRUE) +
+  geom_point(aes(y = YieldActualRef / yield_scale, colour = "Yield actual"),
+             shape = 21, size = 2.3, alpha = 0.5, stroke = 0.2, na.rm = TRUE) +
+  
+  # --- dual y-axis ---
+  scale_y_continuous(
+    name = "Disease severity / Light interception (0–1)",
+    sec.axis = sec_axis(~ . * yield_scale, name = "Yield (kg/ha)")
+  ) +
+  
+  # --- manual legend ---
+  scale_colour_manual(
+    name = "Variables",
+    values = c(
+      "Light interception (healthy)" = "green",
+      "Light interception (diseased)" = "black",
+      "Fungicide efficacy"            = "gold3",
+      "Disease severity"              = "darkslateblue",
+      "Yield attainable"              = "red",
+      "Yield actual"                  = "red"
+    )
+  ) +
+  scale_fill_manual(
+    name = "Area variables",
+    values = c("Fungicide efficacy" = "gold3")
+  ) +
+  
+  theme_classic(base_size = 12) +
+  theme(
+    legend.position = "top",
+    strip.text = element_text(size = 10),
+    axis.text.x = element_text(size = 8)
+  ) +
+  labs(title="Calibration on Hossana (Gambo, no fungicide)", x="")
+
+
+```
+
+💊 Step 2 — Varietal resistance and fungicide schedules
+We now extend simulations to the other site (Agecha), all varieties (Gambo, Galama, Alidoro) and fungicide schedules (no, 2, 3, 7). Only Varietal Resistance is adjusted per cultivar, while fungicide efficacy is applied through parameterized protectant functions.
+
+```{r fungicide_calib,  eval=TRUE, message=FALSE, warning=FALSE, results='hide'}
+#calibrated parameters
+# Disable calibration (fix crop + disease params after step 1 calibration)
+calibCrop    <- FraNchEstYN::disable_all_calibration(df_calib$parameters$crop)
+calibDisease <- FraNchEstYN::disable_all_calibration(df_calib$parameters$disease)
+
+# Initialize empty list to store all simulation outputs
+outputsSim <- list()
+
+fungicideParam <- FraNchEstYN::disable_all_calibration(FraNchEstYN::fungicideParameters$protectant)
+fungicideParam$TenacityFactor$value<-0.05
+fungicideParam$DegradationRate$value<-0.02
+fungicideParam$InitialEfficacy$value<-1
+fungicideParam$AShapeParameter$value<-3
+fungicideParam$BShapeParameter$value<-8
+
+# 🔁 Loop over sites (e.g., Hossana, Agecha)
+for (s in unique(reference_ethiopia$site)) {
+  
+  # 🔁 Loop over varieties (Gambo, Galama, Alidoro)
+  for (var in unique(reference_ethiopia$variety)) {
+    
+    # 🔁 Loop over fungicide treatments (no, 2, 3, 7)
+    for (f in unique(management_ethiopia$fungicide)) {
+      
+      # Filter datasets for this site–variety–fungicide combination
+      ref_sub <- reference_ethiopia %>%
+        filter(site == s, variety == var, fungicide == f)   # observed disease + yield
+      man_sub <- management_ethiopia %>%
+        filter(site == s, fungicide == f)                   # management schedule
+      weather_sub <- weather_ethiopia %>%
+        filter(Site == s)                                   # weather for this site
+      
+      # Skip this combination if any dataset is missing
+      if (nrow(ref_sub) == 0 | nrow(man_sub) == 0 | nrow(weather_sub) == 0) next
+      
+      # Run simulation with FraNchEstYN
+      res <- franchestyn(
+        weather_data        = weather_sub,
+        management_data     = man_sub,
+        reference_data      = ref_sub,
+        cropParameters      = calibCrop,
+        diseaseParameters   = calibDisease,
+        fungicideParameters = fungicideParam,
+        calibration         = "none",   # no further calibration, just simulate
+        start_end           = c(2012,2012),
+      )
+      
+      # If simulation produced outputs, store them in the list
+      if (!is.null(res$outputs$simulation)) {
+        outputsSim[[paste(s, var, f, sep = "_")]] <- res$outputs$simulation %>%
+          mutate(site = s, variety = var, fungicide = f)  # tag outputs with metadata
+      }
+    }
+  }
+}
+
+# Combine all site–variety–fungicide simulations into one data frame
+sim_all <- bind_rows(outputsSim)
+
+```
+
+📊 Plot after looping across sites, varieties, fungicides 
+
+```{r fungicide_plot,  eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=6}
+
+sim_all$fungicide <- factor(sim_all$fungicide,
+  levels=c("no","2","3","7"),
+  labels=c("no treat","2 treat","3 treat","7 treat"))
+
+yield_scale <- 4000
+
+ggplot(sim_all, aes(x = DaysAfterSowing)) +
+  # --- light interception ---
+  geom_line(aes(y = LightIntHealthy, colour = "Light interception (healthy)"),
+            alpha = 1, na.rm = TRUE) +
+  geom_line(aes(y = LightInterception, colour = "Light interception (diseased)"),
+            linewidth = 0.5, linetype = 2, na.rm = TRUE) +
+  
+  # --- fungicide efficacy ---
+  geom_line(aes(y = FungicideEfficacy, colour = "Fungicide efficacy"),
+            linewidth = 0.4, na.rm = TRUE) +
+  geom_area(aes(y = FungicideEfficacy, fill = "Fungicide efficacy"),
+            alpha = 0.5, na.rm = TRUE) +
+  
+  # --- disease severity ---
+  geom_line(aes(y = DiseaseSeverity, colour = "Disease severity"),
+            linewidth = 0.8, na.rm = TRUE) +
+  geom_point(aes(y = DiseaseSeverityRef, colour = "Disease severity"),
+             shape = 21, size = 2.5, stroke = 0.2, na.rm = TRUE) +
+  
+  # --- yield ---
+  geom_line(aes(y = YieldAttainable / yield_scale, colour = "Yield attainable"),
+            linewidth = 0.4, linetype = 2, na.rm = TRUE) +
+  geom_point(aes(y = YieldRef / yield_scale, colour = "Yield attainable"),
+             shape = 22, size = 2.3, stroke = 0.2, na.rm = TRUE) +
+  geom_line(aes(y = YieldActual / yield_scale, colour = "Yield actual"),
+            linewidth = 0.8, na.rm = TRUE) +
+  geom_point(aes(y = YieldActualRef / yield_scale, colour = "Yield actual"),
+             shape = 21, size = 2.3, alpha = 0.5, stroke = 0.2, na.rm = TRUE) +
+  
+  # --- dual y-axis ---
+  scale_y_continuous(
+    name = "Disease severity / Light interception (0–1)",
+    sec.axis = sec_axis(~ . * yield_scale, name = "Yield (kg/ha)")
+  ) +
+  
+  # --- manual legend ---
+  scale_colour_manual(
+    name = "Variables",
+    values = c(
+      "Light interception (healthy)" = "green",
+      "Light interception (diseased)" = "black",
+      "Fungicide efficacy"            = "gold3",
+      "Disease severity"              = "darkslateblue",
+      "Yield attainable"              = "red",
+      "Yield actual"                  = "red"
+    )
+  ) +
+  scale_fill_manual(
+    name = "Area variables",
+    values = c("Fungicide efficacy" = "gold3")
+  ) +
+  
+  facet_grid(variety ~ site + fungicide, switch = "y") +
+  theme_classic(base_size = 12) +
+  theme(
+    strip.background = element_rect(fill = "white", colour = "grey80"),
+    strip.placement = "outside",
+    strip.text = element_text(size = 10),
+    legend.position = "top",
+    panel.spacing.x = unit(0.1, "lines"),
+    axis.text.x = element_text(size = 8)
+  ) +
+  labs(title="Simulated vs observed dynamics across sites, varieties, and fungicide treatments", x="") 
+
+```
+
+## 📝 Key take-home messages
+
+FraNchEstYN successfully reproduced Septoria epidemics and yield losses observed in Ethiopia fungicide trials.
+
+Calibration on the susceptible variety Gambo at Hossana provided a baseline that transferred well to Agecha and to other varieties.
+
+Varietal resistance and fungicide scheduling strongly influenced epidemic progress and yield protection, with more resistant varieties and intensive spray schedules delaying disease development and sustaining yields.
+
+The modeling framework captured multiple canopy processes simultaneously (light interception, disease severity, fungicide efficacy, attainable and actual yields), allowing a holistic assessment of crop loss.
+
+Outputs are fully structured, enabling further diagnostics, parameter analysis, and scenario testing.
+
+## 🚀 Next steps
+
+- Apply the same workflow to other seasons or Ethiopian regions, by plugging in local weather and reference trial data.
+- Test alternative fungicide parameterizations (protectant vs systemic, degradation rates, efficacy curves) to assess spray strategies.
+- Explore genotype × environment × management interactions, by running varietal resistance levels under diverse climates.
+- Assess uncertainty by increasing calibration iterations and comparing parameter stability across replicates.
+- Extend this approach to economic or policy scenarios, estimating yield losses avoided through integrated disease management.

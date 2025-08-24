@@ -36,7 +36,7 @@ Read from `files/management/mgt_indiana.csv` and stored in the package via
 Data were digitized from the original publication by Shaner & Buechley (1995).
 }
 \examples{
-data(management_data)
-head(management_data)
+data(management_indiana)
+head(management_indiana)
 }
 \keyword{datasets}

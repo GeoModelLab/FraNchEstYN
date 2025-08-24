@@ -89,7 +89,7 @@
 #' \url{https://www.apsnet.org/publications/plantdisease/backissues/Documents/1995Articles/PlantDisease79n09_928.PDF}
 #'
 #' @examples
-#' data(management_data)
-#' head(management_data)
+#' data(management_indiana)
+#' head(management_indiana)
 "management_indiana"
 

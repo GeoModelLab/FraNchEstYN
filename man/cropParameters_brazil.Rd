@@ -32,7 +32,7 @@ Each element corresponds to one model parameter with fields:
 }
 }
 \examples{
-data(thisCropParameters)
-names(thisCropParameters)[1:5]
+data(cropParameters_brazil)
+names(cropParameters_brazil)[1:5]
 }
 \keyword{datasets}

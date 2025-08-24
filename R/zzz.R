@@ -1,5 +1,10 @@
 # zzz.R -------------------------------------------------------------------
 
+#' @keywords internal
+#' @importFrom stats cor end median na.omit start
+#' @importFrom utils flush.console head read.csv tail write.table
+"_PACKAGE"
+
 # Package-level environment (if you ever need to stash state)
 .FraNchEstYN <- new.env(parent = emptyenv())
 

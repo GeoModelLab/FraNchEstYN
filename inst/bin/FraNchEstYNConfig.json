@@ -1,20 +1,20 @@
 {
-  "settings": {
-    "startYear": 1950,
-    "endYear": 2020,
-    "sites": [
-        "Indiana"
-    ],
-    "isCalibration": "false",
-    "calibrationVariable": "all",
-    "varieties": [
-      "Generic"
-    ],
-    "simplexes":3,
-    "disease": "thisDisease",
-    "iterations": 111,
-    "weatherTimeStep": "daily"
-  },
+    "settings": {
+        "startYear": 1950,
+        "endYear": 2020,
+        "sites": [
+            "Indiana"
+        ],
+        "isCalibration": "true",
+        "calibrationVariable": "all",
+        "varieties": [
+            "Generic"
+        ],
+        "simplexes": 3,
+        "disease": "thisDisease",
+        "iterations": 111,
+        "weatherTimeStep": "daily"
+    },
     "paths": {
         "weatherDir": "..\\..\\..\\files\\weather",
         "referenceFilePaths": "..\\..\\..\\files\\reference",

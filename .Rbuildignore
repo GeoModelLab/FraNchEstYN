@@ -2,10 +2,47 @@
 ^\.Rproj\.user$
 ^README\.Rmd$
 ^LICENSE\.md$
-^src_csharp$
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
 ^\.github$
 ^doc$
 ^Meta$
+
+# VS / C# build junk
+^src_csharp$
+^src_csharp/.*\.vs$
+^src_csharp/.*/bin$
+^src_csharp/.*/obj$
+^.*\.suo$
+^.*\.user$
+^.*\.csproj$
+^.*\.sln$
+^.*\.dll$
+^.*\.exe$
+
+# RStudio project junk
+^.*\.Rproj$
+^\.Rproj\.user$
+^\.vs$
+
+# Extra top-level stuff not needed in build
+^shiny$
+^data-raw$
+^tests/githubSite\.R$
+
+# Notebook caches
+^\.Rproj\.user/shared/notebooks$
+^\.Rproj\.user/shared/notebooks/.*$
+
+# Debug output directories
+^bin/Debug$
+^bin/Debug/.*$
+
+^\.Rproj\.user$
+^.*\.Rproj$
+^src_csharp/
+^.*\.csv$
+^.*\.dll$
+^.*\.exe$
+

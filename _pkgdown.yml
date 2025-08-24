@@ -1,4 +1,5 @@
 url: https://geomodellab.github.io/FraNchEstYN/
+
 template:
   bootstrap: 5
   bootswatch: darkly
@@ -20,16 +21,14 @@ navbar:
     articles:
       text: "Articles"
       menu:
-        - text: "Getting started"
-          href: articles/getting-started.html
-        - text: "Case studies"
-          menu:
-            - text: "Septoria on wheat in Indiana"
-              href: articles/case-study-indiana.html
-            - text: "Wheat blast on wheat in Brazil"
-              href: articles/case-study-brazil.html
-            - text: "Yellow rust on wheat in Egypt"
-              href: articles/case-study-egypt.html
+        - text: "Septoria on wheat in Indiana"
+          href: articles/case-study-indiana-septoria.html
+        - text: "Wheat blast on wheat in Brazil"
+          href: articles/case-study-brazil-wheat-blast.html
+        - text: "Yellow rust on wheat in Egypt"
+          href: articles/case-study-egypt-yellow-rust.html
+        - text: "Septoria fungicide trials in Ethiopia"
+          href: articles/case-study-ethiopia-septoria-fungicide.html
     github:
       icon: fab fa-github
       href: https://github.com/GeoModelLab/FraNchEstYN
@@ -70,8 +69,11 @@ reference:
       - reference_indiana
       - reference_egypt
       - reference_brazil
+      - reference_ethiopia
+      - weather_ethiopia
       - management_indiana
       - management_brazil
+      - management_ethiopia
       - cropParameters_brazil
 
   - title: "Internal Utilities"
@@ -79,11 +81,9 @@ reference:
       - compute_error_metrics
 
 articles:
-  - title: "Getting started"
-    contents:
-      - getting-started
-
   - title: "Case studies"
-    - case-study-indiana-septoria
-    - case-study-brazil-wheat-blast
-    - case-study-egypt-yellow-rust
+    contents:
+      - case-study-indiana-septoria
+      - case-study-brazil-wheat-blast
+      - case-study-egypt-yellow-rust
+      - case-study-ethiopia-septoria-fungicide

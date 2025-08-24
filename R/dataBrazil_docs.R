@@ -93,6 +93,6 @@
 #' Pathology, 165*, 421–431. \doi{10.1007/s10658-022-02614-7}
 #'
 #' @examples
-#' data(thisCropParameters)
-#' names(thisCropParameters)[1:5]
+#' data(cropParameters_brazil)
+#' names(cropParameters_brazil)[1:5]
 "cropParameters_brazil"
