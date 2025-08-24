@@ -81,8 +81,8 @@ iterations = 666 #the devil number!
 calibration = 'all' #we calibrate the crop and disease model together
 
 source("R\\franchestyn_batch.R")
-
-franchestyn_batch(weather_data = weather_data,
+library(FraNchEstYN)
+FraNchEstYN::franchestyn_batch(weather_data = weather_data,
                 management_data = management_data,
                 cropParameters = thisCropParam,
                 diseaseParameters = thisDiseaseParam,

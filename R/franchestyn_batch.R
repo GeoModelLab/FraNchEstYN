@@ -143,22 +143,15 @@ franchestyn_batch <- function(weather_data, management_data,
 
 
   # Check requirements for calibration
-  if (calibration != "none") {
-    if (is.null(reference_data)) {
-      stop("🦇 'reference_data' must be provided for calibration.")
-    }
-  } else {
-    if (is.null(reference_data)) {
+
       # create fake reference data for C#
-      reference_data <- data.frame(
+    reference_data <- data.frame(
         crop    = "thisCrop",
         Disease = 0,
         doy     = 300,
         year    = start_year,
         stringsAsFactors = FALSE
-      )
-    }
-  }
+
 
   #TODO PATHS!!!
   pkg_path <- system.file("", package = "FraNchEstYN")
