@@ -1,4 +1,4 @@
-# FraNchEstYN – Framework for syNchronous Yield reductioN
+# FraNchEstYN – Framework for syNchronous Estimates of Yield reductioN
 
 <img src="man/figures/logo.png" alt="franchestyin logo" width="250" align="right"/>
 
@@ -10,84 +10,58 @@
 ---
 
 ## 📖 Overview
-FraNchEstYN is a hybrid R/C# modeling framework designed to quantify crop yield losses caused by plant diseases under varying environmental conditions.
-It couples a Radiation Use Efficiency (RUE) crop growth model with a generic epidemiological module that dynamically simulates daily disease severity based on weather-derived environmental suitability.
+**FraNchEstYN** is a **crop–disease–fungicide simulation and calibration framework**, designed to support quantitative research in **plant disease epidemiology and crop modeling**.  
 
-The model is intended for:
-
-    Yield loss assessment under historical and future climate scenarios
-
-    Integration with crop model ensembles (e.g., AgMIP datasets)
-
-    Multi-disease simulation without the need for disease-specific model development
-
-    Scenario analysis for plant protection strategies
+It integrates:  
+- 🌱 **Crop growth & yield dynamics** (internal or external crop models)  
+- 🦠 **Disease epidemiology** via weather-driven infection and damage mechanisms  
+- 💊 **Fungicide programs** (timing, efficacy, decay)  
+- 🔬 **Calibration routines** for crop, disease, or both  
+- 🤖 *Optional*: **LLM-based narrative summaries** of results in different tones (scientist, extensionist, farmer)  
 
 > **Note:** FraNchEstYN is released as an **R package** with **C# routines** invoked from R. It is currently available only on **Windows**, but cross-platform compatibility is under development. 
 
 ---
 
-## Table of Contents
+## 🚀 Highlights
 
-- [Highlights](#highlights)
-- [Description](#description)
-- [Installation](#installation)
-- [Getting Started](#getting-started)
-  - [phenologyCalibration()](#phenologyCalibration())
-  - [runPhenomenals()](#runPhenomenals()) 
-- [Support](#support)
-- [License](#license)
-  
----
-
-## Highlights
-
-- 🌾 Generic crop and epidemiology model 
-
-- 🦠 Simulate healthy vs diseased wheat yields
-
-- 🌡️ Driven by real weather data — temperature, humidity, and leaf wetness decide your fate
-
-- 🔗 Crop–disease coupling via SEIR model and damage mechanisms
-
-- 💀 Cross–environment, multi–disease analysis… at scale
-
-- ⚙️ R interface + C# model core (Windows only, for now…)
+- Coupling with **any external crop model** (via `cropModel_data`)  
+- Dynamic **epidemic simulation** with yield loss quantification  
+- Built-in **fungicide timing & effectiveness modeling**  
+- Flexible **parameter calibration** (`"none"`, `"crop"`, `"disease"`, `"all"`)  
+- AI-based **decision-support summaries** (if `franchy_message = TRUE`)  
+- 📦 Example datasets included for quick testing  
 
 ---
 
-## Description
+## 📘 Description
 
-Plant diseases account for 20–40% yield losses in staple crops globally (Savary et al., 2019), with losses expected to increase due to climate change (Singh et al., 2023).
-While crop models simulate environmental effects on growth, they rarely incorporate dynamic disease processes. Conversely, epidemiological models often simulate disease progression in isolation, without quantifying yield loss.
+Plant diseases account for **20–40% yield losses** in staple crops globally, with losses expected to be erratic under climate change.  
 
-FraNchEstYN bridges this gap by:
+- **Crop models** simulate environmental effects on growth and yield, but rarely include dynamic disease processes.  
+- **Epidemiological models** simulate disease progression, but usually in isolation, without linking to crop yield.  
 
-    Calculating daily infection suitability from temperature, humidity, and leaf wetness
+**FraNchEstYN bridges this gap** by combining crop growth, disease epidemiology, and fungicide dynamics into a single framework. It allows researchers to quantify yield losses directly from epidemic dynamics.  
 
-    Simulating epidemic progression via a generic infection model
+Specifically, FraNchEstYN:  
 
-    Coupling severity to growth by reducing light interception proportional to diseased leaf area
+- 📅 Calculates **daily infection suitability** from weather (temperature, humidity, leaf wetness)  
+- 🦠 Simulates **epidemic progression** using a generic infection model  
+- 🌱 Couples **disease severity to crop growth** by reducing light interception proportional to diseased leaf area  
+- 🌾 Computes **yield loss** as the difference between healthy and diseased crops  
 
-    Computing yield loss as the difference between simulated healthy and diseased crops
-    
-The model is intended for:
+The framework is intended for:  
 
-    Yield loss assessment under historical and future climate scenarios
+- Yield loss assessment under **historical and future climate scenarios**  
+- Integration with **crop model ensembles** (e.g., AgMIP datasets)  
+- Multi-disease simulation **without disease-specific model coding**  
+- Scenario analysis for **plant protection strategies** (fungicide timing, resistance levels, sowing dates)  
 
-    Integration with crop model ensembles (e.g., AgMIP datasets)
-
-    Multi-disease simulation without the need for disease-specific model development
-
-    Scenario analysis for plant protection strategies
-    
 ---
 
-## Installation
+## 📥 Installation
 
-> ⚠️ **Platform notice:**  
-> FraNchEstYN currently runs **only on Windows** due to its use of compiled C# executable.  
-> Cross-platform support (macOS/Linux) is under active development.
+> ⚠️ **Platform notice:** FraNchEstYN currently runs **only on Windows** due to its C# simulation core. Cross-platform support is in development.
 
 ### 1. Install R
 
@@ -100,20 +74,8 @@ If your R environment does not already have **devtools**, install it first:
 
 ```r
 install.packages("devtools")
-```
-
-### 3. Install FraNchEstYN from GitHub
-
-You can install the FraNchEstYN package directly using devtools:
-```r
 devtools::install_github("GeoModelLab/FraNchEstYN")
 ```
-
-This will:
-
-    Download the FraNchEstYN R package
-    Compile and install it locally
-    Include the precompiled C# backend executable required for model execution (Windows only, cross-platform support under development)
 
 ### Access Documentation    
 The core function franchestyn includes Roxygen-style documentation. You can access help directly from R:
@@ -129,39 +91,68 @@ The C# source code for the model core engine is included in the repository under
 
 ---
 
-## Getting Started
+## 🏃 Getting Started
 
-
----
-
-### phenologyCalibration()
-
-This function performs **calibration** of the PhenoMeNals phenology model using weather data and BBCH phenological observations.  
-It automatically prepares input files and calls the embedded C# engine — users do not need to handle configuration files manually.
-
----
-
-#### **Example**
+Example with built-in demo datasets
 
 ```r
-result <- franchestyn(
-  weather_data    = weather_df,
-  management_data = mgmt_df,
-  reference_data  = ref_df,   # Optional if calibration = "none"
-  cropParameters  = cropParams,
-  diseaseParameters = disParams,
-  calibration     = "all",    # "disease", "none", "all"
-  start_end       = c(2000, 2025),
-  sites           = "all",
-  varieties       = "all"
+
+library(FraNchEstYN)
+
+res <- franchestyn(
+  weather_data        = weather_example,
+  management_data     = management_example,
+  reference_data      = reference_example,
+  cropParameters      = cropParameters$Wheat,
+  diseaseParameters   = diseaseParameters$Septoria,
+  fungicideParameters = fungicideParameters$protectant,
+  calibration         = "disease",
+  start_end           = c(1972, 1975),
+  franchy_message     = TRUE,
+  personality         = "farmer"
 )
-```
 
-#### Outputs:
-```r
-result$outputs$simulation  # per-timestep outputs 
-result$outputs$summary    # season summaries (AUDPC, yields, etc.)
-result$diagnostics$metrics # RMSE, MAE, r, R2, NSE (if reference present)
-result$diagnostics$parameters # RMSE, MAE, r, R2, NSE (if reference present)
-result$parameters # calibrated crop and/or disease parameters
+str(res$outputs$summary)
 ```
+## 📊 Example diagnostic output
+
+```
+==================== 📊 FraNchEstYN Decision-support diagnostic 📊 ====================
+🧐 OVERVIEW
+In our fields, we’re seeing an average disease severity of about 4.3%,
+while crops are yielding around 8095 kg/ha. With rainfall at 618 mm
+and leaf wetness ~1125 h, conditions were moderately conducive.
+
+🌧️ WEATHER–DISEASE ASSOCIATIONS
+Weather–disease associations: rainfall (r=0.26); leaf-wetness (r=0.16); Tmax (r=0.13).
+
+🍄 DISEASE DYNAMICS (CALENDAR DATES)
+Typical onset ~04/22, rapid rise ~04/29, peak ~06/08.
+Growing season length ≈210 days.
+
+⚕️ FUNGICIDE PROGRAM & TIMING
+Average of 4.4 sprays. 60% were preventive, 40% late.
+Advice: shift first spray closer to onset (~04/22).
+
+🤖 MODEL PERFORMANCE
+Model–observation performance:
+• DisSev: RMSE≈0.32, R²≈0.84 (model underestimates)
+• LightInterception: insufficient validation signal
+
+📅 YEARLY HIGHLIGHTS
+• 1980: 9.9% severity; 7718 kg/ha (10.2% loss). Peak 06/07. [highest severity]
+• 1986: 0% severity; 8723 kg/ha (0% loss). [lowest severity]
+
+💬 PROVERB
+Moisture at the wrong time invites disease to thrive.
+======================================================================================
+```
+## 📚 Documentation & Website
+Full documentation and tutorials:
+👉 https://geomodellab.github.io/FraNchEstYN 
+
+## 📄 License
+Creative Commons Attribution-NonCommercial 3.0 Unported (CC BY-NC 3.0)
+
+## ✍ Authors
+Roberto Ferrise & Simone Bregaglio

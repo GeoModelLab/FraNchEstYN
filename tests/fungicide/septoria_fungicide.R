@@ -80,7 +80,7 @@ df<-FraNchEstYN::franchestyn(weather_data = weather_data,
                              diseaseParameters = thisDiseaseParam,
                              calibration="all", #'all', 'crop', 'disease'
                              start_end = start_end,
-                             iterations=1999)
+                             iterations=999)
 df$diagnostics$calibration$plots
 sim<-df$outputs$simulation
 

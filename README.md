@@ -17,30 +17,34 @@
 ## 📖 Overview
 **FraNchEstYN** is a **crop–disease–fungicide simulation and calibration framework**, designed to support **quantitative plant disease epidemiology and crop modeling research**.  
 
-It combines a **process-based crop–disease model in C#** with an **R interface** for data preprocessing, experiment setup, and automated post-analysis.  
+It couples a **process-based crop–disease model in C#** with an **R interface** for:
+- input preparation,
+- experiment setup,
+- simulation and calibration,  
+- and automated post-analysis with optional AI-driven narratives.  
+
+FraNchEstYN can run **standalone crop–disease–fungicide simulations** or be **coupled to any external crop model** (e.g. APSIM, DSSAT, STICS, WOFOST), provided daily LAI or fInt is supplied.  
 
 The framework integrates:
-- **Phenology-driven crop growth and yield formation**
-- **Disease epidemiology and plant–pathogen interactions through damage mechanisms**
-- **Fungicide dynamics and efficacy modeling**
-- **Calibration routines** for crop, disease, and fungicide parameters  
-- 🔮 *Optional*: a **Large Language Model (LLM) post-processor** that generates **narrative summaries** of outputs (`franchy_message = TRUE`), using an API key from [OpenRouter](https://openrouter.ai/)  
+- 🌱 **Crop growth & yield formation** (internal or externally provided)  
+- 🦠 **Disease epidemiology and host–pathogen dynamics**  
+- 💊 **Fungicide effects** (timing, dose, decay, efficacy)  
+- 🔬 **Calibration routines** for crop, disease, and fungicide parameters  
+- 📊 **Diagnostics & metrics** (RMSE, R², Bias, NSE)  
+- 🧙 **Optional narrative summaries** via Large Language Models (LLMs) in **scientist**, **extensionist**, or **farmer** styles  
 
-The result is a flexible tool for **dynamic simulation of disease severity to quantify yield losses** caused by plant diseases under different management and climatic scenarios.  
-
-> **Note:** FraNchEstYN is currently **Windows-only** due to its C# computation core. Cross-platform support is in progress.
+> ⚠️ Currently **Windows-only** due to the C# core. Cross-platform support is planned.  
 
 ---
 
 ## Highlights
 
-- 🌱 **Crop growth & yield dynamics** with environmental drivers and "genetic" modulators (parameters)   
-- 🦠 **Epidemic development** driven by weather variables, pathogen characteristics and host resistance  
-- 💊 **Fungicide modeling** (timing, dose, decay, efficacy classes)  
-- 🔬 **Parameter calibration** (`"crop"`, `"disease"`, or `"all"`) with automated optimization  
-- 📊 **Performance metrics** (RMSE, MAE, NSE, R²) calculated automatically  
-- 🖥 **Hybrid architecture**: R handles inputs/outputs, C# runs simulations  
-- 🧙 **LLM narrative summaries** for results interpretation (optional)  
+- Flexible: use FraNchEstYN **with or without an external crop model**  
+- Automated handling of weather, management, reference, and parameter data  
+- Multiple **calibration modes** (`"crop"`, `"disease"`, `"all"`, `"none"`)  
+- Integrated **fungicide programs** with multi-spray schedules  
+- Built-in **validation diagnostics** (summary tables, plots, and metrics)  
+- 🔮 LLM-based summaries: context-aware **scientist**, **extensionist**, or **farmer** commentary  
 
 ---
 
@@ -60,17 +64,18 @@ Minimal run example:
 library(FraNchEstYN)
 
 res <- franchestyn(
-  weather_data        = weather_df,      # one site only
-  management_data     = mgmt_df,         # crop/variety/sowing/treatments/year
-  reference_data      = ref_df,          # required if calibration != "none"
+  weather_data        = weather_df,       # one site only
+  management_data     = mgmt_df,          # crop/variety/sowing/treatments/year
+  reference_data      = ref_df,           # required if calibration != "none"
   cropParameters      = cropParameters$Wheat,
   diseaseParameters   = diseaseParameters$Septoria,
   fungicideParameters = fungicideParameters$protectant,
-  calibration         = "all",           # "none", "crop", "disease", "fungicide", or "all"
+  calibration         = "all",            # "none", "crop", "disease", "all"
   start_end           = c(2010, 2020),
-  api_key             = "your-openrouter-api-key", #start with sk-or-v1-xxxxxxxxxxxxxxxxxxx....
-  franchy_message     = TRUE, # enables the LLM message
-  iterations          = 200
+  iterations          = 200,              # Monte Carlo runs
+  apikey              = "sk-or-v1-xxxx",  # OpenRouter key
+  franchy_message     = TRUE,             # enables LLM commentary
+  personality         = "farmer"          # or "scientist" / "extensionist"
 )
 
 str(res$outputs$summary)
@@ -79,43 +84,94 @@ str(res$outputs$summary)
 
 ## 🔬 Scientific Purpose
 
-FraNchEstYN is developed as a research framework for:
+FraNchEstYN is designed for research on:
 
-- Assessing disease-induced yield reduction across environments
-- Supporting epidemiological and crop modeling experiments
-- Testing management strategies (e.g., sowing dates, fungicide timings, resistance levels)
-- Providing a transparent and reproducible modeling environment for the scientific community
+- Quantifying yield losses caused by plant diseases
+- Testing management strategies (sowing dates, fungicide timings, host resistance)
+- Exploring climate impacts on epidemics and yield formation
+- Model calibration & validation using observed reference data
+- Decision-support narratives with audience-specific styles
+
+## 🔗 Coupling with External Crop Models
+
+FraNchEstYN can be run **standalone** (using its internal crop growth routines) or **coupled with any external crop model** (e.g., APSIM, DSSAT, STICS, WOFOST, CropSyst, etc.).  
+
+When coupling, you must provide a `cropModel_data` dataframe with at least:
+
+- `year`, `doy` — growing season identifiers  
+- `agb` — above-ground biomass (g/m²)  
+- `yield` — attainable/potential yield (kg/ha or g/m²)  
+- `fint` (fraction of intercepted radiation, 0–1) **or** `lai` (leaf area index, m²/m²)  
+  - If only `lai` is provided, FraNchEstYN converts it internally:  
+    \[
+    f_{int} = 1 - \exp(-k \times LAI), \quad k=0.6 \ (\text{default})
+    \]
+
+Optional: `gdd` (growing degree days), `thermaltime`
+
+
+```r
+# External crop model outputs (simplified WOFOST run)
+wofost_out <- data.frame(
+  year = rep(2020, 5),
+  doy  = c(100, 120, 140, 160, 180),
+  lai  = c(0.5, 1.2, 3.5, 5.0, 3.8),
+  agb  = c(100, 350, 1200, 2500, 3800),
+  yield = c(0, 0, 0, 1000, 3000)
+)
+
+# Run FraNchEstYN with external LAI
+res <- franchestyn(
+  weather_data      = weather_df,
+  cropModel_data    = wofost_out,           # external crop model coupling
+  management_data   = mgmt_df,
+  reference_data    = NULL,                 # no calibration
+  diseaseParameters = diseaseParameters$Septoria,
+  fungicideParameters = fungicideParameters$protectant,
+  calibration       = "none",               # simulation only
+  start_end         = c(2020, 2020),
+  iterations        = 1,
+  franchy_message   = TRUE,
+  personality       = "extensionist"        # options: farmers/scientist/extensionist
+)
+
+👉 In this mode, no cropParameters are required — FraNchEstYN directly uses your crop model dynamics, while simulating disease progress and yield reduction.
+
+```
 
 ## 🩺 Example diagnostic output
 
-Running `franchestyn()` with weather, management, and crop–disease parameter inputs will produce a structured decision-support report.  
-Below is an illustrative excerpt:
+When franchy_message = TRUE, FraNchEstYN generates an LLM-based summary tailored to the selected persona.
+
+Example (persona = "farmer"):
 
 ```
 ==================== 📊 FraNchEstYN Decision-support diagnostic 📊 ====================
-🧐 OVERVIEW
-The crop-disease dataset reveals an average severity of approximately 65% and a mean yield of about 2905 kg/ha, with temperature ranges of Tx/Tn approximately 13.5/4.2 °C, total rainfall of around 798.6 mm, and cumulative leaf wetness of approximately 1603.8 hours, indicating critical infection windows conducive to disease development. These factors collectively inform the understanding of disease dynamics and potential
+🧑‍🌾 OVERVIEW
+In our fields, we’re seeing an average disease severity of about 4.3%, which isn’t too bad, while our crops are yielding around 8095 kg per hectare. With temperatures swinging between 10.8°C and 1.5°C, and rainfall at 617.8 mm, we’re keeping a close eye on leaf wetness, which has been around 1124.7 hours.
 
-🌧️ WEATHER–DISEASE ASSOCIATIONS
-Weather–disease associations: rainfall (r= 0.83 ); leaf-wetness (r= 0.71 ); t max (r= -0.03 ); t min (r= 0.11 ); rh max (r= 0.42 ); rh min (r= 0.45 ).
+🌦️ WEATHER–DISEASE LINK
+Rainfall (r=0.26), leaf-wetness (r=0.16), t max (r=0.13), t min (r=0.11), rh max (r=0.23), rh min (r=0.17).
 
-🍄 DISEASE DYNAMICS (CALENDAR DATES)
-The median timings for the observed season are as follows: onset on 05/26, rapid-rise on 06/09, and peak on 07/16. The total season length is approximately 280 days.
+🍄 DISEASE DYNAMICS
+The growing season begins around 04/22, with a rapid rise in growth observed by 04/29, reaching its peak on 06/08. The overall length of the season is ~210 days.
 
-⚕️ FUNGICIDE PROGRAM & TIMING
-Apply the first spray by 05/26 to align with the onset of disease. Given the late application pattern, ensure subsequent sprays are administered every 7–10 days, with the next application by 06/09.
-Applications often lagged the epidemic; advance the first spray to just before onset (≈ 05/26) and avoid long gaps during the rapid increase window (≈ 06/09).
+💊 FUNGICIDE PROGRAM
+On average 4.4 sprays. First spray near 04/22 (onset). 60% were preventive, 40% late.  
+Advice: Shift sprays closer to onset (≈04/22) and keep intervals tight around 04/29.
 
-🤖 MODEL PERFORMANCE
-Model–observation performance:
-• DisSev: RMSE≈0.22, R²≈0.89 (model underestimates)
-• LightInterception: RMSE≈0.13, R²≈0.95 (model underestimates)
+📈 MODEL PERFORMANCE
+DisSev: RMSE≈0.32, R²≈0.84 (model underestimates)  
+LightInterception: insufficient validation signal
 
 📅 YEARLY HIGHLIGHTS
-• 1973: 85.8% severity; 840.6 kg/ha (87.4% loss). Onset 05/17, rapid rise ~05/23, peak 07/07 (85.8%). First spray 12/12 (late) [highest severity]
-• 1986: 19.3% severity; 7794.5 kg/ha (1.8% loss). Onset 06/28, rapid rise ~06/28, peak 07/28 (19.3%). First spray 12/12 (late) [lowest severity]
-• 1989: 83.3% severity; 710.3 kg/ha (90.9% loss). Onset 05/22, rapid rise ~05/25, peak 07/15 (83.3%). First spray 12/12 (late)
-• 1990: 51.5% severity; 3713.1 kg/ha (50.6% loss). Onset 05/09, rapid rise ~06/09, peak 07/09 (51.5%). First spray 12/12 (late)
+• 1980: 9.9% severity; 7718 kg/ha (10.2% loss). Onset 04/17. First spray 04/14 (preventive) [highest severity]  
+• 1986: 0% severity; 8723 kg/ha (0% loss). No epidemic detected. First spray 04/15 [lowest severity]  
+...
+
+💬 PROVERB
+Moisture at the wrong time invites disease to thrive.
+
 ```
 
 ## Documentation

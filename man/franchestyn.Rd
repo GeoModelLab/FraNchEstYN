@@ -6,124 +6,156 @@
 \usage{
 franchestyn(
   weather_data,
-  management_data,
+  cropModel_data = NULL,
+  management_data = NULL,
   reference_data = NULL,
   cropParameters = NULL,
   diseaseParameters = NULL,
   fungicideParameters = NULL,
   calibration = "disease",
   start_end = c(2000, 2025),
+  k = 0.6,
+  iterations = 100,
   apikey = NULL,
   franchy_message = FALSE,
-  ...
+  personality = c("scientist", "extensionist", "farmer")
 )
 }
 \arguments{
-\item{weather_data}{A data frame of daily or hourly weather for \strong{one site only}.
-  The function will detect if input is daily or hourly.
-  Column names are matched case-insensitively, ignoring spaces, underscores, and dashes.
+\item{weather_data}{A data frame of daily or hourly weather for \strong{one site}.
+  Input frequency is auto-detected. Column names are matched case-insensitively,
+  ignoring spaces, underscores, and dashes.
 
   \strong{Date columns (mandatory):}
-
-  Provide the combination of \code{year}, \code{month}, \code{day}
-  (and optionally \code{hour} for hourly data).
+  \itemize{
+    \item Daily: \code{year}, \code{month}, \code{day}.
+    \item Hourly: additionally \code{hour}.
+  }
 
   \strong{Meteorological variables:}
-
-  \emph{Mandatory:}
   \itemize{
-    \item Daily inputs: \code{tmax}, \code{tx}, \code{t2mmax}, \code{maxtemp}
-          (max temperature, °C),
-          \code{tmin}, \code{tn}, \code{t2mmin}, \code{mintemp}
-          (min temperature, °C),
-          \code{precipitation}, \code{prec}, \code{p}, \code{rainfall}, \code{rain}
-          (mm d\eqn{^{-1}}).
-    \item Hourly inputs: \code{temp}, \code{temperature}, \code{t2m}
-          (air temperature, °C),
-          \code{precipitation}, \code{prec}, \code{precip}, \code{prectotcorr},
-          \code{rainfall}, \code{rain} (mm h\eqn{^{-1}}).
+    \item Daily (mandatory): max temp (\code{tmax}, \code{tx}, etc.), min temp (\code{tmin}, \code{tn}, etc.),
+          precipitation (\code{precipitation}, \code{rain}, etc.).
+    \item Hourly (mandatory): air temp (\code{temp}, \code{t2m}, etc.), precipitation.
   }
 
-  \emph{Radiation or Latitude (one required):}
+  \strong{Radiation/Latitude (at least one):}
   \itemize{
-    \item Radiation: \code{rad}, \code{solar}, \code{solarrad} [MJ m\eqn{^{-2}} d\eqn{^{-1}}]
-    \item Latitude: \code{lat}, \code{latitude}, \code{site_lat} [decimal degrees]
+    \item Radiation (\code{rad}, \code{solar}, etc.) [MJ m\eqn{^{-2}} d\eqn{^{-1}}]
+    \item Latitude (\code{lat}, \code{latitude}) [decimal degrees]
   }
-  If radiation is missing, it will be estimated from latitude and day length.
+  Radiation will be estimated if missing but latitude is supplied.
 
-  \emph{Optional variables (used if present, estimated otherwise):}
+  \strong{Optional:}
   \itemize{
-    \item Relative humidity:
-      \code{rh}, \code{humidity}, \code{relhumidity}, \code{relativehumidity} (hourly),
-      \code{rhmax}, \code{rhx} and \code{rhmin}, \code{rhn} (daily).
-    \item Leaf wetness: not required — computed internally from
-      humidity > 90\% or rainfall ≥ 0.2 mm/h.
+    \item Relative humidity (daily \code{rhmax}/\code{rhmin}, or hourly \code{rh})
+    \item Leaf wetness (computed internally from RH>90\% or rain ≥ 0.2 mm h\eqn{^{-1}})
   }}
 
-\item{management_data}{A data frame with management information for the
-  \strong{same site} as \code{weather_data}. Column matching is case-insensitive;
-  spaces/underscores/dashes are ignored and normalized to snake_case.
+\item{cropModel_data}{Optional crop-model output used instead of internal crop
+  growth simulation. If supplied:
+  \itemize{
+    \item Disease calibration is enforced automatically.
+    \item \code{cropParameters} are ignored.
+  }
+
+  Required columns: \code{year}, \code{doy}, \code{agb}, \code{yield},
+  and either \code{fint} or \code{lai}.
+
+  Optional: \code{gdd} / \code{thermal_time}.}
+
+\item{management_data}{Optional data frame of management operations
+  (for the same site as \code{weather_data}). Column names are normalized
+  to snake_case. Required if fungicide schedules are used.
 
   \strong{Required columns:}
   \itemize{
-    \item \code{crop} — character (e.g., "Wheat").
-    \item \code{sowingDOY} — integer DOY in \code{[1, 366]}.
-    \item \code{year} — either an ISO year (YYYY) or the string \code{"All"}.
+    \item \code{crop} — e.g. "Wheat".
+    \item \code{sowingDOY} — integer day-of-year.
+    \item \code{year} — ISO year (YYYY) or \code{"All"}.
   }
 
   \strong{Optional:}
   \itemize{
-    \item \code{treatment} — character with one or more fungicide dates
-          separated by commas/semicolons (e.g., \code{"12 Feb; 28 Feb"}).
+    \item \code{treatment_1}, \code{treatment_2}, … — DOY of fungicide sprays.
   }}
 
-\item{reference_data}{An optional data frame with observations;
-  **required when** \code{calibration != "none"}.
-  Column names are matched case-insensitively, spaces trimmed, and aliases accepted.
+\item{reference_data}{Optional data frame with observed values.
+  Required if \code{calibration != "none"}. Column names are normalized.
 
-  \strong{Minimum requirement for disease calibration:}
-  Must contain a disease severity column:
-  \code{DiseaseSeverity}, \code{dissev}, or \code{disease}.
-  Values should be fractional in \code{[0,1]}.
+  \strong{For disease calibration:} must include a disease severity column
+  named \code{DiseaseSeverity}, \code{dissev}, or \code{disease}, with
+  values in \eqn{[0,1]}.
 
-  Recommended alignment: year + DOY
-  (\code{year}/\code{yr} + \code{doy}/\code{day_of_year}).}
+  Recommended keys: \code{year}, \code{doy}.}
 
-\item{cropParameters}{A named list of crop parameters
-(see \code{data(cropParameters)}).}
+\item{cropParameters}{Nested list of crop parameters. Required unless
+\code{cropModel_data} is supplied.}
 
-\item{diseaseParameters}{A named list of disease parameters
-(see \code{data(diseaseParameters)}).}
+\item{diseaseParameters}{Nested list of disease parameters (always required).}
 
-\item{fungicideParameters}{Optional list of fungicide parameters
-(see \code{data(fungicideParameters)}).}
+\item{fungicideParameters}{Optional list of fungicide parameters.
+If omitted, defaults to \code{fungicideParameters$protectant}.}
 
-\item{calibration}{Character. What to calibrate:
-\code{"none"}, \code{"crop"}, \code{"disease"}, or \code{"all"}.}
+\item{calibration}{What to calibrate. One of:
+\itemize{
+  \item \code{"none"} — run only.
+  \item \code{"crop"} — calibrate crop parameters.
+  \item \code{"disease"} — calibrate disease parameters.
+  \item \code{"all"} — calibrate both.
+}
+If \code{cropModel_data} is provided, this is forced to \code{"disease"}.}
 
-\item{start_end}{Numeric vector of length 2. Start and end years for simulation
-(default: \code{c(2000, 2025)}).}
+\item{start_end}{Numeric length-2. Start and end years for simulation
+(default \code{c(2000, 2025)}).}
 
-\item{apikey}{Optional string. API key for enabling LLM-based commentary.
-Generated at \url{https://openrouter.ai/}.}
+\item{k}{Extinction coefficient for Beer’s law conversion of LAI→fInt
+(default 0.6).}
 
-\item{franchy_message}{Logical. If TRUE, generate commentary via LLM.}
+\item{iterations}{Integer. Number of Monte Carlo runs (default 100).
+Can also be set via \code{...}.}
 
-\item{...}{Advanced options (hidden). Currently supports:
-\code{iterations} (integer; default 100).}
+\item{apikey}{Optional API key string for enabling LLM commentary
+(via \url{https://openrouter.ai/}).}
+
+\item{franchy_message}{Logical. If \code{TRUE}, generates a diagnostic
+commentary block. If \code{apikey} is valid, LLM-based text is used,
+otherwise rule-based summaries are returned.}
+
+\item{personality}{Character. Style of AI-generated commentary:
+\code{"scientist"}, \code{"extensionist"}, or \code{"farmer"}.}
 }
 \value{
-A list with elements: \code{outputs}, \code{diagnostics},
-  \code{parameters}, \code{spooky_message}.
+A list with elements:
+  \itemize{
+    \item \code{outputs} — simulated time series.
+    \item \code{diagnostics} — calibration diagnostics.
+    \item \code{parameters} — parameter sets used.
+    \item \code{decision_support_message} — optional persona-driven report.
+  }
 }
 \description{
-Runs the FraNchEstYN model. The function prepares inputs
-(weather, management, parameters, reference) and launches the executable.
-Users do not manage paths or config files manually.
+Prepares inputs (weather, management, crop model, parameters, reference) and
+runs the FraNchEstYN model executable. Users never manage paths or config
+files manually.
 }
 \details{
-- Only one site per run.
-- Column names matched case-insensitively, tolerant to spaces, underscores, and dashes.
+FraNchEstYN can operate standalone (with its internal crop growth routines)
+or be coupled with \strong{any external crop model} by supplying
+\code{cropModel_data}. In that case, crop growth dynamics (e.g. biomass,
+intercepted radiation, yield) come directly from the external model, while
+FraNchEstYN handles disease progression, fungicide programs, and yield loss.
+
+Supports flexible management inputs, default or user-specified fungicide
+parameterizations, and optional AI-based commentary in different
+communication styles (\code{"scientist"}, \code{"extensionist"},
+\code{"farmer"}).
+
+
+- One site per run.
+- Column matching is forgiving (case-insensitive, ignores underscores/dashes).
+- If \code{calibration="none"} and \code{reference_data} is missing,
+  a dummy dataset is created for compatibility.
 }
 \examples{
 \dontrun{
@@ -138,6 +170,7 @@ franchestyn(
   start_end           = c(2010, 2020),
   apikey              = "sk-or-v1-xxxx",
   franchy_message     = TRUE,
+  personality         = "farmer",
   iterations          = 200
 )
 }

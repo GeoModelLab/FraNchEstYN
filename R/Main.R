@@ -1,109 +1,137 @@
 #' Run the FraNchEstYN crop–disease simulation or calibration
 #'
-#' Runs the FraNchEstYN model. The function prepares inputs
-#' (weather, management, parameters, reference) and launches the executable.
-#' Users do not manage paths or config files manually.
+#' Prepares inputs (weather, management, crop model, parameters, reference) and
+#' runs the FraNchEstYN model executable. Users never manage paths or config
+#' files manually.
 #'
-#' @param weather_data A data frame of daily or hourly weather for \strong{one site only}.
-#'   The function will detect if input is daily or hourly.
-#'   Column names are matched case-insensitively, ignoring spaces, underscores, and dashes.
+#' FraNchEstYN can operate standalone (with its internal crop growth routines)
+#' or be coupled with \strong{any external crop model} by supplying
+#' \code{cropModel_data}. In that case, crop growth dynamics (e.g. biomass,
+#' intercepted radiation, yield) come directly from the external model, while
+#' FraNchEstYN handles disease progression, fungicide programs, and yield loss.
+#'
+#' Supports flexible management inputs, default or user-specified fungicide
+#' parameterizations, and optional AI-based commentary in different
+#' communication styles (\code{"scientist"}, \code{"extensionist"},
+#' \code{"farmer"}).
+#'
+#' @param weather_data A data frame of daily or hourly weather for \strong{one site}.
+#'   Input frequency is auto-detected. Column names are matched case-insensitively,
+#'   ignoring spaces, underscores, and dashes.
 #'
 #'   \strong{Date columns (mandatory):}
-#'
-#'   Provide the combination of \code{year}, \code{month}, \code{day}
-#'   (and optionally \code{hour} for hourly data).
+#'   \itemize{
+#'     \item Daily: \code{year}, \code{month}, \code{day}.
+#'     \item Hourly: additionally \code{hour}.
+#'   }
 #'
 #'   \strong{Meteorological variables:}
-#'
-#'   \emph{Mandatory:}
 #'   \itemize{
-#'     \item Daily inputs: \code{tmax}, \code{tx}, \code{t2mmax}, \code{maxtemp}
-#'           (max temperature, °C),
-#'           \code{tmin}, \code{tn}, \code{t2mmin}, \code{mintemp}
-#'           (min temperature, °C),
-#'           \code{precipitation}, \code{prec}, \code{p}, \code{rainfall}, \code{rain}
-#'           (mm d\eqn{^{-1}}).
-#'     \item Hourly inputs: \code{temp}, \code{temperature}, \code{t2m}
-#'           (air temperature, °C),
-#'           \code{precipitation}, \code{prec}, \code{precip}, \code{prectotcorr},
-#'           \code{rainfall}, \code{rain} (mm h\eqn{^{-1}}).
+#'     \item Daily (mandatory): max temp (\code{tmax}, \code{tx}, etc.), min temp (\code{tmin}, \code{tn}, etc.),
+#'           precipitation (\code{precipitation}, \code{rain}, etc.).
+#'     \item Hourly (mandatory): air temp (\code{temp}, \code{t2m}, etc.), precipitation.
 #'   }
 #'
-#'   \emph{Radiation or Latitude (one required):}
+#'   \strong{Radiation/Latitude (at least one):}
 #'   \itemize{
-#'     \item Radiation: \code{rad}, \code{solar}, \code{solarrad} [MJ m\eqn{^{-2}} d\eqn{^{-1}}]
-#'     \item Latitude: \code{lat}, \code{latitude}, \code{site_lat} [decimal degrees]
+#'     \item Radiation (\code{rad}, \code{solar}, etc.) [MJ m\eqn{^{-2}} d\eqn{^{-1}}]
+#'     \item Latitude (\code{lat}, \code{latitude}) [decimal degrees]
 #'   }
-#'   If radiation is missing, it will be estimated from latitude and day length.
+#'   Radiation will be estimated if missing but latitude is supplied.
 #'
-#'   \emph{Optional variables (used if present, estimated otherwise):}
+#'   \strong{Optional:}
 #'   \itemize{
-#'     \item Relative humidity:
-#'       \code{rh}, \code{humidity}, \code{relhumidity}, \code{relativehumidity} (hourly),
-#'       \code{rhmax}, \code{rhx} and \code{rhmin}, \code{rhn} (daily).
-#'     \item Leaf wetness: not required — computed internally from
-#'       humidity > 90\% or rainfall ≥ 0.2 mm/h.
+#'     \item Relative humidity (daily \code{rhmax}/\code{rhmin}, or hourly \code{rh})
+#'     \item Leaf wetness (computed internally from RH>90\% or rain ≥ 0.2 mm h\eqn{^{-1}})
 #'   }
 #'
-#' @param management_data A data frame with management information for the
-#'   \strong{same site} as \code{weather_data}. Column matching is case-insensitive;
-#'   spaces/underscores/dashes are ignored and normalized to snake_case.
+#' @param management_data Optional data frame of management operations
+#'   (for the same site as \code{weather_data}). Column names are normalized
+#'   to snake_case. Required if fungicide schedules are used.
 #'
 #'   \strong{Required columns:}
 #'   \itemize{
-#'     \item \code{crop} — character (e.g., "Wheat").
-#'     \item \code{sowingDOY} — integer DOY in \code{[1, 366]}.
-#'     \item \code{year} — either an ISO year (YYYY) or the string \code{"All"}.
+#'     \item \code{crop} — e.g. "Wheat".
+#'     \item \code{sowingDOY} — integer day-of-year.
+#'     \item \code{year} — ISO year (YYYY) or \code{"All"}.
 #'   }
 #'
 #'   \strong{Optional:}
 #'   \itemize{
-#'     \item \code{treatment} — character with one or more fungicide dates
-#'           separated by commas/semicolons (e.g., \code{"12 Feb; 28 Feb"}).
+#'     \item \code{treatment_1}, \code{treatment_2}, … — DOY of fungicide sprays.
 #'   }
 #'
-#' @param reference_data An optional data frame with observations;
-#'   **required when** \code{calibration != "none"}.
-#'   Column names are matched case-insensitively, spaces trimmed, and aliases accepted.
+#' @param cropModel_data Optional crop-model output used instead of internal crop
+#'   growth simulation. If supplied:
+#'   \itemize{
+#'     \item Disease calibration is enforced automatically.
+#'     \item \code{cropParameters} are ignored.
+#'   }
 #'
-#'   \strong{Minimum requirement for disease calibration:}
-#'   Must contain a disease severity column:
-#'   \code{DiseaseSeverity}, \code{dissev}, or \code{disease}.
-#'   Values should be fractional in \code{[0,1]}.
+#'   Required columns: \code{year}, \code{doy}, \code{agb}, \code{yield},
+#'   and either \code{fint} or \code{lai}.
 #'
-#'   Recommended alignment: year + DOY
-#'   (\code{year}/\code{yr} + \code{doy}/\code{day_of_year}).
+#'   Optional: \code{gdd} / \code{thermal_time}.
 #'
-#' @param cropParameters A named list of crop parameters
-#'   (see \code{data(cropParameters)}).
+#' @param reference_data Optional data frame with observed values.
+#'   Required if \code{calibration != "none"}. Column names are normalized.
 #'
-#' @param diseaseParameters A named list of disease parameters
-#'   (see \code{data(diseaseParameters)}).
+#'   \strong{For disease calibration:} must include a disease severity column
+#'   named \code{DiseaseSeverity}, \code{dissev}, or \code{disease}, with
+#'   values in \eqn{[0,1]}.
 #'
-#' @param fungicideParameters Optional list of fungicide parameters
-#'   (see \code{data(fungicideParameters)}).
+#'   Recommended keys: \code{year}, \code{doy}.
 #'
-#' @param calibration Character. What to calibrate:
-#'   \code{"none"}, \code{"crop"}, \code{"disease"}, or \code{"all"}.
+#' @param cropParameters Nested list of crop parameters. Required unless
+#'   \code{cropModel_data} is supplied.
 #'
-#' @param start_end Numeric vector of length 2. Start and end years for simulation
-#'   (default: \code{c(2000, 2025)}).
+#' @param diseaseParameters Nested list of disease parameters (always required).
 #'
-#' @param apikey Optional string. API key for enabling LLM-based commentary.
-#'   Generated at \url{https://openrouter.ai/}.
+#' @param fungicideParameters Optional list of fungicide parameters.
+#'   If omitted, defaults to \code{fungicideParameters$protectant}.
 #'
-#' @param franchy_message Logical. If TRUE, generate commentary via LLM.
+#' @param calibration What to calibrate. One of:
+#'   \itemize{
+#'     \item \code{"none"} — run only.
+#'     \item \code{"crop"} — calibrate crop parameters.
+#'     \item \code{"disease"} — calibrate disease parameters.
+#'     \item \code{"all"} — calibrate both.
+#'   }
+#'   If \code{cropModel_data} is provided, this is forced to \code{"disease"}.
 #'
-#' @param ... Advanced options (hidden). Currently supports:
-#'   \code{iterations} (integer; default 100).
+#' @param start_end Numeric length-2. Start and end years for simulation
+#'   (default \code{c(2000, 2025)}).
+#'
+#' @param k Extinction coefficient for Beer’s law conversion of LAI→fInt
+#'   (default 0.6).
+#'
+#' @param iterations Integer. Number of Monte Carlo runs (default 100).
+#'   Can also be set via \code{...}.
+#'
+#' @param personality Character. Style of AI-generated commentary:
+#'   \code{"scientist"}, \code{"extensionist"}, or \code{"farmer"}.
+#'
+#' @param apikey Optional API key string for enabling LLM commentary
+#'   (via \url{https://openrouter.ai/}).
+#'
+#' @param franchy_message Logical. If \code{TRUE}, generates a diagnostic
+#'   commentary block. If \code{apikey} is valid, LLM-based text is used,
+#'   otherwise rule-based summaries are returned.
 #'
 #'
 #' @details
-#' - Only one site per run.
-#' - Column names matched case-insensitively, tolerant to spaces, underscores, and dashes.
+#' - One site per run.
+#' - Column matching is forgiving (case-insensitive, ignores underscores/dashes).
+#' - If \code{calibration="none"} and \code{reference_data} is missing,
+#'   a dummy dataset is created for compatibility.
 #'
-#' @return A list with elements: \code{outputs}, \code{diagnostics},
-#'   \code{parameters}, \code{spooky_message}.
+#' @return A list with elements:
+#'   \itemize{
+#'     \item \code{outputs} — simulated time series.
+#'     \item \code{diagnostics} — calibration diagnostics.
+#'     \item \code{parameters} — parameter sets used.
+#'     \item \code{decision_support_message} — optional persona-driven report.
+#'   }
 #'
 #' @examples
 #' \dontrun{
@@ -118,23 +146,29 @@
 #'   start_end           = c(2010, 2020),
 #'   apikey              = "sk-or-v1-xxxx",
 #'   franchy_message     = TRUE,
+#'   personality         = "farmer",
 #'   iterations          = 200
 #' )
 #' }
 #' @export
-franchestyn <- function(weather_data, management_data, reference_data = NULL,
-                        cropParameters = NULL, diseaseParameters = NULL, fungicideParameters = NULL,
+franchestyn <- function(weather_data,
+                        cropModel_data = NULL,
+                        management_data = NULL,
+                        reference_data = NULL,
+                        cropParameters = NULL,
+                        diseaseParameters = NULL,
+                        fungicideParameters = NULL,
                         calibration  = 'disease',
                         start_end = c(2000,2025),
+                        k = 0.6,
+                        iterations=100,# extinction coefficient for LAI→fInt
                         apikey = NULL,                 # optional API key
                         franchy_message = FALSE,
-                        ...)# whether to request spooky LLM summary)
+                        personality = c("scientist", "extensionist", "farmer"))  # NEW...)# whether to request spooky LLM summary)
 {
-  # --- capture advanced args ---
-  dots <- list(...)
-  iterations <- dots$iterations %||% 100  # default to 100 if not provided
-
-  `%||%` <- function(a, b) if (!is.null(a)) a else b
+  # Always coerce to character first
+  personality <- match.arg(as.character(personality),
+                           choices = c("scientist", "extensionist", "farmer"))
 
   # --- detect timestep automatically ---
   normalize <- function(x) {
@@ -162,15 +196,34 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
   # Determine mode
   mode <- if (calibration == "none") "simulation" else "calibration"
 
-  # Detect calibration model
-  calibrationModel <- "crop"
-  if (calibration %in% c("crop", "all")) {
-    calibrationModel <- ifelse(calibration == "crop", "crop", "All")
-  } else if (grepl("^disease(:.*)?$", trimws(calibration), ignore.case = TRUE)) {
-    calibrationModel <- "disease"
+  # --- Detect calibration model ---
+  if (!is.null(cropModel_data)) {
+    if (tolower(calibration) == "none") {
+      # crop model but user explicitly said no calibration
+      calibrationModel <- "none"
+      message("🌱 cropModel_data detected, sowing years/DOYs inferred from cycles")
+    } else {
+      calibrationModel <- "disease"
+      calibration <- "disease"  # force disease mode
+      message("🌱 cropModel_data detected, sowing years/DOYs inferred from cycles")
+    }
+  } else {
+    if (tolower(calibration) %in% c("crop","all")) {
+      calibrationModel <- ifelse(tolower(calibration) == "crop", "crop", "All")
+    } else if (grepl("^disease(:.*)?$", trimws(calibration), ignore.case = TRUE)) {
+      calibrationModel <- "disease"
+    } else {
+      calibrationModel <- "none"
+    }
   }
 
-  # Check requirements for calibration
+  # --- Only run calibration block if not "none" ---
+  if (calibrationModel != "none") {
+    # your calibration code block here
+  }
+
+
+  # --- Check requirements for calibration ---
   if (calibration != "none") {
     if (is.null(reference_data)) {
       stop("🦇 'reference_data' must be provided for calibration.")
@@ -182,7 +235,7 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
         crop    = "thisCrop",
         Disease = 0,
         doy     = 300,
-        year    = start_year,
+        year    = start_end[1],
         stringsAsFactors = FALSE
       )
     }
@@ -195,6 +248,121 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
   # exe_path <- file.path(pkg_path, "bin", "FraNchEstYN.exe")
 
   if (!file.exists(exe_path)) stop("❌ Executable not found.")
+
+  ## ------------------- CROP MODEL HANDLING ------------------- ##
+  crop_model_dir <- file.path(dirname(exe_path), "files", "cropModel")
+  dir.create(crop_model_dir, recursive = TRUE, showWarnings = FALSE)
+
+  cropModel_flag <- "no"
+
+  if (!is.null(cropModel_data)) {
+    if (!is.data.frame(cropModel_data)) {
+      stop("❌ 'cropModel_data' must be a data.frame if provided.")
+    }
+
+    # Normalizer (like in C#)
+    normalize <- function(x) tolower(gsub("[ _-]", "", x))
+    nms <- normalize(names(cropModel_data))
+
+    # --- required column mapping ---
+    year_col <- names(cropModel_data)[nms %in% c("year","yr")][1]
+    doy_col  <- names(cropModel_data)[nms %in% c("doy","dayofyear","dy","d")][1]
+    agb_col  <- names(cropModel_data)[nms %in% c("agb","abovegroundbiomass","biomass","wtop")][1]
+    yld_col  <- names(cropModel_data)[nms %in% c("yield","yieldattainable","yieldpotential","wgrn","grainyieldpotential")][1]
+    fint_col <- names(cropModel_data)[nms %in% c("fint","f_int","lightinterception","lightint","lightinterception")][1]
+    lai_col  <- names(cropModel_data)[nms %in% c("lai","leafareaindex")][1]
+    gdd_col  <- names(cropModel_data)[nms %in% c("gdd","thermaltime","thermal_time")][1]
+
+    if (is.null(year_col) || is.null(doy_col)) stop("❌ cropModel_data must contain 'year' and 'doy' columns")
+    if (is.null(agb_col) || is.null(yld_col)) stop("❌ cropModel_data must contain both 'AGB' and 'Yield' columns")
+    if (is.null(fint_col) && is.null(lai_col))stop("❌ cropModel_data must contain either 'fInt' or 'LAI' column")
+
+    # --- LAI → fInt conversion (Beer’s law) ---
+    if (is.null(fint_col) && !is.null(lai_col)) {
+      cropModel_data$fInt <- 1 - exp(-k * cropModel_data[[lai_col]])
+      fint_col <- "fInt"
+      message(sprintf("🌱 Converted LAI to fInt using k = %.2f", k))
+    }
+
+    # --- build Date from Year + DOY ---
+    cropModel_data$Date <- as.Date(
+      cropModel_data[[doy_col]] - 1,
+      origin = paste0(cropModel_data[[year_col]], "-01-01")
+    )
+
+    # --- standardize columns ---
+    cm <- data.frame(
+      Date  = cropModel_data$Date,
+      Year  = as.integer(cropModel_data[[year_col]]),
+      DOY   = as.integer(cropModel_data[[doy_col]]),
+      fInt  = as.numeric(cropModel_data[[fint_col]]),
+      AGB   = as.numeric(cropModel_data[[agb_col]]),
+      Yield = as.numeric(cropModel_data[[yld_col]]),
+      stringsAsFactors = FALSE
+    )
+
+    # optional GDD / ThermalTime
+    has_gdd <- FALSE
+    if (!is.na(gdd_col)) {cm$GDD <- as.numeric(cropModel_data[[gdd_col]])
+      has_gdd <- TRUE
+      message("📈 Included GDD/ThermalTime column.")}
+
+    # --- detect cycles (sowing jumps or harvest resets) ---
+    dates <- sort(unique(cm$Date))
+    cycles <- list()
+    cycle_start <- min(dates)
+
+    for (i in seq(2, length(dates))) {
+      prev <- dates[i-1]; curr <- dates[i]
+
+      # detect DOY jump not due to year wrap
+      doy_backwards <- as.integer(format(curr, "%j")) < as.integer(format(prev, "%j"))
+      year_wrap <- format(prev, "%m") == "12" && format(curr, "%m") == "01"
+      sowing_jump <- doy_backwards && !year_wrap
+
+      # detect harvest reset (yield drops >100 → <=100)
+      yPrev <- cm$Yield[cm$Date == prev][1]
+      yCurr <- cm$Yield[cm$Date == curr][1]
+      harvest_reset <- !is.na(yPrev) && !is.na(yCurr) && (yCurr <= 100 && yPrev > 100)
+
+      if (sowing_jump || harvest_reset) {
+        cycles[[length(cycles)+1]] <- c(cycle_start, prev)
+        cycle_start <- curr
+      }
+    }
+    cycles[[length(cycles)+1]] <- c(cycle_start, max(dates))  # close final cycle
+
+    # --- compute cycle percentage ---
+    cm$cyclePercentage <- NA_real_
+
+    for (cyc in cycles) {
+      start <- as.Date(cyc[1]); end <- as.Date(cyc[2])
+      idx <- cm$Date >= start & cm$Date <= end
+      if (!any(idx)) next
+
+      if (has_gdd) {
+        gdd_vals <- cm$GDD[idx]
+        gdd_max <- suppressWarnings(max(gdd_vals, na.rm = TRUE))
+        if (is.finite(gdd_max) && gdd_max > 0) {
+          cm$cyclePercentage[idx] <- gdd_vals / gdd_max * 100
+        }
+      } else {
+        total_days <- as.numeric(end - start)
+        if (total_days > 0) {
+          cm$cyclePercentage[idx] <- as.numeric(difftime(cm$Date[idx], start, units = "days")) /
+            total_days * 100
+        }
+      }
+    }
+
+    # --- write file ---
+    out_crop_file <- file.path(crop_model_dir, "cropModelData.csv")
+    write.table(cm, out_crop_file,
+                sep = ",", row.names = FALSE, col.names = TRUE, quote = FALSE)
+
+    cropModel_flag <- "yes"
+  }
+
 
   list_files_out <- list.files(
     path = file.path(dirname(exe_path), "outputs"),
@@ -218,21 +386,42 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
   # will accept "Indiana" and return the canonical name from management_data
   sites <- unique(weather_data$Site)
 
-  if(length(sites)>1)
-  {
+  if(length(sites)>1){
     stop("💀 weather_data' must contain a single site!")
   }
 
-  # Check Parameters
-  if (!is.list(cropParameters)) stop("🕸 'cropParameters' must be a nested list.")
-  if (!is.list(diseaseParameters)) stop("🕸 'diseaseParameters' must be a nested list.")
+  # ---- Fallback for fungicides ----
+  if (is.null(fungicideParameters)) {
+    if (exists("fungicideParameters", envir = asNamespace("FraNchEstYN"))) {
+      pkg_fungicides <- get("fungicideParameters", envir = asNamespace("FraNchEstYN"))
+      fungicideParameters <- pkg_fungicides$protectant
+    }
+  }
 
-  # Run the check:
-  validate_parameter_ranges(
-    cropParameters = cropParameters,
-    diseaseParameters = diseaseParameters,
-    fungicideParameters = fungicideParameters
-  )
+  # ---- Check Parameters ----
+  if (is.null(cropModel_data)) {
+    # Standard case → need crop & disease parameters
+    if (!is.list(cropParameters)) stop("🕸 'cropParameters' must be a nested list.")
+    if (!is.list(diseaseParameters)) stop("🕸 'diseaseParameters' must be a nested list.")
+
+    validate_parameter_ranges(
+      cropParameters      = cropParameters,
+      diseaseParameters   = diseaseParameters,
+      fungicideParameters = fungicideParameters
+    )
+
+  } else {
+    # Crop model provided → cropParameters ignored
+    if (!is.null(cropParameters)) {
+      cropParameters <- NULL
+    }
+    if (!is.list(diseaseParameters)) stop("🕸 'diseaseParameters' must be a nested list.")
+
+    validate_parameter_ranges(
+      diseaseParameters   = diseaseParameters,
+      fungicideParameters = fungicideParameters
+    )
+  }
 
   # Check years
   # --- validate start_end ---
@@ -274,6 +463,19 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
     # Normalize calibration
     calib <- tolower(trimws(as.character(calibration)))
 
+    # If calibration = "none" and reference_data is NULL → just return NULL
+    if (calib == "none" && is.null(reference_data)) {
+      if (isTRUE(verbose)) {
+        message("ℹ️ Calibration = 'none' and no reference_data supplied → skipping checks.")
+      }
+      return(NULL)
+    }
+
+    if (is.null(reference_data)) {
+      stop(sprintf("reference_data must be provided when calibration = '%s'.", calib),
+           call. = FALSE)
+    }
+
     # Trim spaces from column names
     names(reference_data) <- trimws(names(reference_data))
 
@@ -286,7 +488,7 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
     low <- tolower(nms)
 
     # ---------------------------
-    # Check YEAR column
+    # Check YEAR column (always required)
     year_hit <- match(year_aliases, low, nomatch = 0)
     year_hit <- year_hit[year_hit > 0]
     if (length(year_hit) == 0) {
@@ -298,7 +500,7 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
       )
     }
 
-    # Check DOY column
+    # Check DOY column (always required)
     doy_hit <- match(doy_aliases, low, nomatch = 0)
     doy_hit <- doy_hit[doy_hit > 0]
     if (length(doy_hit) == 0) {
@@ -315,7 +517,7 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
     hit <- match(disease_aliases, low, nomatch = 0)
     hit <- hit[hit > 0]
 
-    if (calib == "crop") {
+    if (calib %in% c("crop", "none")) {
       # Disease column is OPTIONAL
       if (length(hit) > 0) {
         idx <- hit[1]
@@ -341,152 +543,172 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
     reference_data
   }
 
-
   ref_file <- file.path(input_reference_dir, "referenceData.csv")
 
-  #required columns for c#
-  reference_data$site    <- sites
-  reference_data$variety <- "Generic"
+  # required columns for C#
+  if (!is.null(reference_data)) {
+    reference_data$site    <- sites
+    reference_data$variety <- "Generic"
 
-  # Make the column named exactly "thisDisease"
-  reference_data <- prepare_reference_data(reference_data,
-                                           calibration = calibration,
-                                           disease_name = "thisDisease")
+    # Make the column named exactly "thisDisease"
+    reference_data <- prepare_reference_data(reference_data,
+                                             calibration = calibration,
+                                             disease_name = "thisDisease")
 
-  write.table(
-    reference_data,
-    file = ref_file,
-    sep = ",",
-    row.names = FALSE,
-    col.names = TRUE,
-    quote = FALSE
-  )
+    write.table(
+      reference_data,
+      file = ref_file,
+      sep = ",",
+      row.names = FALSE,
+      col.names = TRUE,
+      quote = FALSE
+    )
+  }
 
-  # build output file path
+
+  ##-- MANAGEMENT DATA --##
   man_file <- file.path(input_management_dir, "sowing.csv")
 
-  # normalize names for safety
-  names(management_data) <- tolower(gsub("\\s+", "_", names(management_data)))
+  management_user <- management_data  # copy raw
 
-  # required columns
-  required <- c("crop", "sowingdoy", "year")
-  missing_req <- setdiff(required, names(management_data))
-  if (length(missing_req)) {
-    stop("Missing required column(s): ", paste(missing_req, collapse = ", "))
-  }
-
-  # override or assign site column
-  if (length(sites) == 1L) {
-    management_data$site <- sites
-  } else if (length(sites) == nrow(management_data)) {
-    management_data$site <- sites
-  } else {
-    stop("`sites` must be length 1 or equal to nrow(management_data).")
-  }
-
-  # coerce crop & variety
-  management_data$crop    <- as.character(management_data$crop)
-  management_data$variety <- "Generic"
-
-  # sowingDOY checks
-  management_data$sowingdoy <- as.integer(management_data$sowingdoy)
-  bad_doy <- !is.na(management_data$sowingdoy) &
-    !(management_data$sowingdoy >= 1 & management_data$sowingdoy <= 366)
-  if (any(bad_doy)) {
-    warning("Some sowingDOY values are out of [1..366]: rows ",
-            paste(which(bad_doy), collapse = ", "))
-  }
-
-  # year handling
-  management_data$year <- trimws(as.character(management_data$year))
-  is_all   <- tolower(management_data$year) == "all"
-  is_yyyy  <- grepl("^\\d{4}$", management_data$year)
-  bad_year <- !(is_all | is_yyyy | is.na(management_data$year))
-  if (any(bad_year)) {
-    warning("Some 'year' values are neither 'All' nor YYYY: rows ",
-            paste(which(bad_year), collapse = ", "))
-  }
-  yr_num <- suppressWarnings(as.integer(management_data$year))
-  yr_num[!is_yyyy] <- NA_integer_
-  if (!any(is_all, na.rm = TRUE)) {
-    management_data$year <- yr_num
-    if (any(!is.na(management_data$year) &
-            (management_data$year < 1900 | management_data$year > 2100))) {
-      warning("Some 'year' values are outside [1900..2100]: rows ",
-              paste(which(!is.na(management_data$year) &
-                            (management_data$year < 1900 | management_data$year > 2100)),
-                    collapse = ", "))
+  if (is.null(cropModel_data)) {
+    # ------------------ STANDARD CASE ------------------
+    if (is.null(management_user)) {
+      stop("❌ Either 'management_data' or 'cropModel_data' must be provided.")
     }
-  } else {
-    out_of_range <- !is.na(yr_num) & (yr_num < 1900 | yr_num > 2100)
-    if (any(out_of_range)) {
-      warning("Some numeric 'year' values are outside [1900..2100]: rows ",
-              paste(which(out_of_range), collapse = ", "))
+
+    names(management_user) <- tolower(gsub("\\s+", "_", names(management_user)))
+
+    # required cols
+    required <- c("crop", "year")
+    missing_req <- setdiff(required, names(management_user))
+    if (length(missing_req)) {
+      stop("Missing required column(s): ", paste(missing_req, collapse = ", "))
     }
-    # keep as character when "All" is present
+
+    # site assignment
+    if (!"site" %in% names(management_user)) {
+      management_user$site <- sites[1]
+    }
+    if (!"variety" %in% names(management_user)) {
+      management_user$variety <- "All"
+    }
+
+    # sowing DOY (optional)
+    if (!"sowingdoy" %in% names(management_user)) {
+      management_user$sowingdoy <- NA_integer_
+    } else {
+      management_user$sowingdoy <- as.integer(management_user$sowingdoy)
+    }
+
+    # year cleanup
+    management_user$year <- trimws(as.character(management_user$year))
+    is_all   <- tolower(management_user$year) == "all"
+    is_yyyy  <- grepl("^\\d{4}$", management_user$year)
+    yr_num   <- suppressWarnings(as.integer(management_user$year))
+    yr_num[!is_yyyy] <- NA_integer_
+    if (!any(is_all, na.rm = TRUE)) {
+      management_user$year <- yr_num
+    }
+
+  } else {
+    # --- derive sowings directly from cropModel cycles ---
+    sowings <- lapply(cycles, function(cyc) {
+      start <- as.Date(cyc[1])
+      data.frame(
+        site      = sites,
+        crop      = "wheat",
+        variety   = "Generic",
+        sowingdoy = as.integer(strftime(start, "%j")),
+        year      = as.integer(format(start, "%Y")),
+        stringsAsFactors = FALSE
+      )
+    })
+    management_auto <- do.call(rbind, sowings)
+
+    # 👇 merge user treatments if provided
+    if (!is.null(management_data) && "treatment" %in% names(management_data)) {
+      message("💊 Using fungicide treatments from user-supplied management_data.")
+
+      names(management_data) <- tolower(gsub("\\s+", "_", names(management_data)))
+
+      # Keep only year + treatment
+      tr_in <- management_data[, c("year", "treatment"), drop = FALSE]
+
+      # Merge by year → treatments appear only where year matches
+      management_auto <- merge(
+        management_auto,
+        tr_in,
+        by = "year",
+        all.x = TRUE
+      )
+    }
+
+    management_user <- management_auto
   }
 
-  # if a 'treatment' column is present, parse dates into DOY treatment_1..n
-  if ("treatment" %in% names(management_data)) {
-    fallback_year <- 2021L  # used when year == "All" or missing
+  # ---- detect and parse treatments ----
+  treatment_cols <- character(0)
+  if (!is.null(management_user) && "treatment" %in% names(management_user)) {
+    fallback_year <- 2021L
 
     parse_doy <- function(tok, yr) {
-      tok <- gsub("[-./]", " ", tok, perl = TRUE)
+      tok <- gsub("[-./]", " ", tok)
       tok <- gsub("\\s+", " ", trimws(tok))
-      for (fmt in c("%d %b %Y", "%b %d %Y", "%d %B %Y", "%B %d %Y")) {
+      for (fmt in c("%d %b %Y", "%b %d %Y", "%d %B %Y", "%B %d %Y", "%d %b", "%b %d")) {
         d <- as.Date(paste(tok, yr), format = fmt)
         if (!is.na(d)) return(as.integer(strftime(d, "%j")))
       }
       NA_integer_
     }
 
-    for (i in seq_len(nrow(management_data))) {
-      cell <- management_data$treatment[[i]]
-      if (is.null(cell)) next
+    is_all <- tolower(management_user$year) == "all"
 
-      toks <- if (length(cell) > 1) as.character(cell) else {
-        x <- as.character(cell)
-        if (is.na(x) || !nzchar(trimws(x))) character(0) else
-          trimws(unlist(strsplit(x, "[,;]+", perl = TRUE)))
-      }
+    for (i in seq_len(nrow(management_user))) {
+      cell <- management_user$treatment[[i]]
+      if (is.null(cell) || !nzchar(cell)) next
+      toks <- trimws(unlist(strsplit(as.character(cell), "[,;]+")))
+      toks <- toks[nzchar(toks)]
       if (!length(toks)) next
 
-      ref_year <- if (is_all[i]) fallback_year else suppressWarnings(as.integer(management_data$year[i]))
+      ref_year <- if (is_all[i]) fallback_year else suppressWarnings(as.integer(management_user$year[i]))
       if (is.na(ref_year)) ref_year <- fallback_year
 
       doys <- vapply(toks, parse_doy, integer(1L), yr = ref_year)
       doys <- doys[!is.na(doys)]
-      if (!length(doys)) next
 
       for (k in seq_along(doys)) {
-        management_data[[paste0("treatment_", k)]][i] <- as.numeric(doys[k])
+        col <- paste0("treatment_", k)
+        if (!col %in% names(management_user)) {
+          management_user[[col]] <- NA_real_
+        }
+        management_user[[col]][i] <- as.numeric(doys[k])
       }
     }
-    # we won't select 'treatment' below, so it won't appear in the output
+
+    # keep track of treatment columns if created
+    treatment_cols <- grep("^treatment_\\d+$", names(management_user), value = TRUE)
+    if (length(treatment_cols)) {
+      tr_order <- order(as.integer(sub("^treatment_(\\d+)$", "\\1", treatment_cols)))
+      treatment_cols <- treatment_cols[tr_order]
+    }
+
+    # drop raw text col
+    management_user$treatment <- NULL
   }
 
-  # detect treatment columns
-  tr_cols <- grep("^treatment_\\d+$", names(management_data),
-                  ignore.case = TRUE, value = TRUE)
-  if (length(tr_cols)) {
-    tr_order <- order(as.integer(sub("^treatment_(\\d+)$", "\\1", tr_cols)))
-    tr_cols <- tr_cols[tr_order]
-    management_data[tr_cols] <- lapply(management_data[tr_cols], as.numeric)
-  }
+  # ---- final selection & order ----
+  keep_cols <- c("site", "crop", "variety", "sowingdoy", "year", treatment_cols)
+  management_user <- management_user[, keep_cols, drop = FALSE]
 
-  # select & order columns
-  keep_cols <- c("site", "crop", "variety", "sowingdoy", "year", tr_cols)
-  management_data <- management_data[, keep_cols, drop = FALSE]
-
-  # write the file
+  # ---- write sowing.csv ----
   write.table(
-    management_data,
+    management_user,
     file = man_file,
-    sep = ",",
-    row.names = FALSE,
-    col.names = TRUE,
-    quote = FALSE
+    sep = ",", row.names = FALSE, col.names = TRUE, quote = FALSE, na = ""
   )
+
+  management_data <- management_user
 
   # WRITE WEATHER FILE ----
   # Validate required columns
@@ -609,16 +831,20 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
       isCalibration = ifelse(calibration!='none','true','false'),
       calibrationVariable = calibration,
       varieties = as.list(c("Generic")),
+      cropModel = ifelse(is.null(cropModel_data), "no", "yes"),
       simplexes = 3,
       disease = disease,
       iterations = iterations,
       weatherTimeStep = tolower(timestep)
     ),
     paths = list(
-      weatherDir = normalizePath(dirname(input_weather_dir), winslash = "\\", mustWork = FALSE),
-      referenceFilePaths = normalizePath(input_reference_dir, winslash = "\\", mustWork = FALSE),
-      paramFile = normalizePath(param_file, winslash = "\\", mustWork = FALSE),
-      sowingFile = normalizePath(man_file, winslash = "\\", mustWork = FALSE)
+      weatherDir        = normalizePath(dirname(input_weather_dir), winslash = "\\", mustWork = FALSE),
+      referenceFilePaths= normalizePath(input_reference_dir, winslash = "\\", mustWork = FALSE),
+      paramFile         = normalizePath(param_file, winslash = "\\", mustWork = FALSE),
+      sowingFile        = normalizePath(man_file, winslash = "\\", mustWork = FALSE),
+      cropModelFile     = if (!is.null(cropModel_data))
+        normalizePath(crop_model_dir, winslash = "\\", mustWork = FALSE)
+      else ""
     )
   )
 
@@ -747,7 +973,14 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
 
   #parameter files
   if (calibration != "none") {
-    # ---- load calibrated parameter files --------------------------------------
+
+    ## ---- packages (fail early if missing) -----------------------------------
+    if (!requireNamespace("dplyr", quietly = TRUE))
+      stop("Package 'dplyr' is required. Please install it.")
+    if (!requireNamespace("ggplot2", quietly = TRUE))
+      stop("Package 'ggplot2' is required. Please install it.")
+
+    ## ---- load calibrated parameter files ------------------------------------
     list_files_out_param <- list.files(
       file.path(dirname(exe_path), "calibratedParameters"),
       pattern = "\\.csv$", full.names = TRUE
@@ -761,24 +994,36 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
       }))
     } else data.frame()
 
-    # ---- apply calibrated values back to param lists --------------------------
+    # normalize names (lowercase) once
+    if (nrow(param_df)) names(param_df) <- tolower(names(param_df))
+
+    ## ---- deep copy originals BEFORE updating --------------------------------
+    deep_copy <- function(x) unserialize(serialize(x, NULL))
+    origCropParameters    <- if (exists("cropParameters"))    deep_copy(cropParameters)    else NULL
+    origDiseaseParameters <- if (exists("diseaseParameters")) deep_copy(diseaseParameters) else NULL
+
+    ## ---- apply calibrated values (do NOT touch originals) -------------------
     update_param_list <- function(param_list, calib_df, clamp = TRUE) {
       if (is.null(param_list) || !length(param_list) || !nrow(calib_df)) return(param_list)
-      df <- calib_df
-      names(df) <- tolower(names(df))
-      pcol <- if ("parameter" %in% names(df)) "parameter" else if ("param" %in% names(df)) "param" else return(param_list)
-      vcol <- if ("value" %in% names(df)) "value" else if ("val" %in% names(df)) "val" else return(param_list)
 
-      for (i in seq_len(nrow(df))) {
-        pname <- trimws(as.character(df[[pcol]][i]))
+      # figure out columns present in CSVs
+      pcol <- if ("parameter" %in% names(calib_df)) "parameter" else if ("param" %in% names(calib_df)) "param" else return(param_list)
+      vcol <- if ("value" %in% names(calib_df)) "value"       else if ("val" %in% names(calib_df))   "val"   else return(param_list)
+
+      for (i in seq_len(nrow(calib_df))) {
+        pname <- trimws(as.character(calib_df[[pcol]][i]))
         if (!nzchar(pname) || !(pname %in% names(param_list))) next
-        v <- suppressWarnings(as.numeric(df[[vcol]][i])); if (is.na(v)) next
+
+        v <- suppressWarnings(as.numeric(calib_df[[vcol]][i]))
+        if (is.na(v)) next
+
         if (clamp) {
           mn <- suppressWarnings(as.numeric(param_list[[pname]]$min))
           mx <- suppressWarnings(as.numeric(param_list[[pname]]$max))
           if (!is.na(mn)) v <- max(v, mn)
           if (!is.na(mx)) v <- min(v, mx)
         }
+        # overwrite current value with calibrated (originals are in orig*)
         param_list[[pname]]$value <- v
       }
       param_list
@@ -787,10 +1032,17 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
     updatedCropParameters    <- update_param_list(cropParameters,    param_df)
     updatedDiseaseParameters <- update_param_list(diseaseParameters, param_df)
 
-    ## ---- FLATTEN PARAMETER LISTS (incl. calibration flag) ----------------------
-    .is_param_leaf <- function(x)
-      is.list(x) && all(c("min","max","value","calibration") %in% names(x))
+    # If we're calibrating 'disease' only, ignore crop parameters
+    if (tolower(calibrationModel) == "disease") {
+      updatedCropParameters <- NULL
+    }
 
+    ## ---- flatten helpers ----------------------------------------------------
+    .is_param_leaf <- function(x) {
+      is.list(x) && all(c("min","max","value","calibration") %in% names(x))
+    }
+
+    # Flatten a parameter tree into a table with a single numeric column called 'value'
     flatten_params <- function(x, model) {
       rows <- list()
       walk <- function(node, path = character()) {
@@ -802,7 +1054,7 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
             unit        = if (!is.null(node$unit)) node$unit else NA_character_,
             min         = suppressWarnings(as.numeric(node$min)),
             max         = suppressWarnings(as.numeric(node$max)),
-            default     = suppressWarnings(as.numeric(node$value)),
+            value       = suppressWarnings(as.numeric(node$value)),
             calibration = isTRUE(node$calibration),
             stringsAsFactors = FALSE
           )
@@ -811,64 +1063,92 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
           for (i in seq_along(node)) walk(node[[i]], c(path, nms[[i]]))
         }
       }
+      if (is.null(x)) {
+        return(data.frame(Model=character(), Parameter=character(), unit=character(),
+                          min=numeric(), max=numeric(), value=numeric(),
+                          calibration=logical(), stringsAsFactors = FALSE))
+      }
       walk(x)
       if (!length(rows)) {
         return(data.frame(Model=character(), Parameter=character(), unit=character(),
-                          min=numeric(), max=numeric(), default=numeric(),
+                          min=numeric(), max=numeric(), value=numeric(),
                           calibration=logical(), stringsAsFactors = FALSE))
       }
       do.call(rbind, rows)
     }
 
-    bounds_crop    <- if (!is.null(cropParameters))    flatten_params(cropParameters,    "crop")    else NULL
-    bounds_disease <- if (!is.null(diseaseParameters)) flatten_params(diseaseParameters, "disease") else NULL
-    bounds_df <- do.call(rbind, Filter(Negate(is.null), list(bounds_crop, bounds_disease))) |>
-      dplyr::group_by(Model,Parameter) |>
-      dplyr::slice_head()
+    ## ---- build defaults (original) & calibrated (updated) -------------------
+    defaults_crop    <- flatten_params(origCropParameters,         "crop")
+    defaults_disease <- flatten_params(origDiseaseParameters,      "disease")
+    calib_crop       <- flatten_params(updatedCropParameters,      "crop")
+    calib_disease    <- flatten_params(updatedDiseaseParameters,   "disease")
 
-    ## ---- LOAD CALIBRATED PARAM CSVs --------------------------------------------
-    merged<-bounds_df |>
-      dplyr::left_join(param_df ,
-                       by=c('Model'="model",
-                            'Parameter'= "param")) |>
-      dplyr::group_by(Model,Parameter) |>
-      dplyr::slice_head()
+    # rename their 'value' columns to default / calibrated
+    if (nrow(defaults_crop))    names(defaults_crop)   [names(defaults_crop)   == "value"] <- "default"
+    if (nrow(defaults_disease)) names(defaults_disease)[names(defaults_disease)== "value"] <- "default"
+    if (nrow(calib_crop))       names(calib_crop)      [names(calib_crop)      == "value"] <- "calibrated"
+    if (nrow(calib_disease))    names(calib_disease)   [names(calib_disease)   == "value"] <- "calibrated"
+
+    # join defaults + calibrated on common keys
+    join_two <- function(a, b) {
+      dplyr::full_join(a, b, by = c("Model","Parameter","unit","min","max","calibration"))
+    }
+
+    bounds_list <- list(
+      if (nrow(defaults_crop) || nrow(calib_crop))          join_two(defaults_crop,    calib_crop)    else NULL,
+      if (nrow(defaults_disease) || nrow(calib_disease))    join_two(defaults_disease, calib_disease) else NULL
+    )
+    bounds_df <- dplyr::bind_rows(Filter(Negate(is.null), bounds_list))
+
+    ## ---- optionally merge CSV columns (if present) --------------------------
+    # only do the join if param_df has the needed columns
+    if (nrow(param_df) && all(c("model","param") %in% names(param_df))) {
+      merged <- dplyr::left_join(bounds_df, param_df, by = c("Model"="model","Parameter"="param"))
+    } else {
+      merged <- bounds_df
+    }
+
+    # ensure unique per Model-Parameter (keep first if duplicates)
+    merged <- dplyr::group_by(merged, Model, Parameter)
+    merged <- dplyr::slice_head(merged, n = 1)
+    merged <- dplyr::ungroup(merged)
 
     # facet label = "Parameter (unit)"
     merged$facet_label <- ifelse(!is.na(merged$unit) & nzchar(merged$unit),
                                  paste0(merged$Parameter, " (", merged$unit, ")"),
                                  merged$Parameter)
 
-    # split
+    # split for downstream compatibility
     crop_dat    <- subset(merged, tolower(Model) == "crop")
     disease_dat <- subset(merged, tolower(Model) == "disease")
 
-    ## ---- FACET PLOTS: default vs calibrated (nudged), color = calibration flag ---
-    if (!requireNamespace("ggplot2", quietly = TRUE))
-      stop("Package 'ggplot2' is required for plotting. Please install it.")
-    if (!requireNamespace("rlang", quietly = TRUE))
-      stop("Package 'rlang' is required for tidy-eval in plotting. Please install it.")
-
+    ## ---- plotting function (define BEFORE using it) -------------------------
     plot_params_facets <- function(df, title) {
       if (!nrow(df)) return(NULL)
 
-      # build a plotting frame with both points: default & calibrated
-      # two layers with position nudges to avoid overlap
+      # build a flag column for plotting
+      df$point_color <- ifelse(df$calibration, "Calibration", "Default")
 
       ggplot2::ggplot(df, ggplot2::aes(x = 1)) +
-        ggplot2::geom_hline(ggplot2::aes(yintercept = min,  color = "Min"),  linewidth = 1.5) +
-        ggplot2::geom_hline(ggplot2::aes(yintercept = max,  color = "Max"),  linewidth = 1.5) +
-        ggplot2::geom_hline(ggplot2::aes(yintercept = default, color = "Default"), linewidth = 1.2) +
+        ggplot2::geom_hline(ggplot2::aes(yintercept = min,     color = "Min"),     linewidth = 1.2, na.rm = TRUE) +
+        ggplot2::geom_hline(ggplot2::aes(yintercept = max,     color = "Max"),     linewidth = 1.2, na.rm = TRUE) +
+        ggplot2::geom_hline(ggplot2::aes(yintercept = default, color = "Default"), linewidth = 1.2, na.rm = TRUE) +
         ggplot2::geom_point(
-          ggplot2::aes(y = value, color = "Calibration"),
-          shape = 16, size = 4, na.rm = TRUE
+          ggplot2::aes(y = calibrated, color = point_color),
+          shape = 16, size = 3, na.rm = TRUE
         ) +
         ggplot2::coord_flip() +
         ggplot2::scale_color_manual(
           name = "Legend",
-          values = c("Min" = "black", "Max" = "grey50", "Calibration" = "red", "Default" = "blue"),
-          breaks = c("Min", "Max", "Calibration", "Default")
+          values = c(
+            "Min"         = "black",
+            "Max"         = "grey50",
+            "Default"     = "blue",
+            "Calibration" = "red"
+          ),
+          breaks = c("Min","Max","Default","Calibration")
         ) +
+        ggplot2::labs(title = title, x = NULL, y = NULL) +
         ggplot2::theme_classic(base_size = 12) +
         ggplot2::theme(
           legend.position = "bottom",
@@ -876,68 +1156,66 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
           axis.ticks.y = ggplot2::element_blank()
         ) +
         ggplot2::facet_wrap(~facet_label, scales = "free")
-
-
     }
 
-    crop_plot    <- plot_params_facets(crop_dat,    "CROP parameters: calibrated vs default vs bounds")
-    disease_plot <- plot_params_facets(disease_dat, "DISEASE parameters: calibrated vs default vs bounds")
 
-      # expose in your final result (no early return)
-      if (!exists("result")) result <- list()
-      result$diagnostics$calibration <- list(
-        tables = list(crop = crop_dat, disease = disease_dat),
-        plots  = list(crop = crop_plot, disease = disease_plot)
-      )
+    ## ---- build plots once ---------------------------------------------------
+    crop_plot    <- plot_params_facets(crop_dat,    "CROP parameters: default vs calibrated")
+    disease_plot <- plot_params_facets(disease_dat, "DISEASE parameters: default vs calibrated")
 
+    ## ---- expose in result ---------------------------------------------------
+    if (!exists("result")) result <- list()
+    result$diagnostics$calibration <- list(
+      tables = list(crop = crop_dat, disease = disease_dat),
+      plots  = list(crop = crop_plot, disease = disease_plot)
+    )
 
-    # cleanup calibrated param CSVs quietly
+    ## ---- cleanup calibrated param CSVs quietly ------------------------------
     if (length(list_files_out_param)) {
       try(suppressWarnings(file.remove(list_files_out_param)), silent = TRUE)
     }
 
-      # include the (possibly updated) parameter lists so users can reuse them
-      result$parameters <- list(
-        crop    = updatedCropParameters,
-        disease = updatedDiseaseParameters
-      )
+    ## ---- return updated parameter lists for reuse ---------------------------
+    result$parameters <- list(
+      crop    = updatedCropParameters,   # will be NULL if disease-only calibration
+      disease = updatedDiseaseParameters
+    )
   }
+
 
   # --- OPTIONAL SPOOKY MESSAGE ---------------------------------------------
   if (isTRUE(franchy_message)) {
-    try({
+    tryCatch({
+      # ---------------- personality setup ----------------
+      personality <- match.arg(personality, choices = c("scientist","extensionist","farmer"))
+
+      system_role <- switch(personality,
+                            "scientist"    = "You are a concise agrometeorology & plant pathology scientist. Neutral, precise, scientific. Use mm/dd dates, no DOY, no emojis.",
+                            "extensionist" = "You are a farm advisor. Be clear, supportive, and practical. Use mm/dd dates, no jargon, no emojis.",
+                            "farmer"       = "You are a seasoned farmer. Use simple words, warm tone, and memorable phrasing. Use mm/dd dates, no DOY, no emojis."
+      )
+
       # ---------------- helpers ----------------
       safe_mean  <- function(x, k = 1) round(mean(x, na.rm = TRUE), k)
       safe_round <- function(x, k = 1) if (is.null(x)) NA_real_ else round(x, k)
-
-      # Parse outputs_df$Date to Date (supports "mm/dd/YYYY" and "YYYY-mm-dd")
       .parse_output_date <- function(x) as.Date(x, tryFormats = c("%m/%d/%Y", "%Y-%m-%d"))
-
-      # Convert Year+DOY → Date (vectorized)
-      .year_doy_to_date <- function(year, doy) {
+      .year_doy_to_date  <- function(year, doy) {
         y <- suppressWarnings(as.integer(year)); d <- suppressWarnings(as.integer(doy))
         as.Date(d - 1L, origin = sprintf("%04d-01-01", y))
       }
-
-      # Format Date → "mm/dd" (vectorized)
       fmt_mmdd <- function(dates) ifelse(is.na(dates), NA_character_, format(as.Date(dates), "%m/%d"))
-
-      # Find a DOY column (case-insensitive)
       .find_doy_col <- function(df) {
         nms <- names(df)
         i <- which(tolower(nms) %in% c("doy","dayofyear"))[1]
-        if (is.na(i)) stop("DOY column not found (expected 'DOY'/'Doy'/'doy' or 'DayOfYear').", call. = FALSE)
+        if (is.na(i)) stop("DOY column not found.", call. = FALSE)
         nms[i]
       }
 
       mmdd_to_date <- function(mmdd, ref_year = 2001) {
-        # mmdd: character vector like "10/27" or NA
         x <- ifelse(is.na(mmdd) | mmdd == "", NA_character_, mmdd)
-        # turn "10/27" -> "10-27", then paste "2001-10-27"
         y <- paste0(ref_year, "-", sub("^([0-9]{1,2})/([0-9]{1,2})$", "\\1-\\2", x))
         suppressWarnings(as.Date(y, format = "%Y-%m-%d"))
       }
-
       median_mmdd_from_dates <- function(dates) {
         dates <- as.Date(dates)
         if (!length(dates) || all(is.na(dates))) return(NA_character_)
@@ -946,7 +1224,6 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
         if (is.na(med)) return(NA_character_)
         format(as.Date(med - 1L, origin = "2001-01-01"), "%m/%d")
       }
-
 
       # Robust epidemic phases using TRUE calendar dates
       # - If a valid Date column exists, use it
@@ -1045,8 +1322,6 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
         out
       }
 
-
-
       # First treatment per season as DATE STRING and timing class vs onset
       first_treatment_dates <- function(management_data, seasons, phases_df) {
         tr_cols <- grep("^treatment_\\d+$", names(management_data), value = TRUE, ignore.case = TRUE)
@@ -1129,54 +1404,23 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
       year_max  <- summary_df$GrowingSeason[which.max(summary_df$DiseaseSeverity)]
       year_min  <- summary_df$GrowingSeason[which.min(summary_df$DiseaseSeverity)]
 
-      # epidemic phases (dates per season)
       phases <- detect_epidemic_phases_dates(outputs_df)
-
-      # Peak YieldActual per season (date + value)
-      peak_yield <- outputs_df |>
-        dplyr::mutate(.Date = .parse_output_date(Date)) |>
-        dplyr::group_by(GrowingSeason) |>
-        dplyr::slice_max(order_by = YieldActual, n = 1, with_ties = FALSE) |>
-        dplyr::ungroup() |>
-        dplyr::transmute(
-          GrowingSeason,
-          peak_yield_value = round(as.numeric(YieldActual), 1),
-          peak_yield_date  = fmt_mmdd(.Date)
-        )
-
-      # sprays: first date + timing class
       seasons  <- sort(unique(summary_df$GrowingSeason))
       spray_df <- first_treatment_dates(management_data, seasons, phases)
 
-      per_year <- summary_df |>
-        dplyr::group_by(GrowingSeason) |>
-        dplyr::summarise(
-          sev_pct  = safe_round(mean(DiseaseSeverity, na.rm = TRUE) * 100, 1),
-          y_act    = safe_round(mean(YieldActual,    na.rm = TRUE), 1),
-          loss_pct = safe_round(mean(YieldLossPerc,  na.rm = TRUE), 1),
-          .groups  = "drop"
-        ) |>
-        dplyr::left_join(phases[, c("GrowingSeason","onset_date","rapid_date","peak_date","peak_sev")], by = "GrowingSeason") |>
-        dplyr::left_join(spray_df[, c("GrowingSeason","first_spray_date","timing_class")], by = "GrowingSeason") |>
-        dplyr::left_join(peak_yield, by = "GrowingSeason")
-
-
-      # median timing across seasons (calendar, no years)
       onset_med_mmdd <- median_mmdd_from_dates(mmdd_to_date(phases$onset_date))
       rapid_med_mmdd <- median_mmdd_from_dates(mmdd_to_date(phases$rapid_date))
       peak_med_mmdd  <- median_mmdd_from_dates(mmdd_to_date(phases$peak_date))
 
-      # season duration from actual Date range
       gs_len <- outputs_df |>
         dplyr::mutate(.Date = .parse_output_date(Date)) |>
         dplyr::group_by(GrowingSeason) |>
-        dplyr::summarise(
-          start = suppressWarnings(min(.Date, na.rm = TRUE)),
-          end   = suppressWarnings(max(.Date, na.rm = TRUE)),
-          .groups = "drop"
-        ) |>
+        dplyr::summarise(start = min(.Date, na.rm = TRUE), end = max(.Date, na.rm = TRUE), .groups="drop") |>
         dplyr::mutate(length_days = as.numeric(end - start) + 1)
       dur_med <- safe_round(stats::median(gs_len$length_days, na.rm = TRUE), 0)
+
+      no_epidemic <- !any(summary_df$DiseaseSeverity > 0, na.rm = TRUE)
+      avg_tr_num <- suppressWarnings(mean(apply(spray_df, 1, function(x) sum(!is.na(x)))))
 
       # weather–disease associations (Pearson r)
       yearly_summary <- summary_df |>
@@ -1217,8 +1461,6 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
         )
       }
 
-
-
       # proportions by class
       timing_tab <- table(factor(spray_df$timing_class, levels = c("preventive","on-time","late")), useNA = "no")
       total_n <- sum(timing_tab)
@@ -1238,28 +1480,58 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
       }
 
       # --- LLM utilities ------------------------------------------------------------
-      .llm_enabled <- function(apikey) is.character(apikey) && nzchar(apikey)
+      .llm_enabled <- function(apikey) {is.character(apikey) && nzchar(apikey)}
 
-      .llm_chat <- function(prompt, apikey, model = "openai/gpt-4o-mini", max_tokens = 300) {
+      # personality mapper → textual style
+      .llm_personality_style <- function(persona) {
+        switch(tolower(persona[1]),
+               "scientist"    = "neutral, scientific, concise, with technical precision",
+               "extensionist" = "practical, advisory, farmer-facing tone; clear but non-technical",
+               "farmer"       = "informal, field-wise tone with plain language",
+               "neutral, scientific" # fallback
+        )
+      }
+
+      # build system role for chat
+      .llm_system_role <- function(persona) {
+        switch(tolower(persona[1]),
+               "scientist"    = "You are a concise agrometeorology & plant pathology scientist. Neutral, precise, scientific. Use mm/dd dates, no DOY, no emojis.",
+               "extensionist" = "You are a farm advisor. Be clear, supportive, and practical. Use mm/dd dates, no jargon, no emojis.",
+               "farmer"       = "You are a seasoned farmer. Use simple words, warm tone, and memorable phrasing. Use mm/dd dates, no DOY, no emojis.",
+               "You are a neutral assistant. Use mm/dd dates, no DOY, no emojis."
+        )
+      }
+
+      # generic chat wrapper
+      .llm_chat <- function(prompt,
+                            apikey,
+                            persona = "scientist",
+                            model = "openai/gpt-4o-mini",
+                            max_tokens = 300,
+                            temperature = 0.3) {
         if (!.llm_enabled(apikey)) return(NA_character_)
         if (!requireNamespace("httr2", quietly = TRUE)) {
           warning("Package 'httr2' is required for LLM features. Falling back to rule-based text.")
           return(NA_character_)
         }
+
+        system_role <- .llm_system_role(persona)
+
         req <- httr2::request("https://openrouter.ai/api/v1/chat/completions") |>
           httr2::req_headers(
             "Authorization" = paste("Bearer", apikey),
-            "Content-Type" = "application/json"
+            "Content-Type"  = "application/json"
           ) |>
           httr2::req_body_json(list(
             model = model,
             messages = list(
-              list(role = "system", content = "You are a concise agrometeorology & plant pathology assistant. Keep outputs short, precise, and non-redundant. Use mm/dd for dates; never use DOY."),
-              list(role = "user", content = prompt)
+              list(role = "system", content = system_role),
+              list(role = "user",   content = prompt)
             ),
-            max_tokens = max_tokens,
-            temperature = 0.2
+            max_tokens  = max_tokens,
+            temperature = temperature
           ))
+
         resp <- try(httr2::req_perform(req), silent = TRUE)
         if (inherits(resp, "try-error")) return(NA_character_)
         out <- try(httr2::resp_body_json(resp), silent = TRUE)
@@ -1269,103 +1541,241 @@ franchestyn <- function(weather_data, management_data, reference_data = NULL,
         as.character(txt)
       }
 
-      # Compose DISEASE DYNAMICS prompt
-      .llm_prompt_disease_dyn <- function(no_epidemic, onset_med_mmdd, rapid_med_mmdd, peak_med_mmdd, dur_med) {
+
+      # --- Prompt builders ----------------------------------------------------------
+
+      .llm_prompt_disease_dyn <- function(no_epidemic,
+                                          onset_med_mmdd,
+                                          rapid_med_mmdd,
+                                          peak_med_mmdd,
+                                          dur_med,
+                                          persona = "scientist") {
+        style <- .llm_personality_style(persona)
         if (isTRUE(no_epidemic)) {
-          sprintf(paste(
-            "Write a 2–3 sentence block",
-            "Context: No epidemic observed (severity ~0). Typical season length ~%s days.",
-            "Style: neutral, scientific, mm/dd only, no DOY; avoid implying 'infection windows'.",
-            "Mention that timing benchmarks (onset/peak) will be reported when disease appears.",
-            sep = " "), dur_med)
+          sprintf("Write a 2–3 sentence block. Context: no epidemic observed (severity≈0). Typical season length ~%s days.
+Style: %s. Use mm/dd only, no DOY.",
+                  dur_med, style)
         } else {
-          sprintf(paste(
-            "Write a 2–3 sentence block",
-            "Median timings: onset %s, rapid-rise %s, peak %s; season length ~%s days.",
-            "Style: neutral, scientific, mm/dd only, no DOY; avoid redundancy.",
-            sep = " "),
-            onset_med_mmdd, rapid_med_mmdd, peak_med_mmdd, dur_med)
+          sprintf("Write a 2–3 sentence block. Median timings: onset %s, rapid-rise %s, peak %s; season length ~%s days.
+Style: %s. Use mm/dd only, no DOY.",
+                  onset_med_mmdd, rapid_med_mmdd, peak_med_mmdd, dur_med, style)
         }
       }
 
-      # Compose FUNGICIDE block prompt
-      .llm_prompt_sprays <- function(no_epidemic, avg_treatments, pct_prev, pct_on, pct_late, onset_med_mmdd, rapid_med_mmdd) {
+      .llm_prompt_sprays <- function(no_epidemic,
+                                     avg_treatments,
+                                     pct_prev,
+                                     pct_on,
+                                     pct_late,
+                                     onset_med_mmdd,
+                                     rapid_med_mmdd,
+                                     persona = "scientist") {
+        style <- .llm_personality_style(persona)
         if (isTRUE(no_epidemic)) {
-          sprintf(paste(
-            "Write a 2–3 sentence block",
-            "Inputs: average applications = %s; no epidemic observed (onset unavailable).",
-            "Guidance: emphasize scouting and weather-based risk; suggest reducing prophylactic sprays.",
-            "Style: neutral, scientific, mm/dd only, no DOY.",
-            sep = " "),
-            ifelse(is.finite(avg_treatments), round(avg_treatments,1), "NA"))
+          sprintf("Write a 2–3 sentence block. Inputs: average applications=%s; no epidemic observed (onset unavailable).
+Guidance: emphasize scouting and weather-based risk; suggest reducing prophylactic sprays.
+Style: %s. Use mm/dd only, no DOY.",
+                  ifelse(is.finite(avg_treatments), round(avg_treatments, 1), "NA"),
+                  style)
         } else {
-          sprintf(paste(
-            "Write a 2–3 sentence block",
-            "Inputs: average applications=%s; first-spray vs onset distribution: preventive=%s%%, on-time=%s%%, late=%s%%.",
-            "Benchmarks: onset≈%s, rapid-rise≈%s (mm/dd).",
-            "Provide precise, actionable timing guidance; mm/dd only.",
-            sep = " "),
-            ifelse(is.finite(avg_treatments), round(avg_treatments,1), "NA"),
-            ifelse(is.na(pct_prev), "NA", pct_prev),
-            ifelse(is.na(pct_on),   "NA", pct_on),
-            ifelse(is.na(pct_late), "NA", pct_late),
-            ifelse(is.na(onset_med_mmdd), "NA", onset_med_mmdd),
-            ifelse(is.na(rapid_med_mmdd), "NA", rapid_med_mmdd))
+          sprintf("Write a 2–3 sentence block. Inputs: average applications=%s; first-spray vs onset: preventive=%s%%, on-time=%s%%, late=%s%%.
+Benchmarks: onset≈%s, rapid-rise≈%s (mm/dd).
+Provide timing guidance. Style: %s. Use mm/dd only, no DOY.",
+                  ifelse(is.finite(avg_treatments), round(avg_treatments, 1), "NA"),
+                  ifelse(is.na(pct_prev), "NA", pct_prev),
+                  ifelse(is.na(pct_on),   "NA", pct_on),
+                  ifelse(is.na(pct_late), "NA", pct_late),
+                  ifelse(is.na(onset_med_mmdd), "NA", onset_med_mmdd),
+                  ifelse(is.na(rapid_med_mmdd), "NA", rapid_med_mmdd),
+                  style)
         }
       }
 
-      # no_epidemic already computed above
-      use_llm <- .llm_enabled(apikey)
-      # minimal OpenRouter call with httr2 (optional dependency)
-      .llm_generate <- function(apikey, prompt, model = "openai/gpt-4o-mini", max_tokens = 120) {
-        if (is.null(apikey) || !nzchar(apikey)) return(NA_character_)
-        if (!requireNamespace("httr2", quietly = TRUE)) return(NA_character_)
-        url <- "https://openrouter.ai/api/v1/chat/completions"
-        req <- httr2::request(url) |>
-          httr2::req_headers(
-            "Authorization" = paste("Bearer", apikey),
-            "HTTP-Referer"  = "https://geomodellab.github.io/FraNchEstYN/",
-            "X-Title"       = "FraNchEstYN"
-          ) |>
-          httr2::req_body_json(list(
-            model = model,
-            messages = list(list(role="user", content = prompt)),
-            max_tokens = max_tokens,
-            temperature = 0.7
-          ))
-        resp <- try(httr2::req_perform(req), silent = TRUE)
-        if (inherits(resp, "try-error")) return(NA_character_)
-        js <- try(httr2::resp_body_json(resp), silent = TRUE)
-        if (inherits(js, "try-error")) return(NA_character_)
-        out <- try(js$choices[[1]]$message$content, silent = TRUE)
-        if (inherits(out, "try-error") || is.null(out)) return(NA_character_)
-        as.character(out)
+      # --- Persona-aware section headers --------------------------------------------
+      .section_headers <- function(persona) {
+        switch(tolower(persona[1]),
+               "scientist" = list(
+                 overview   = "🧐 OVERVIEW",
+                 weather    = "🌧️ WEATHER–DISEASE ASSOCIATIONS",
+                 dynamics   = "🍄 DISEASE DYNAMICS (CALENDAR DATES)",
+                 sprays     = "⚕️ FUNGICIDE PROGRAM & TIMING",
+                 metrics    = "🤖 MODEL PERFORMANCE",
+                 yearly     = "📅 YEARLY HIGHLIGHTS",
+                 proverb    = "💬 PROVERB"
+               ),
+               "extensionist" = list(
+                 overview   = "📋 ADVISORY NOTES",
+                 weather    = "🌦️ WEATHER & DISEASE LINK",
+                 dynamics   = "🌱 CROP & DISEASE CYCLE",
+                 sprays     = "💊 SPRAY PROGRAM",
+                 metrics    = "📊 MODEL CHECK",
+                 yearly     = "📅 FIELD SEASON HIGHLIGHTS",
+                 proverb    = "💬 FIELD WISDOM"
+               ),
+               "farmer" = list(
+                 overview   = "🌱 FIELD NOTES",
+                 weather    = "🌦️ WEATHER & DISEASE",
+                 dynamics   = "🍂 SEASON’S DISEASE STORY",
+                 sprays     = "💉 SPRAYING PRACTICES",
+                 metrics    = "🔍 HOW THE MODEL DID",
+                 yearly     = "📅 SEASON-BY-SEASON HIGHLIGHTS",
+                 proverb    = "💬 FARM SAYING"
+               ),
+               # fallback
+               list(
+                 overview   = "🧐 OVERVIEW",
+                 weather    = "🌧️ WEATHER–DISEASE ASSOCIATIONS",
+                 dynamics   = "🍄 DISEASE DYNAMICS (CALENDAR DATES)",
+                 sprays     = "⚕️ FUNGICIDE PROGRAM & TIMING",
+                 metrics    = "🤖 MODEL PERFORMANCE",
+                 yearly     = "📅 YEARLY HIGHLIGHTS",
+                 proverb    = "💬 PROVERB"
+               )
+        )
       }
 
-      get_llm_overview <- function(apikey, stats, no_epidemic) {
+      # --- WEATHER–DISEASE ASSOCIATIONS ---------------------------------------------
+      .llm_prompt_weather_assoc <- function(cors, no_epidemic, persona="scientist") {
+        style <- .llm_personality_style(persona)
+
+        if (isTRUE(no_epidemic)) {
+          sprintf("Write 1–2 sentences. Context: no epidemic detected, so weather–disease correlations are negligible.
+Style: %s. Be concise, mm/dd dates if needed, no DOY.",
+                  style)
+        } else {
+          cors_text <- paste(cors$var, "(r=", sprintf("%.2f", cors$r), ")", collapse = "; ")
+          sprintf("Write 1–2 sentences summarizing weather–disease associations.
+Inputs: %s.
+Style: %s. Be concise, no DOY.",
+                  cors_text, style)
+        }
+      }
+
+      get_llm_weather_assoc <- function(apikey, cors, no_epidemic, persona="scientist") {
+        prompt <- .llm_prompt_weather_assoc(cors, no_epidemic, persona)
+        .llm_chat(prompt, apikey, persona=persona, max_tokens=120)
+      }
+
+      # --- MODEL PERFORMANCE / METRICS ----------------------------------------------
+      .llm_prompt_metrics <- function(metrics_df, persona="scientist") {
+        style <- .llm_personality_style(persona)
+
+        if (is.null(metrics_df) || !nrow(metrics_df)) {
+          sprintf("Write 1 short sentence: validation metrics not available. Style: %s.", style)
+        } else {
+          # Extract a human-readable string
+          nm <- tolower(names(metrics_df))
+          vcol_idx <- which(nm %in% c("variable","var","name","metric"))[1]
+          vcol <- if (!is.na(vcol_idx)) names(metrics_df)[vcol_idx] else "Variable"
+
+          num_df <- metrics_df[sapply(metrics_df, is.numeric)]
+          agg <- stats::aggregate(num_df, list(Variable = metrics_df[[vcol]]),
+                                  FUN = function(x) suppressWarnings(median(as.numeric(x), na.rm=TRUE)))
+
+          lines <- apply(agg, 1, function(r) {
+            var  <- as.character(r[["Variable"]])
+            rmse <- suppressWarnings(as.numeric(r[["RMSE"]]))
+            r2   <- suppressWarnings(as.numeric(r[["R2"]]))
+            bias <- suppressWarnings(as.numeric(r[["Bias"]]))
+            if (is.na(rmse) || is.na(r2)) {
+              paste0(var, ": insufficient validation signal")
+            } else {
+              dir <- if (!is.na(bias) && bias > 0) "overestimates"
+              else if (!is.na(bias)) "underestimates" else "bias unclear"
+              paste0(var, ": RMSE≈", round(rmse,2), ", R²≈", round(r2,2), " (model ", dir, ")")
+            }
+          })
+          metrics_text <- paste(lines, collapse = "; ")
+
+          sprintf("Write a 1–2 sentence summary of model–observation performance.
+Inputs: %s.
+Style: %s. Be concise, no DOY.",
+                  metrics_text, style)
+        }
+      }
+
+      get_llm_weather_assoc <- function(apikey, cors, no_epidemic, persona="scientist") {
+        prompt <- .llm_prompt_weather_assoc(cors, no_epidemic, persona)
+        .llm_chat(prompt, apikey, persona=persona, max_tokens=120)
+      }
+
+
+      get_llm_metrics <- function(apikey, metrics_df, persona="scientist") {
+        prompt <- .llm_prompt_metrics(metrics_df, persona)
+        .llm_chat(prompt, apikey, persona=persona, max_tokens=120)
+      }
+
+      get_llm_overview <- function(apikey, stats, no_epidemic, persona="scientist") {
+        style <- .llm_personality_style(persona)
+        base_prompt <- if (no_epidemic) {
+          sprintf("Write 1–2 sentences (no emojis). Dataset: no epidemic signal.
+Include mean yield≈%s kg/ha, Tx/Tn≈%s/%s °C, rainfall≈%s mm, leaf-wetness≈%s h.
+Style: %s.",
+                  stats$avg_yield, stats$mean_tx, stats$mean_tn, stats$mean_pr, stats$mean_lw, style)
+        } else {
+          sprintf("Write 1–2 sentences (no emojis). Dataset: crop–disease dataset.
+Include avg severity≈%s%%, mean yield≈%s kg/ha, Tx/Tn≈%s/%s °C, rainfall≈%s mm, leaf-wetness≈%s h.
+Style: %s.",
+                  stats$avg_sev, stats$avg_yield, stats$mean_tx, stats$mean_tn, stats$mean_pr, stats$mean_lw, style)
+        }
+        .llm_chat(base_prompt, apikey, persona = persona, max_tokens = 90)
+      }
+
+      get_llm_proverb <- function(apikey, persona="scientist") {
+        style <- .llm_personality_style(persona)
+        prompt <- sprintf("Invent a single-line, field-savvy proverb about crop disease timing and moisture.
+Max 10 words, no emojis. Style: %s.", style)
+        .llm_chat(prompt, apikey, persona = persona, max_tokens = 25)
+      }
+
+
+      # --- Overview / proverb -------------------------------------------------------
+      get_llm_overview <- function(apikey, stats, no_epidemic, persona="scientist") {
+        style <- .llm_personality_style(persona)
+
         base_prompt <- if (no_epidemic) {
           sprintf(
-            "Write 1–2 precise sentences (no emojis) summarizing a crop season set with **no epidemic signal**.
-Include mean yield ≈ %s kg/ha, Tx/Tn ≈ %s/%s °C, rainfall ≈ %s mm, and leaf-wetness ≈ %s h.
-Avoid implying 'infection windows'. Be concise and scientific.",
-            stats$avg_yield, stats$mean_tx, stats$mean_tn, stats$mean_pr, stats$mean_lw)
+            "Write 1–2 sentences (no emojis). Dataset: no epidemic signal.
+Include mean yield≈%s kg/ha, Tx/Tn≈%s/%s °C, rainfall≈%s mm, leaf-wetness≈%s h.
+Style: %s.",
+            stats$avg_yield, stats$mean_tx, stats$mean_tn,
+            stats$mean_pr, stats$mean_lw, style
+          )
         } else {
           sprintf(
-            "Write 1–2 precise sentences (no emojis) summarizing a crop–disease dataset.
-Include avg severity ≈ %s%%, mean yield ≈ %s kg/ha, Tx/Tn ≈ %s/%s °C, rainfall ≈ %s mm, leaf-wetness ≈ %s h.
-You may mention 'infection windows' if appropriate. Be concise and scientific.",
-            stats$avg_sev, stats$avg_yield, stats$mean_tx, stats$mean_tn, stats$mean_pr, stats$mean_lw)
+            "Write 1–2 sentences (no emojis). Dataset: crop–disease dataset.
+Include avg severity≈%s%%, mean yield≈%s kg/ha, Tx/Tn≈%s/%s °C, rainfall≈%s mm, leaf-wetness≈%s h.
+Style: %s.",
+            stats$avg_sev, stats$avg_yield, stats$mean_tx, stats$mean_tn,
+            stats$mean_pr, stats$mean_lw, style
+          )
         }
-        .llm_generate(apikey, base_prompt, max_tokens = 90)
+
+        .llm_chat(base_prompt, apikey, persona = persona, max_tokens = 90)
       }
 
-      get_llm_proverb <- function(apikey) {
-        prompt <- "Invent a single-line, field-savvy proverb about crop disease timing and moisture. 10 words max, no emojis."
-        .llm_generate(apikey, prompt, max_tokens = 25)
+      # WEATHER–DISEASE ASSOCIATIONS
+      llm_weather <- get_llm_weather_assoc(apikey, cors, no_epidemic, persona = personality)
+      block_climate_cor <- if (nzchar(llm_weather)) {
+        llm_weather
+      } else if (no_epidemic) {
+        "No disease was detected across seasons; weather–disease correlations were not computed."
+      } else {
+        paste0("Weather–disease associations: ",
+               paste(cors$var, "(r=", sprintf("%.2f", cors$r), ")", collapse="; "),
+               ".")
+      }
+
+      # MODEL PERFORMANCE
+      llm_metrics <- get_llm_metrics(apikey, metrics_df, persona = personality)
+      block_metrics <- if (nzchar(llm_metrics)) {
+        llm_metrics
+      } else {
+        paste0("Model–observation performance:", summarize_metrics(metrics_df))
       }
 
       # --- DISEASE DYNAMICS via LLM (fallback to rule-based) ---
-      if (use_llm) {
+
         dd_prompt <- .llm_prompt_disease_dyn(
           no_epidemic = no_epidemic,
           onset_med_mmdd = onset_med_mmdd,
@@ -1373,8 +1783,8 @@ You may mention 'infection windows' if appropriate. Be concise and scientific.",
           peak_med_mmdd  = peak_med_mmdd,
           dur_med        = dur_med
         )
-        dd_txt <- .llm_chat(dd_prompt, apikey, max_tokens = 180)
-      }
+        dd_txt <- .llm_chat(dd_prompt, apikey,persona = personality, max_tokens = 180)
+
 
       block_disease_dyn <- if (!is.na(dd_txt)) {
         dd_txt
@@ -1395,7 +1805,7 @@ You may mention 'infection windows' if appropriate. Be concise and scientific.",
 
       # --- FUNGICIDE PROGRAM & TIMING via LLM (fallback to rule-based) ---
       avg_tr_num <- suppressWarnings(mean(count_treatments(management_data)))
-      if (use_llm) {
+
         sp_prompt <- .llm_prompt_sprays(
           no_epidemic       = no_epidemic,
           avg_treatments    = avg_tr_num,
@@ -1405,8 +1815,8 @@ You may mention 'infection windows' if appropriate. Be concise and scientific.",
           onset_med_mmdd    = onset_med_mmdd,
           rapid_med_mmdd    = rapid_med_mmdd
         )
-        sp_txt <- .llm_chat(sp_prompt, apikey, max_tokens = 180)
-      }
+        sp_txt <- .llm_chat(sp_prompt, apikey, persona = personality, max_tokens = 180)
+
       block_sprays <- if (!is.na(sp_txt)) {
         sp_txt
       } else if (no_epidemic) {
@@ -1436,7 +1846,7 @@ You may mention 'infection windows' if appropriate. Be concise and scientific.",
         mean_lw   = mean_lw
       )
 
-      llm_overview <- get_llm_overview(apikey, stats_list, no_epidemic)
+      llm_overview <- get_llm_overview(apikey, persona = personality, stats_list, no_epidemic)
 
       block_overview <- if (isTRUE(no_epidemic)) {
         if (nzchar(llm_overview)) {
@@ -1569,24 +1979,26 @@ You may mention 'infection windows' if appropriate. Be concise and scientific.",
         "Moisture writes what management must read."
       ), 1)
 
+      # --- In report assembly -------------------------------------------------------
+      headers <- .section_headers(personality)
 
-      # ---------------- message ----------------
+      # ---------------- Final message with persona headers ----------------
       msg <- paste(
         "\n==================== 📊 FraNchEstYN Decision-support diagnostic 📊 ====================\n",
-        "🧐 OVERVIEW\n", block_overview, "\n\n",
-        "🌧️ WEATHER–DISEASE ASSOCIATIONS\n", block_climate_cor, "\n\n",
-        "🍄 DISEASE DYNAMICS (CALENDAR DATES)\n", block_disease_dyn, "\n\n",
-        "⚕️ FUNGICIDE PROGRAM & TIMING\n", block_sprays, "\n", timing_advice, "\n\n",
-        "🤖 MODEL PERFORMANCE\n", block_metrics, "\n\n",
-        "📅 YEARLY HIGHLIGHTS\n", paste(yearly_lines, collapse = "\n"), "\n\n",
-        "💬 PROVERB\n", proverb, "\n",
+        headers$overview, "\n",   block_overview,  "\n\n",
+        headers$weather,  "\n",   block_climate_cor,"\n\n",
+        headers$dynamics, "\n",   block_disease_dyn,"\n\n",
+        headers$sprays,   "\n",   block_sprays, "\n", timing_advice, "\n\n",
+        headers$metrics,  "\n",   block_metrics, "\n\n",
+        headers$yearly,   "\n",   paste(yearly_lines, collapse="\n"), "\n\n",
+        headers$proverb,  "\n",   proverb, "\n",
         "======================================================================================\n",
         sep = ""
       )
 
       cat(msg)
       result$decision_support_message <- msg
-    }, silent = TRUE)
+    })
   }
 
   # ---- RETURN EVERYTHING -------------------------------------------------------
