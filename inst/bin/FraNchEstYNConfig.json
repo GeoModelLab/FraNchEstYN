@@ -3,9 +3,9 @@
         "startYear": 1980,
         "endYear": 1982,
         "sites": [
-            "Indiana"
+            "FIJO0QXX"
         ],
-        "isCalibration": "false",
+        "isCalibration": "true",
         "cropModel" :  "no",
         "calibrationVariable": "all",
         "varieties": [
@@ -20,7 +20,7 @@
         "weatherDir": "..\\..\\..\\files\\weather",
         "referenceFilePaths": "..\\..\\..\\files\\reference",
         "paramFile": "..\\..\\..\\files\\parameters\\franchestynParameters.csv",
-        "sowingFile": "..\\..\\..\\files\\management\\mgt_indiana.csv",
-        "cropModelFile" :  "..\\..\\..\\files\\cropModel\\"
+        "sowingFile": "..\\..\\..\\files\\management\\sowing.csv",
+        "cropModelFile": "..\\..\\..\\files\\cropModel\\"
     }
 }
