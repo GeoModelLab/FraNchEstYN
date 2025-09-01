@@ -7,4 +7,9 @@
 src_csharp
 inst/doc
 /doc/
-/Meta/
+Meta
+man
+docs
+pkgdown
+shiny
+
