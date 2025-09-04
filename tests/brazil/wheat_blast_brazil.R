@@ -41,7 +41,7 @@ management_data<-epamig_data |>
   mutate(crop = 'wheat',
          sowingDOY = yday(ymd_hms(sowing_date))) |>
   rename(variety=cultivar) |>
-  select(crop,variety,sowingDOY,year,planting_period)
+  select(crop,sowingDOY,year,planting_period)
 
 reference_data<-epamig_data |>
   ungroup() |>
@@ -63,7 +63,7 @@ reference_data_aug <- reference_data %>%
       )
   ) %>%
   arrange(site, variety, year, doy) |>
-  select(-c(sowing_date,head,harv))
+  select(-c(sowing_date,variety,head,harv))
 
 #saveRDS(df$parameters$crop,'brazil_wheat_parameters.rds')
 
@@ -80,15 +80,21 @@ diseaseParameters
 thisDiseaseParam<-diseaseParameters$wheat_blast
 thisDiseaseParam$AssimilateSappersDamage$calibration<-F
 thisDiseaseParam$AssimilateSappersDamage$value<-0
-thisDiseaseParam$SenescenceAcceleratorDamage$calibration<-T
-thisDiseaseParam$SenescenceAcceleratorDamage$min<-0
+thisDiseaseParam$SenescenceAcceleratorDamage$calibration<-F
+thisDiseaseParam$SenescenceAcceleratorDamage$value<-0
 thisDiseaseParam$SenescenceAcceleratorDamage$max<-0.5
 thisDiseaseParam$CyclePercentageOnset$min<-20
+thisDiseaseParam$OuterInoculumShapeRelease$value<-1
+thisDiseaseParam$LightStealerDamage$value<-0
+thisDiseaseParam$LightStealerDamage$calibration<-F
+thisDiseaseParam$AssimilateSappersDamage$calibration<-T
+thisDiseaseParam$OuterInoculumShapeParameter$value<-0
+thisDiseaseParam$IsSplashBorne$value<-0
 
 
 pps <- unique(management_data$planting_period)
 #for calibration, the others for validation
-pps<-c(1,3,5,7,9,11)
+pps<-c(1,5,10)
 
 all_parameters_disease <- list()
 all_parameters_crop <- list()
@@ -103,7 +109,7 @@ for (pp in pps) {
                              diseaseParameters = thisDiseaseParam,
                              calibration="all", #'all', 'crop', 'disease'
                              start_end = start_end,
-                             iterations=333)
+                             iterations=999)
 
   plot_df<-df$outputs$simulation
 
@@ -153,20 +159,18 @@ calibDisease<-FraNchEstYN::df_to_parameters(param_summary,range_pct=0.2)
 calibDisease <- FraNchEstYN::disable_all_calibration(calibDisease)
 
 #adjust the parameters of the crop and disease model
-#calibDisease$RUEreducerDamage$value<-0.5
 thisCropParameters<-FraNchEstYN::disable_all_calibration(calibCrop)
-thisCropParameters$HalfIntSenescence$value<-75
+# thisCropParameters$HalfIntSenescence$value<-75
+ # thisCropParameters$RadiationUseEfficiency$value<-2
+ # calibDisease$LightStealerDamage$value<-0
 write_rds(thisCropParameters,'..//..//data-raw//brazil_wheat_parameters.rds')
-#thisCropParameters$FloweringStart$value<-55
+write_rds(calibDisease, "brazil_disease_parameters.rds")
 
-
+#thisCropParameters<-readRDS("..//..//data-raw//brazil_wheat_parameters.rds")
+#calibDisease<-readRDS("..//brazil//brazil_disease_parameters.rds")
 
 # containers for results
-library(dplyr)
-
 all_outputs <- list()
-
-
 
 pps <- unique(epamig_data$planting_period)
 
@@ -231,7 +235,7 @@ final_outputs_joined <- final_outputs_joined %>%
   ungroup()
 
 # scale factor to align Yield with the primary axis (tune as needed)
-yield_scale <- 4000
+yield_scale <- 6000
 
 plot_df <- final_outputs_joined %>%
   mutate(
@@ -243,37 +247,25 @@ plot_df <- final_outputs_joined %>%
   mutate(
     anno_plantingExperiment = fct_inorder(anno_plantingExperiment)
   )
-ggplot(plot_df, aes(x = Doy)) +
+
+
+ggplot(plot_df |> filter(planting_period%in%c(1,2,3,4,5,6,7,8,9,10,11,12)), aes(x = Doy)) +
   # healthy interception as area
-  geom_area(aes(y = LightIntHealthy, fill = "Healthy interception"),
+  stat_summary(geom='area',aes(y = LightIntHealthy, fill = "Healthy interception"),
             alpha = 0.3, na.rm = TRUE) +
   # light interception
-  geom_line(aes(y = LightInterception, colour = "Light interception"),
-            linewidth = 0.5, na.rm = TRUE) +
+  geom_line(aes(y = LightInterception, colour = "Light interception"),linewidth = 0.5) +
   # disease severity
-  geom_line(aes(y = DiseaseSeverity, colour = "Disease severity"),
-            linewidth = 0.5, na.rm = TRUE) +
+  geom_line(aes(y = DiseaseSeverity, colour = "Disease severity"),linewidth = 0.5) +
   geom_point(aes(y = DisSev/100, fill = "Disease severity"),
              shape = 21, size = 2, stroke = 0.2, na.rm = TRUE) +
-  geom_errorbar(
-    aes(ymin = (DisSev - DisSev_sd)/100,
-        ymax = (DisSev + DisSev_sd)/100,
-        colour = "Disease severity"),
-    width = 0, linewidth = 0.3, alpha = 0.9, na.rm = TRUE
-  ) +
   # yield
   geom_line(aes(y = YieldActual / yield_scale, colour = "Yield"),
             linewidth = 0.4, na.rm = TRUE) +
   geom_point(aes(y = Yield / yield_scale, colour = "Yield"),
              shape = 22, size = 2, stroke = 0.2, na.rm = TRUE) +
-  geom_errorbar(
-    aes(ymin = (Yield - Yield_sd) / yield_scale,
-        ymax = (Yield + Yield_sd) / yield_scale,
-        colour = "Yield"),
-    width = 0, linewidth = 0.5, alpha = 0.9, na.rm = TRUE
-  ) +
-  facet_wrap(~ anno_plantingExperiment,
-             scales = "free_x", strip.position = "top", ncol = 12) +
+  facet_grid(GrowingSeason~ planting_period,
+             scales = "free_x") +
   scale_y_continuous(
     name = "Disease severity / Light interception (0–1)",
     sec.axis = sec_axis(~ . * yield_scale, name = "Yield (kg/ha)")
@@ -308,3 +300,54 @@ ggplot(plot_df, aes(x = Doy)) +
   ) +
   xlab("")
 
+
+ggplot(plot_df |> filter(planting_period%in%c(1,2,3,4,5,6,7,8,9,10,11,12)), aes(x = Doy)) +
+  # healthy interception as area
+  stat_summary(geom='area',aes(y = LightIntHealthy, fill = "Healthy interception"),
+               alpha = 0.3, na.rm = TRUE) +
+  # light interception
+  stat_summary(aes(y = LightInterception, colour = "Light interception"),linewidth = 0.5) +
+  # disease severity
+  stat_summary(geom='line',aes(y = DiseaseSeverity, colour = "Disease severity"),linewidth = 0.5) +
+  stat_summary(geom='point',aes(y = DisSev/100, fill = "Disease severity"),
+             shape = 21, size = 1, stroke = 0.2, na.rm = TRUE) +
+  # yield
+  stat_summary(geom='line',aes(y = YieldActual / yield_scale, colour = "Yield"),
+            linewidth = 0.4, na.rm = TRUE) +
+  stat_summary(geom='point',aes(y = Yield / yield_scale, colour = "Yield"),
+             shape = 22, size = 1, stroke = 0.2, na.rm = TRUE) +
+  facet_wrap(~ planting_period, ncol=4,
+             scales = "free_x") +
+  scale_y_continuous(
+    name = "Disease severity / Light interception (0–1)",
+    sec.axis = sec_axis(~ . * yield_scale, name = "Yield (kg/ha)")
+  ) +
+  scale_x_continuous(
+    breaks = seq(0, 366, by = 45),
+    labels = function(x) month.abb[ceiling(x/45)],
+    expand = c(0.1, 0.1)
+  ) +
+  scale_colour_manual(
+    name = NULL,
+    values = c("Disease severity" = "blue",
+               "Yield" = "black",
+               "Light interception" = "darkgreen")
+  ) +
+  scale_fill_manual(
+    name = NULL,
+    values = c("Disease severity" = "blue",
+               "Yield" = "black",
+               "Healthy interception" = "green3")
+  ) +
+  theme_classic(base_size = 12) +
+  theme(
+    strip.background = element_rect(fill = "white", colour = "grey80"),
+    strip.placement = "outside",
+    strip.text = element_text(size = 10),
+    legend.position = "top",
+    panel.spacing.x = unit(0.1, "lines"),
+    axis.text.x = element_text(size = 8),
+    axis.text.x.top = element_blank(),
+    axis.ticks.x.top = element_blank()
+  ) +
+  xlab("")

@@ -1,6 +1,7 @@
 library(tidyverse)
 library(FraNchEstYN)
 
+
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
 # locations<-c("Hossana","Agecha")
@@ -34,16 +35,17 @@ reference_data<-read.csv("referenceDataFungicide.csv") |>
   rename(site = sName) |>
   mutate(year = ifelse(site=='Hossana',year+1,year),
          site='all') |>
-  filter(variety =='Gambo', fungicide == 'no')
+  filter(variety =='Gambo', fungicide == 'no') |>
+  select(site,year,variety,DOY:YieldAttainable)
 
 thisCropParameters<-cropParameters$wheat
-thisCropParameters    <- FraNchEstYN::disable_all_calibration(thisCropParameters)
+thisCropParameters  <- FraNchEstYN::disable_all_calibration(thisCropParameters)
 thisCropParameters$TbaseCrop$value<-2
 thisCropParameters$ToptCrop$value<-21
 thisCropParameters$HalfIntSenescence$value<-90
 thisCropParameters$CycleLength$calibration<-T
 thisCropParameters$CycleLength$min<-2100
-thisCropParameters$CycleLength$max<-2300
+thisCropParameters$CycleLength$max<-2200
 thisCropParameters$RadiationUseEfficiency$calibration<-T
 thisCropParameters$FloweringStart$calibration<-T
 thisCropParameters$FloweringStart$min<-45
@@ -62,11 +64,15 @@ thisDiseaseParam$LightStealerDamage$max<-.3
 thisDiseaseParam$HydroThermalTimeOnset$max<-5
 thisDiseaseParam$CyclePercentageOnset$max<-10
 thisDiseaseParam$CyclePercentageOnset$min<-0
+thisDiseaseParam$PathogenSpread$max<-0.3
+
 
 # Add other columns
 management_data <- read.csv("managementData.csv") |>
   mutate(year = "all",sName='all') |>
-  slice_head()
+  rename(site = sName) |>
+  slice_head() |>
+  select(-c(treatment,fungicide,variety))
 
 sites<-unique(reference_data$site)
 
@@ -81,6 +87,7 @@ df<-FraNchEstYN::franchestyn(weather_data = weather_data,
                              calibration="all", #'all', 'crop', 'disease'
                              start_end = start_end,
                              iterations=999)
+
 df$diagnostics$calibration$plots
 sim<-df$outputs$simulation
 
@@ -142,8 +149,8 @@ ggplot(sim, aes(x = as.Date(Date,format='%m/%d/%Y'))) +
   xlab("")+
   facet_wrap(~GrowingSeason,scales='free_x')
 
-# saveRDS(df$parameters$crop,'calibCrop_fungicide.rds')
-# saveRDS(df$parameters$disease,'calibDisease_fungicide.rds')
+ saveRDS(df$parameters$crop,'calibCrop_fungicide.rds')
+ saveRDS(df$parameters$disease,'calibDisease_fungicide.rds')
 
 calibCrop<-readRDS('calibCrop_fungicide.rds')
 calibDisease<-readRDS('calibDisease_fungicide.rds')
@@ -193,12 +200,14 @@ for(thisRow in 1:nrow(management_data)){
     }
 
     this_weather = weather_data |>
-      filter(Site == thisSite)
+      filter(Site == thisScheduling$sName)
 
-    this_management <- thisScheduling
+    this_management <- thisScheduling |>
+      select(-variety)
 
     this_reference <- reference_data |>
-      filter(site==thisSite,variety==thisVariety, fungicide==thisScheduling$fungicide)
+      filter(site==thisScheduling$sName,variety==thisVariety, fungicide==thisScheduling$fungicide) |>
+      select(-variety)
 
     df<-FraNchEstYN::franchestyn(weather_data = this_weather,
                                  management_data = this_management,
@@ -293,3 +302,4 @@ ggplot(sim, aes(x = DaysAfterSowing)) +
     axis.ticks.x.top = element_blank()
   ) +
   xlab("")
+

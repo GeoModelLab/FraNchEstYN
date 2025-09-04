@@ -1,0 +1,41 @@
+Model,Parameter,Description,unit,min,max,value,calibration
+crop,TbaseCrop,base temperature for crop growth and development,°C,-1,5,1,x
+crop,ToptCrop,optimum temperature for crop growth and development,°C,20,28,24,
+crop,TmaxCrop,maximum temperature for crop growth and development,°C,32,37,35,
+crop,CycleLength,crop cycle length,degree days,2500,4000,3200,x
+crop,FloweringStart,percentage of the crop cycle when flowering occurs,% crop cycle,50,85,50,x
+crop,HalfIntGrowth,percentage of the crop cycle when light interception is halved (growth phase),unitless,20,35,25,x
+crop,HalfIntSenescence,percentage of the crop cycle when light interception is halved (senescence phase),unitless,50,99,70,x
+crop,SlopeGrowth,slope of light interception growth phase,unitless,0.001,0.02,0.01,x
+crop,SlopeSenescence,slope of light interception senescence phase,unitless,0.001,0.07,0.01,x
+crop,RadiationUseEfficiency,maximum radiation use efficiency,g MJ-1,1,3.5,3,x
+crop,PartitioningMaximum,maximum partitioning to storage organs,unitless,0.8,1,1,x
+crop,VarietalResistance,varietal resistance,unitless,0,1,0,
+disease,IsSplashBorne,0 or 1 and if 1 the pathogen is dispersed by rain only,unitless,0,1,0,
+disease,OuterInoculumMax,pathogen inoculum from external sources,unitless,0.001,0.14,0.07,x
+disease,PathogenSpread,percentage of canopy cover state infected by the pathogen by sporulation,unitless,0.01,0.5,0.04,x
+disease,WetnessDurationOptimum,optimum leaf wetness duration for pathogen infection,hours,10,20,16,x
+disease,WetnessDurationMinimum,minimum leaf wetness duration for pathogen infection,hours,3,10,5,x
+disease,DryCriticalInterruption,interruption leaf dry critical for pathogen infection,hours,8,48,8,x
+disease,Tmin,tmin for pathogen processes,°C,0,12,3,x
+disease,Topt,topt for pathogen processes,°C,10,22,18,x
+disease,Tmax,tmax for pathogen processes,°C,22,34,36,x
+disease,RelativeHumidityCritical,critical relative humidity for pathogen processes,unitless,50,70,60,x
+disease,Rain50Detachment,50% spore detachment by rain,unitless,0.1,20,10,x
+disease,RelativeHumidityNotLimiting,non limiting relative humidity for pathogen processes,unitless,70,95,70,x
+disease,HydroThermalTimeOnset,threshold of hydro-thermal time to determine disease onset,hydrodegree days,20,45,0,x
+disease,CyclePercentageOnset,crop cycle to determine disease onset,hydrodegree days,25,55,0,x
+disease,LatencyDuration,minimum duration of the latency phase,days,7,17,6,x
+disease,SporulationDuration,maximum duration of the sporulation phase,days,15,35,15,x
+disease,LightStealerDamage,damage mechanism of light stealers,unitless,0.2,2,1,x
+disease,RUEreducerDamage,damage mechanism of photosynthetic reducers,fraction,0,.5,2,x
+disease,SenescenceAcceleratorDamage,damage mechanism of senescence accelerators,fraction,0,1,0,
+disease,AssimilateSappersDamage,damage mechanism of assimilate sappers,kg ha-1,0,40,10,
+disease,OuterInoculumShapeRelease,shape of the primary inoculum release function,unitless,0,1,2,
+disease,OuterInoculumShapeParameter,empirical parameter for inoculum bell shaped,unitless,0,1,1,x
+fungicide,InitialDose,initial fungicide dose,fraction,0,1,1,
+fungicide,DegradationRate,rate of degradation,unitless,0.01,0.15,0.01,
+fungicide,TenacityFactor,tenacity factor,unitless,0.1,0.25,0.25,
+fungicide,InitialEfficacy,initial efficacy,unitless,0.5,1,1,
+fungicide,AShapeParameter,empirical parameter,unitless,3,5,4,
+fungicide,BShapeParameter,empirical parameter,unitless,7,10,8.5,

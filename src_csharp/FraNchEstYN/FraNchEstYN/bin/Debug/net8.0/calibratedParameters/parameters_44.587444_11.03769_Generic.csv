@@ -1,0 +1,7 @@
+model, param, value
+crop,TbaseCrop,1.0692188023238023
+crop,HalfIntGrowth,33.79416622360499
+crop,HalfIntSenescence,57.28892015324807
+crop,SlopeGrowth,0.009266247953295644
+crop,SlopeSenescence,0.0020122145856381335
+crop,PartitioningMaximum,0.9914008369782465

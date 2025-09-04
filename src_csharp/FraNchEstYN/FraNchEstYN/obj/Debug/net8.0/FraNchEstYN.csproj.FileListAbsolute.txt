@@ -1,0 +1,289 @@
+C:\projects\ConsoleApp1\ConsoleApp1\obj\Debug\net8.0\FraNchEstYN.csproj.AssemblyReference.cache
+C:\projects\ConsoleApp1\ConsoleApp1\obj\Debug\net8.0\FraNchEstYN.GeneratedMSBuildEditorConfig.editorconfig
+C:\projects\ConsoleApp1\ConsoleApp1\obj\Debug\net8.0\FraNchEstYN.AssemblyInfoInputs.cache
+C:\projects\ConsoleApp1\ConsoleApp1\obj\Debug\net8.0\FraNchEstYN.AssemblyInfo.cs
+C:\projects\ConsoleApp1\ConsoleApp1\obj\Debug\net8.0\FraNchEstYN.csproj.CoreCompileInputs.cache
+C:\projects\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.csproj.AssemblyReference.cache
+C:\projects\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.GeneratedMSBuildEditorConfig.editorconfig
+C:\projects\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.AssemblyInfoInputs.cache
+C:\projects\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.AssemblyInfo.cs
+C:\projects\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.csproj.CoreCompileInputs.cache
+C:\projects\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\FraNchEstYN.exe
+C:\projects\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\FraNchEstYN.deps.json
+C:\projects\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\FraNchEstYN.runtimeconfig.json
+C:\projects\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\FraNchEstYN.dll
+C:\projects\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\FraNchEstYN.pdb
+C:\projects\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\optimizerSimplex.dll
+C:\projects\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEs.FFE66E09.Up2Date
+C:\projects\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.dll
+C:\projects\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\refint\FraNchEstYN.dll
+C:\projects\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.pdb
+C:\projects\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.genruntimeconfig.cache
+C:\projects\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\ref\FraNchEstYN.dll
+C:\projects\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\FraNchEstYNConfig.json
+C:\projects\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\parameters\cropParameters.csv
+C:\projects\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\parameters\diseaseParameters.csv
+C:\projects\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\FIJO0QXX.csv
+C:\projects\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\ININ0QXX.csv
+C:\projects\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\ITPO0QXX.csv
+C:\projects\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\TRIZ0QXX.csv
+C:\projects\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\UKRO0QXX.csv
+C:\projects\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\USMA0QXX.csv
+C:\projects\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\FIJO0QXX.csv
+C:\projects\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\TRIZ0QXX.csv
+C:\projects\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\UKRO0QXX.csv
+C:\projects\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\USMA0QXX.csv
+C:\projects\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\ININ0QXX.csv
+C:\projects\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\ITPO0QXX.csv
+C:\projects\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\management\sowing.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.csproj.AssemblyReference.cache
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.AssemblyInfoInputs.cache
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.AssemblyInfo.cs
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.csproj.CoreCompileInputs.cache
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.sourcelink.json
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\FraNchEstYN.exe
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\management\sowing.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\Disease\Everlange.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\Disease\Ottava.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\Disease\Reuler.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\Burmerange.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\Christnach.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\Everlange.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\FIJO0QXX.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\Indiana.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\ININ0QXX.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\ITPO0QXX.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\Ottava.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\Ottava_ori.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\Reuler.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\SchleswigHolstein.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\SLucia.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\SLucia_ori.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\TRIZ0QXX.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\UKRO0QXX.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\USMA0QXX.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\FraNchEstYNConfig.json
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\FraNchEstYN.deps.json
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\FraNchEstYN.runtimeconfig.json
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\FraNchEstYN.dll
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\FraNchEstYN.pdb
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\optimizerSimplex.dll
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEs.FFE66E09.Up2Date
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.dll
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\refint\FraNchEstYN.dll
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.pdb
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.genruntimeconfig.cache
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\ref\FraNchEstYN.dll
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\Disease\Confienza.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\Disease\Garbagna.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\Collobiano.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\Confienza.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\Garbagna.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\parameters\franchestynParameters.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\FIJO0QXX.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\ININ0QXX.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\ITPO0QXX.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\Ottava.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\SLucia.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\TRIZ0QXX.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\UKRO0QXX.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\USMA0QXX.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\Indiana.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\SchleswigHolstein.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\Christnach.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\GGE.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\GGE.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\HAN.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\KAL.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\KIE.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\QLB.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\RHH.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\HAN.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\KAL.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\KIE.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\QLB.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\RHH.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\Collobiano.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\Disease\Burmerange_.csv
+C:\Users\simoneugomaria.brega\OneDrive - CREA\Documenti\git\FRaNchEstYn\test\c#\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\Burmerange.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\FraNchEstYNConfig.json
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\FraNchEstYN.exe
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\management\sowing.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\parameters\franchestynParameters.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\Burmerange.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\Christnach.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\Collobiano.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\Disease\Burmerange_.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\Disease\Confienza.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\Disease\Everlange.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\Disease\Garbagna.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\Disease\Ottava.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\Disease\Reuler.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\FIJO0QXX.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\GGE.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\HAN.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\Indiana.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\ININ0QXX.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\ITPO0QXX.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\KAL.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\KIE.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\Ottava.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\QLB.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\RHH.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\SchleswigHolstein.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\SLucia.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\TRIZ0QXX.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\UKRO0QXX.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\USMA0QXX.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\Burmerange.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\Christnach.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\Collobiano.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\Confienza.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\Everlange.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\FIJO0QXX.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\Garbagna.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\GGE.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\HAN.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\Indiana.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\ININ0QXX.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\ITPO0QXX.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\KAL.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\KIE.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\Ottava.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\Ottava_ori.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\QLB.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\Reuler.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\RHH.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\SchleswigHolstein.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\SLucia.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\SLucia_ori.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\TRIZ0QXX.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\UKRO0QXX.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\USMA0QXX.csv
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\FraNchEstYN.deps.json
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\FraNchEstYN.runtimeconfig.json
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\FraNchEstYN.dll
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\FraNchEstYN.pdb
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\optimizerSimplex.dll
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.csproj.AssemblyReference.cache
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.GeneratedMSBuildEditorConfig.editorconfig
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.AssemblyInfoInputs.cache
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.AssemblyInfo.cs
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.csproj.CoreCompileInputs.cache
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.sourcelink.json
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEs.FFE66E09.Up2Date
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.dll
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\refint\FraNchEstYN.dll
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.pdb
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.genruntimeconfig.cache
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\ref\FraNchEstYN.dll
+C:\GitHub\FraNchEstYN\src\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\referenceData.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\FraNchEstYNConfig.json
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\FraNchEstYN.exe
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\management\sowing.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\parameters\franchestynParameters.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\reference\Burmerange.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\reference\Christnach.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\reference\Collobiano.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\reference\Disease\Burmerange_.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\reference\Disease\Confienza.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\reference\Disease\Everlange.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\reference\Disease\Garbagna.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\reference\Disease\Ottava.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\reference\Disease\Reuler.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\reference\FIJO0QXX.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\reference\GGE.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\reference\HAN.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\reference\Indiana.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\reference\ININ0QXX.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\reference\ITPO0QXX.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\reference\KAL.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\reference\KIE.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\reference\Ottava.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\reference\QLB.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\reference\referenceData.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\reference\RHH.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\reference\SchleswigHolstein.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\reference\SLucia.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\reference\TRIZ0QXX.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\reference\UKRO0QXX.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\reference\USMA0QXX.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\weather\daily\Burmerange.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\weather\daily\Christnach.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\weather\daily\Collobiano.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\weather\daily\Confienza.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\weather\daily\Everlange.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\weather\daily\FIJO0QXX.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\weather\daily\Garbagna.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\weather\daily\GGE.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\weather\daily\HAN.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\weather\daily\Indiana.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\weather\daily\ININ0QXX.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\weather\daily\ITPO0QXX.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\weather\daily\KAL.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\weather\daily\KIE.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\weather\daily\Ottava.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\weather\daily\Ottava_ori.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\weather\daily\QLB.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\weather\daily\Reuler.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\weather\daily\RHH.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\weather\daily\SchleswigHolstein.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\weather\daily\SLucia.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\weather\daily\SLucia_ori.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\weather\daily\TRIZ0QXX.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\weather\daily\UKRO0QXX.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\files\weather\daily\USMA0QXX.csv
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\FraNchEstYN.deps.json
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\FraNchEstYN.runtimeconfig.json
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\FraNchEstYN.dll
+C:\GitHub\FraNchEstYN\inst\bin\Debug\net8.0\FraNchEstYN.pdb
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\FraNchEstYN.exe
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\parameters\franchestynParameters.csv
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\Collobiano.csv
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\FIJO0QXX.csv
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\Indiana.csv
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\ININ0QXX.csv
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\ITPO0QXX.csv
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\Ottava.csv
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\referenceData.csv
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\SLucia.csv
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\TRIZ0QXX.csv
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\UKRO0QXX.csv
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\reference\USMA0QXX.csv
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\Collobiano.csv
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\Confienza.csv
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\FIJO0QXX.csv
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\Garbagna.csv
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\Indiana.csv
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\ININ0QXX.csv
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\ITPO0QXX.csv
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\Ottava.csv
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\Reuler.csv
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\SchleswigHolstein.csv
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\SLucia.csv
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\TRIZ0QXX.csv
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\UKRO0QXX.csv
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\daily\USMA0QXX.csv
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\weather\hourly\Indiana.csv
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\FraNchEstYN.deps.json
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\FraNchEstYN.runtimeconfig.json
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\FraNchEstYN.dll
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\FraNchEstYN.pdb
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\optimizerSimplex.dll
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.csproj.AssemblyReference.cache
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.GeneratedMSBuildEditorConfig.editorconfig
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.AssemblyInfoInputs.cache
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.AssemblyInfo.cs
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.csproj.CoreCompileInputs.cache
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.sourcelink.json
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEs.FFE66E09.Up2Date
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.dll
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\refint\FraNchEstYN.dll
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.pdb
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\FraNchEstYN.genruntimeconfig.cache
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\obj\Debug\net8.0\ref\FraNchEstYN.dll
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\cropModel\cropModelData.csv
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\files\management\sowing.csv
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\FraNchEstYNConfig_ok.json
+C:\GitHub\FraNchEstYN\src_csharp\FraNchEstYN\FraNchEstYN\bin\Debug\net8.0\FraNchEstYNConfig.json

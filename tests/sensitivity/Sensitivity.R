@@ -1,14 +1,16 @@
 # Remove objects from the Global Environment----
 rm(list=ls())
 
+#remove.packages('FraNchEstYN')
+
+
 #libraries
 library(sensitivity) #for doing sensitivity
 library(tidyverse)
-#devtools::install_github("GeoModelLab/FraNchEstYN")
+#devtools::install_github("GeoModelLab/FraNchEstYN", force = TRUE, build_vignettes = FALSE)
 library(FraNchEstYN)
 
 #set this directory as the working directory
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 thisDir<-getwd()
 
 ##----------------------------------------------------------------
@@ -16,18 +18,17 @@ thisDir<-getwd()
 ##ONLY ONCE BEFORE SENSITIVITY SIMULATIONS
 ##----------------------------------------------------------------
 options(scipen=999)
-param<-read.csv('franchestynParameters.csv') 
 
 #1. calibrate crop parameters
 
 ## mgt data
 site_sowing_dates <- list(
-  FIJO = 127,
-  ININ = 299,
-  ITPO = 323,
-  TRIZ = 320,
-  UKRO = 289,
-  USMA = 360
+  FIJO0QXX = 127,
+  ININ0QXX = 299,
+  ITPO0QXX = 323,
+  TRIZ0QXX = 320,
+  UKRO0QXX = 289,
+  USMA0QXX = 360
 )
 
 # Convert the named list to a data frame
@@ -63,17 +64,17 @@ read_weather_with_site <- function(file_path) {
 }
 
 # Read and combine all files into one data frame
-weather_data <- do.call(rbind, lapply(weather_list, read_weather_with_site)) 
-  #|> 
-  #rename(rad=SRAD, Year=YYYY, Month = MM, Day=DD)
+weather_data <- do.call(rbind, lapply(weather_list, read_weather_with_site)) |> 
+  rename(rad=SRAD, Year=YYYY, Month = MM, Day=DD)
 
 
 ## reference data
 reference_list <- list.files(paste0(getwd(),'//referenceData'),full.names = T)
-reference_data <- do.call(rbind, lapply(reference_list, read.csv)) |> 
-  rename(site = sName, YieldAttainable = WGRN, AGB = WTOP, Year = Pyear) |> 
+reference_data <- do.call(rbind, lapply(reference_list, read_weather_with_site)) |> 
+  rename(YieldAttainable = WGRN, AGB = WTOP, Year = Pyear) |> 
   mutate(YieldAttainable = YieldAttainable*10,
-         AGB = AGB*10)
+         AGB = AGB*10) |> 
+  select(site,Year,DOY,FINT,YieldAttainable,AGB)
 
 #1. crop calibration
 sites<-unique(weather_data$site)
@@ -87,29 +88,40 @@ all_parameters <- list()
 all_outputs <- list()
 all_metrics <- list()
 
+library(FraNchEstYN)
 #adjust param bounds
 thisCropParam <- cropParameters$wheat
 thisCropParam$RadiationUseEfficiency$calibration<-T
 thisCropParam$CycleLength$max<-3500
-thisCropParam$HalfIntGrowth$min<-15
-thisCropParam$PartitioningMaximum$calibration<-F
+thisCropParam$CycleLength$min<-1500
+thisCropParam$FloweringStart$min<-40
+thisCropParam$FloweringStart$max<-65
+thisCropParam$RadiationUseEfficiency$min<-2
+thisCropParam$RadiationUseEfficiency$max<-3.8
+thisCropParam$HalfIntGrowth$min<-12
+thisCropParam$HalfIntGrowth$max<-25
+thisCropParam$PartitioningMaximum$min<-.8
+thisCropParam$PartitioningMaximum$calibration<-T
+thisCropParam$ToptCrop$calibration<-T
+thisCropParam$ToptCrop$max<-25
 
+s<-sites[2]
 for(s in sites)
 {
   thisWeather <- weather_data |> 
     filter(site == s)
   
   thisReference <- reference_data |> 
-    filter(site == substr(s, 1, 4)) |> 
-    mutate(Disease=NA) 
+    mutate(Disease=NA) |> 
+    filter(site == s)
   
   thisManagement <- management_data |> 
-    filter(site == substr(s, 1, 4))
+    filter(site == s)
   
   df<-franchestyn(weather_data = thisWeather,
                   management_data = thisManagement,
                   reference_data = thisReference,
-                  cropParameters = cropParameters$wheat,
+                  cropParameters = thisCropParam,
                   diseaseParameters = diseaseParameters$black_rust,
                   start_end = start_end,
                   calibration = 'crop',
@@ -126,1169 +138,714 @@ for(s in sites)
 combined_outputs <- bind_rows(all_outputs, .id = "site")
 combined_metrics <- bind_rows(all_metrics, .id = "site")
 
+saveRDS(combined_outputs,'cropCalibration_outputs.rds')
+saveRDS(combined_metrics,'cropCalibration_metrics.rds')
+
+combined_outputs<-readRDS('cropCalibration_outputs.rds')
+
+unique(combined_outputs$site)
+
 #plots
-ggplot(combined_outputs |> filter(GrowingSeason<1990), aes(x=DaysAfterSowing)) + 
-  geom_line(aes(y=YieldAttainable/20000),col='red')+
-  geom_point(aes(y=YieldRef/20000),col='red')+
-  geom_line(aes(y=LightInterception),col='green2')+
-  geom_point(aes(y=LightInterceptionRef),col='green2')+
-  geom_line(aes(y=AGBattainable/20000),col='blue')+
-  geom_point(aes(y=AGBRef/20000),col='blue')+
-  facet_grid(site~GrowingSeason)
+ggplot(combined_outputs, aes(x=DaysAfterSowing)) + 
+  stat_summary(geom='line',aes(y=YieldAttainable/20000),col='red')+
+  stat_summary(aes(y=YieldRef/20000),col='red')+
+  stat_summary(geom='line',aes(y=LightInterception),col='green2')+
+  stat_summary(aes(y=LightInterceptionRef),col='green2')+
+  stat_summary(geom='line',aes(y=AGBattainable/20000),col='blue')+
+  stat_summary(aes(y=AGBRef/20000),col='blue')+
+  facet_wrap(~site)
 
-param<-readRDS(paste0("cropparameters/ITPO0QXX_parameters.rds"))
-df<-parameters_to_df(param)
 
-##
-m_levels=4
-m_grid.jump = m_levels/2
-## 
-#length(unique(param$parameter))
 
-###morris design
-morris_df = morris(model = NULL, factors = param$parameter, r = 300,
-                  design = list(type = "oat", levels = m_levels,
-                                grid.jump = m_grid.jump),
-                  binf = param$min, bsup = param$max, scale = FALSE)
+paramITPO<-readRDS(paste0("cropparameters/ITPO0QXX_parameters.rds"))
+dfITPO<-parameters_to_df(paramITPO)
+paramUSMA<-readRDS(paste0("cropparameters/USMA0QXX_parameters.rds"))
+dfUSMA<-parameters_to_df(paramUSMA)
+paramTRIZ<-readRDS(paste0("cropparameters/TRIZ0QXX_parameters.rds"))
+dfTRIZ<-parameters_to_df(paramTRIZ)
+paramININ<-readRDS(paste0("cropparameters/ININ0QXX_parameters.rds"))
+dfININ<-parameters_to_df(paramININ)
+paramFIJO<-readRDS(paste0("cropparameters/FIJO0QXX_parameters.rds"))
+dfFIJO<-parameters_to_df(paramFIJO)
+paramUKRO<-readRDS(paste0("cropparameters/UKRO0QXX_parameters.rds"))
+dfUKRO<-parameters_to_df(paramUKRO)
 
-dfParsets<-morris_df$X 
-#save RDS file primary
-saveRDS(morris_df, paste0(thisDir, "\\parametersDesign.rds"))
 
-toWrite<-as.data.frame(morris_df$X) %>%
-   dplyr::mutate(Model = "franchestyn",
-          ID_run = 1:n()) %>%
-   pivot_longer(-c(Model,ID_run),names_to="parameter",values_to="value")
-# 
-# 
-write.csv(toWrite, paste0("testMorris.csv"),row.names=F)
-morris_df<-readRDS(paste0(getwd(), "\\parametersDesign.rds"))
-##
-# this path
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
-load_all("..\\..\\R\\.") # Working directory should be in the package SCC_R_package
+# read crop parameters
+paramSensitivity <- read.csv('franchestynParameters.csv') |> 
+  dplyr::filter(Model=='disease') |> 
+  group_by(Parameter) |> 
+  slice_head()
 
-#devtools::install('..//..//FRaNchEstYn')
-#devtools::document('..//..//FRaNchEstYn')
-library('fRanchestyn')
+#create two sets of parameters for two different pathogens
+#set 1 - rust-type pathogen
+set1<-paramSensitivity
+set1$set<-'set_1'
+set1$value[set1$Parameter == "IsSplashBorne"] <- 0
 
-# this path
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+set1$value[set1$Parameter == "Tmin"] <- 2
+set1$min[set1$Parameter == "Tmin"] <- 0
+set1$max[set1$Parameter == "Tmin"] <- 4
 
-# list of output files 
-filesOuputs<- list.files("..//AgMIP", 
-                         pattern = '.AgMIP',
-                         full.names = T)
-# load only header
-header <- as.character(read.table(filesOuputs[1], skip =4, header =F, nrows=1))
-# create a single dataframe
-weather<-lapply(filesOuputs, function(x) 
+set1$value[set1$Parameter == "Topt"] <- 20
+set1$min[set1$Parameter == "Topt"] <- 18
+set1$max[set1$Parameter == "Topt"] <- 22
+
+set1$value[set1$Parameter == "Tmax"] <- 30
+set1$min[set1$Parameter == "Tmax"] <- 28
+set1$max[set1$Parameter == "Tmax"] <- 32
+
+set1$value[set1$Parameter == "WetnessDurationMinimum"] <- 2
+set1$min[set1$Parameter == "WetnessDurationMinimum"] <- 0
+set1$max[set1$Parameter == "WetnessDurationMinimum"] <- 4
+
+set1$value[set1$Parameter == "WetnessDurationOptimum"] <- 6
+set1$min[set1$Parameter == "WetnessDurationOptimum"] <- 4
+set1$max[set1$Parameter == "WetnessDurationOptimum"] <- 8
+
+set1$value[set1$Parameter == "DryCriticalInterruption"] <- 2
+set1$min[set1$Parameter == "DryCriticalInterruption"] <- 0
+set1$max[set1$Parameter == "DryCriticalInterruption"] <- 4
+
+set1$value[set1$Parameter == "LatencyDuration"] <- 5
+set1$min[set1$Parameter == "LatencyDuration"] <- 3
+set1$max[set1$Parameter == "LatencyDuration"] <- 7
+
+set1$value[set1$Parameter == "SporulationDuration"] <- 10
+set1$min[set1$Parameter == "SporulationDuration"] <- 8
+set1$max[set1$Parameter == "SporulationDuration"] <- 12
+
+set1$value[set1$Parameter == "RelativeHumidityCritical"] <- 70
+set1$min[set1$Parameter == "RelativeHumidityCritical"] <- 65
+set1$max[set1$Parameter == "RelativeHumidityCritical"] <- 75
+
+set1$value[set1$Parameter == "RelativeHumidityNotLimiting"] <- 90
+set1$min[set1$Parameter == "RelativeHumidityNotLimiting"] <- 85
+set1$max[set1$Parameter == "RelativeHumidityNotLimiting"] <- 95
+
+set1$value[set1$Parameter == "SenescenceAcceleratorDamage"] <- .1
+set1$min[set1$Parameter == "SenescenceAcceleratorDamage"] <- .05
+set1$max[set1$Parameter == "SenescenceAcceleratorDamage"] <- .15
+
+set1$value[set1$Parameter == "AssimilateSappersDamage"] <- 30
+set1$min[set1$Parameter == "AssimilateSappersDamage"] <- 20
+set1$max[set1$Parameter == "AssimilateSappersDamage"] <- 40
+
+set1$value[set1$Parameter == "RUEreducerDamage"] <- 1
+set1$min[set1$Parameter == "RUEreducerDamage"] <- .5
+set1$max[set1$Parameter == "RUEreducerDamage"] <- 1.5
+
+set1$value[set1$Parameter == "LightStealerDamage"] <- 1
+set1$min[set1$Parameter == "LightStealerDamage"] <- .5
+set1$max[set1$Parameter == "LightStealerDamage"] <- 1.5
+
+set1$value[set1$Parameter == "Rain50Detachment"] <- 5
+set1$min[set1$Parameter == "Rain50Detachment"] <- 3
+set1$max[set1$Parameter == "Rain50Detachment"] <- 7
+
+set1$value[set1$Parameter == "OuterInoculumMax"] <- 0.03
+set1$min[set1$Parameter == "OuterInoculumMax"] <- 0.02
+set1$max[set1$Parameter == "OuterInoculumMax"] <- 0.04
+
+set1$value[set1$Parameter == "OuterInoculumShapeRelease"] <- 0
+
+set1$value[set1$Parameter == "PathogenSpread"] <- 0.1
+set1$min[set1$Parameter == "PathogenSpread"] <- 0.05
+set1$max[set1$Parameter == "PathogenSpread"] <- 0.15
+
+set1$value[set1$Parameter == "HydroThermalTimeOnset"] <- 10
+set1$min[set1$Parameter == "HydroThermalTimeOnset"] <- 8
+set1$max[set1$Parameter == "HydroThermalTimeOnset"] <- 12
+
+set1$value[set1$Parameter == "CyclePercentageOnset"] <- 30
+set1$min[set1$Parameter == "CyclePercentageOnset"] <- 25
+set1$max[set1$Parameter == "CyclePercentageOnset"] <- 35
+
+
+#set 2 - blast-type pathogen
+set2<-paramSensitivity
+set2$set<-'set_2'
+set2$value[set1$Parameter == "IsSplashBorne"] <- 1
+
+set2$value[set1$Parameter == "Tmin"] <- 11
+set2$min[set1$Parameter == "Tmin"] <- 9
+set2$max[set1$Parameter == "Tmin"] <- 13
+
+set2$value[set1$Parameter == "Topt"] <- 26
+set2$min[set1$Parameter == "Topt"] <- 24
+set2$max[set1$Parameter == "Topt"] <- 28
+
+set2$value[set1$Parameter == "Tmax"] <- 36
+set2$min[set1$Parameter == "Tmax"] <- 34
+set2$max[set1$Parameter == "Tmax"] <- 38
+
+set2$value[set1$Parameter == "WetnessDurationMinimum"] <- 5
+set2$min[set1$Parameter == "WetnessDurationMinimum"] <- 3
+set2$max[set1$Parameter == "WetnessDurationMinimum"] <- 7
+
+set2$value[set1$Parameter == "WetnessDurationOptimum"] <- 12
+set2$min[set1$Parameter == "WetnessDurationOptimum"] <- 10
+set2$max[set1$Parameter == "WetnessDurationOptimum"] <- 14
+
+set2$value[set1$Parameter == "DryCriticalInterruption"] <- 20
+set2$min[set1$Parameter == "DryCriticalInterruption"] <- 18
+set2$max[set1$Parameter == "DryCriticalInterruption"] <- 22
+
+set2$value[set1$Parameter == "LatencyDuration"] <- 8
+set2$min[set1$Parameter == "LatencyDuration"] <- 6
+set2$max[set1$Parameter == "LatencyDuration"] <- 10
+
+set2$value[set1$Parameter == "SporulationDuration"] <- 16
+set2$min[set1$Parameter == "SporulationDuration"] <- 14
+set2$max[set1$Parameter == "SporulationDuration"] <- 18
+
+set2$value[set1$Parameter == "RelativeHumidityCritical"] <- 60
+set2$min[set1$Parameter == "RelativeHumidityCritical"] <- 55
+set2$max[set1$Parameter == "RelativeHumidityCritical"] <- 65
+
+set2$value[set1$Parameter == "RelativeHumidityNotLimiting"] <- 80
+set2$min[set1$Parameter == "RelativeHumidityNotLimiting"] <- 75
+set2$max[set1$Parameter == "RelativeHumidityNotLimiting"] <- 85
+
+set2$value[set1$Parameter == "SenescenceAcceleratorDamage"] <- .1
+set2$min[set1$Parameter == "SenescenceAcceleratorDamage"] <- .05
+set2$max[set1$Parameter == "SenescenceAcceleratorDamage"] <- .15
+
+set2$value[set1$Parameter == "AssimilateSappersDamage"] <- 30
+set2$min[set1$Parameter == "AssimilateSappersDamage"] <- 20
+set2$max[set1$Parameter == "AssimilateSappersDamage"] <- 40
+
+set2$value[set1$Parameter == "RUEreducerDamage"] <- 1
+set2$min[set1$Parameter == "RUEreducerDamage"] <- .5
+set2$max[set1$Parameter == "RUEreducerDamage"] <- 1.5
+
+set2$value[set1$Parameter == "LightStealerDamage"] <- 1
+set2$min[set1$Parameter == "LightStealerDamage"] <- .5
+set2$max[set1$Parameter == "LightStealerDamage"] <- 1.5
+
+set2$value[set1$Parameter == "Rain50Detachment"] <- 5
+set2$min[set1$Parameter == "Rain50Detachment"] <- 3
+set2$max[set1$Parameter == "Rain50Detachment"] <- 7
+
+set2$value[set1$Parameter == "OuterInoculumMax"] <- 0.1
+set2$min[set1$Parameter == "OuterInoculumMax"] <- 0.09
+set2$max[set1$Parameter == "OuterInoculumMax"] <- 0.11
+
+set2$value[set1$Parameter == "OuterInoculumShapeRelease"] <- 0
+
+set2$value[set1$Parameter == "PathogenSpread"] <- 0.1
+set2$min[set1$Parameter == "PathogenSpread"] <- 0.05
+set2$max[set1$Parameter == "PathogenSpread"] <- 0.15
+
+set2$value[set1$Parameter == "HydroThermalTimeOnset"] <- 10
+set2$min[set1$Parameter == "HydroThermalTimeOnset"] <- 8
+set2$max[set1$Parameter == "HydroThermalTimeOnset"] <- 12
+
+set2$value[set1$Parameter == "CyclePercentageOnset"] <- 30
+set2$min[set1$Parameter == "CyclePercentageOnset"] <- 25
+set2$max[set1$Parameter == "CyclePercentageOnset"] <- 35
+
+param_sets<-rbind(set1,set2) |> 
+  dplyr::filter(!Parameter%in%c('IsSplashBorne','OuterInoculumShapeRelease'))
+
+
+#set boundaries at +- 15%
+# sensitivity analysis
+m_levels=6
+m_grid.jump = 3
+
+parSets<-unique(param_sets$set)
+
+parSet<-parSets[1]
+for(parSet in parSets)
 {
-  # Read the content of the file
-  file_content <- readLines(filesOuputs[[1]])
-  # Extract the LAT value from the specific line (it’s on the second line in your example)
-  lat_line <- file_content[4]  # Assuming LAT is on the second line
-  lat_value <- as.numeric(strsplit(lat_line, "\\s+")[[1]][3])  # Extract the LAT value, assuming it's the second value
+  thisParSet<-param_sets |> 
+    dplyr::filter(set==parSet)
   
-  out <- tryCatch(read.table(x, 
-                             header = F, 
-                             skip = 5), error = function(e) NULL)
-  if (!is.null(out)) {
-    out$source_file <- x
-    out$lat<-lat_value
-  }
-  return(out)
-})
-#assuming the same header/columns for all files
-weather = do.call("rbind", weather) 
-colnames(weather) = c(header, 'file')
-colnames(weather)[[length(colnames(weather))]] = "LAT"
-weather$Site <- gsub("Meteo/|\\.AgMIP", "", weather$file)
-colnames(weather)[[1]]<-"DATE"
-# Extract year and day of the year
-year <- floor(weather$DATE / 1000)  # First 4 digits (year)
-day_of_year <- weather$DATE %% 1000  # Last 3 digits (day of the year)
-# Convert to Date
-weather$DATE <- as.Date(paste(year, day_of_year, sep = "-"), format = "%Y-%j")
-
-#load optimized crop parameters
-cropCalibration<-list.files('..//cropCalibration',full.names = T)
-# Read and combine all CSV files into one data frame
-cropCalibration <- do.call(rbind, lapply(cropCalibration, read.csv))
-
-
-paramsSA<-read.csv('testMorris.csv')
-
-i<-1
-
-
-
-
-outDfs<-list(list())
-outYieldGap<-list(list())
-outDisSev<-list(list())
-outMorrisYieldGap<-list()
-outMorrisDisSev<-list()
-outDfsUncertainty<-list()
-
-site<-1
-for(site in 1:length(unique(weather$Site)))
-{
-  thisWeather <- weather |> 
-    filter(Site == unique(weather$Site)[site])
+  ###morris design
+  morris_df = sensitivity::morris(model = NULL, factors = thisParSet$Parameter, r = 30,
+                  design = list(type = "oat", levels = m_levels, grid.jump = m_grid.jump),
+                  binf = thisParSet$min, bsup = thisParSet$max, scale = T)
   
-  location <- sub(".*//.*?/([A-Z]{4}).*", "\\1", unique(weather$Site)[site])
+  #save RDS file primary
+  saveRDS(morris_df, paste0(thisDir, paste0("\\parametersDesign", parSet, ".rds")))
+
+  paramsSA<-as.data.frame(morris_df$X) |> 
+     dplyr::mutate(Model = "franchestyn",
+          ID_run = 1:n()) |> 
+     pivot_longer(-c(Model,ID_run),names_to="parameter",values_to="value")
+  write.csv(paramsSA, paste0("morris_", parSet, ".csv"),row.names=F)
   
-  par<-1
-  for(par in 1:length(unique(paramsSA$ID_run)))
-  #for(par in 1:5)  
+  outDfs<-list(list())
+  outYieldLoss_mean<-list(list())
+  outYieldLoss_sd<-list(list())
+  outDisSev_mean<-list(list())
+  outDisSev_sd<-list(list())
+  outMorrisYieldLoss_mean<-list()
+  outMorrisYieldLoss_sd<-list()
+  outMorrisDisSev_mean<-list()
+  outMorrisDisSev_sd<-list()
+  outDfsUncertainty<-list()
+
+  s<-sites[1]
+  #loop over sites
+  for(s in sites)
   {
-      thisPar<- paramsSA |> filter(ID_run == par) %>%
-        select(-Model,ID_run)
-      
-      #assign crop parameters  
-      paramCrop<-cropCalibration |> 
-        filter(site == location)
-      
-      paramDisease<-paramsSA |> 
-        filter(ID_run==par) |> 
-        select(-c(Model,ID_run)) |> 
-        pivot_wider(names_from = parameter, values_from = c(value))
-      
-      # Step 3: Perform a run with optimized parameters
-      optimizedSimulation <- fRanchestyn_daily(
-        thisWeather|> filter(YYYY>=2004 & YYYY<=2009),
-        #weather |> filter(YYYY>=2004 & YYYY<=2009, Site==unique(thisSiteParams$Location)),
-        paramCrop, 
-        paramDisease, 
-        estimateRad = F,
-        sowingDate = site_sowing_dates[[site]], 
-        leafWetnessRH = 89
-      ) |> 
-        filter(season!=0)
-      
-      # Extract yield gap 
-      yieldGap <- optimizedSimulation |> 
-        group_by(season) |> 
-        slice_tail() |> 
-        mutate(yieldGap = (yieldPotState-yieldDisState)/yieldPotState) |> 
-        ungroup() |> 
-        summarise(yieldGap=mean(yieldGap))
-      outYieldGap[[par]] <- yieldGap
-      
-      # extract dis sev
-      DisSev <- optimizedSimulation |> 
-        group_by(season) |> 
-        slice_tail() |> 
-        ungroup() |> 
-        summarise(DisSev=mean(HTaffected))
-      outDisSev[[par]]<-DisSev
-      
-      dailyOut<-optimizedSimulation |> 
-        select(site,season,daysAfterSowing,
-               fIntPotState,bioPotState,yieldPotState,
-               HTtime,HTlatent,HTsporulating,HTdead,HTaffected,
-               fIntDisState,bioDisState,yieldDisState)
-      outDfs[[par]] <- dailyOut
-  }
-  
-      # Process fruits results for this experiment and soil
-      outVarYieldGap <- lapply(outYieldGap, "[[", "error") |> 
-        unlist(use.names = FALSE)
-      # Compute sensitivity indices for fruits
-      resultsYieldGap <- tell(morris_df, as.numeric(outVarYieldGap))
-      outMorrisYieldGap[[location]] <- resultsYieldGap
-      
-      # Process fruits results for this experiment and soil
-      outVarDisSev <- lapply(outDisSev, "[[", "error") |> 
-        unlist(use.names = FALSE)
-      # Compute sensitivity indices for fruits
-      resultsDisSev <- tell(morris_df, as.numeric(outVarDisSev))
-      outMorrisYieldGap[[location]] <- resultsDisSev
-      
-      # Save uncertainty outputs for this soil and experiment
-      outDfsUncertainty[[location]] <- outDfs
-}
-
-####save RDS objects outMorris outDfsUncertainty
-saveRDS(outMorrisYieldGap, 'outMorrisYieldGap.rds')
-saveRDS(outMorrisDisSev, 'outMorrisDisSev.rds')
-
-saveRDS(outDfsUncertainty, 'outDfsUncertainty.rds')
-
-outMorris <- readRDS('outMorris.rds')
-
-exp<-1
-results_Err_list<-list()
-for(exp in 1:length(outMorris))
-{
-  #fruits
-  dfErrors<-as.data.frame(apply(outMorris[exp][[1]][[11]], 2, mean))
- 
-  # Rename the single column that was generated to "mean_values"
-  colnames(dfErrors) <- "mu"
- 
-  #Fruits dataset
-  dfErrors$parameter <- rownames(dfErrors)
-  dfErrors$experiment <- exp
-  dfErrors$muStar<-as.data.frame(apply(outMorris[exp][[1]][[11]], 2, 
-                                           function(x) mean(abs(x))))[,1]
-  dfErrors$sigma<-as.data.frame(apply(outMorris[exp][[1]][[11]], 2, sd))[,1]
-  
-  # Reset row names to ensure they are not included in the final result
-  rownames(dfErrors) <- NULL
-  
-  # Rearrange the columns into the desired order
-  new_order <- c("experiment", "parameter", "mu", "muStar", "sigma")
-  dfErrors <- dfErrors[, new_order]
- 
-  
-  # Store results in the predefined list
-  results_Err_list[[exp]] <- list(dfErrors)
-  
- 
-}
-
-
-
-# Combine all data frames into one
-allErrorsExperiments <- do.call(rbind, lapply(results_Err_list, function(x) {
-  do.call(rbind, x)  # Combine sand, loam, clay within each experiment
-}))
-
-
-# Step 1: Extract row names
-rownames_col <- rownames(allErrorsExperiments)
-
-
-# Step 4: Remove the row names by resetting them to numeric indices
-rownames(allErrorsExperiments) <- NULL
-
-allErrorsExperiments <- allErrorsExperiments[, new_order]
-
-unique(allErrorsExperiments$parameter)
-
-#TODO: ANALYSIS!!!!
-new_acronyms <- c(
-  "parDormancy_limitingPhotoperiod" = "DorLP", 
-  "parDormancy_notLimitingPhotoperiod" = "DorNLP", 
-  "parDormancy_limitingTemperature" = "DorLT", 
-  "parDormancy_notLimitingTemperature" = "DorNLT", 
-  "parDormancy_photoThermalThreshold" = "DorPT", 
-  "parEndodormancy_limitingLowerTemperature" = "EndoLLT", 
-  "parEndodormancy_notLimitingLowerTemperature" = "EndoNLLT", 
-  "parEndodormancy_notLimitingUpperTemperature" = "EndoNLUT", 
-  "parEndodormancy_limitingUpperTemperature" = "EndoLUT", 
-  "parEndodormancy_chillingThreshold" = "EndoTh", 
-  "parEcodormancy_notLimitingTemperature" = "EcoNLT", 
-  "parEcodormancy_notLimitingPhotoperiod" = "EcoNLP", 
-  "parEcodormancy_photoThermalThreshold" = "EcoTh", 
-  "parGrowth_minimumTemperature" = "GroTn", 
-  "parGrowth_optimumTemperature" = "GroTo", 
-  "parGrowth_maximumTemperature" = "GroTx", 
-  "parGrowth_thermalThreshold" = "GroTh", 
-  "parGreendown_thermalThreshold" = "GreTh", 
-  "parSenescence_limitingPhotoperiod" = "SenLP", 
-  "parSenescence_notLimitingPhotoperiod" = "SenNLP", 
-  "parSenescence_limitingTemperature" = "SenLT", 
-  "parSenescence_notLimitingTemperature" = "SenNLT", 
-  "parSenescence_photoThermalThreshold" = "SenTh", 
-  "parVegetationIndex_nNDVIGrowth" = "GroVI", 
-  "parVegetationIndex_nNDVISenescence" = "SenVI", 
-  "parVegetationIndex_nNDVIGreendown" = "GreVI", 
-  "parVegetationIndex_nNDVIEcodormancy" = "EcoVI", 
-  "parVegetationIndex_nNDVIEndodormancy" = "EndoVI", 
-  "parVegetationIndex_pixelTemperatureShift" = "Tshift", 
-  "parVegetationIndex_minimumNDVI" = "VIn", 
-  "parVegetationIndex_maximumNDVI" = "VIx"
-)
-
-# Example of how to apply the mapping to a dataset column
-# Substituting the parameter column in the data frame
-allErrorsExperiments$parameter <- new_acronyms[allErrorsExperiments$parameter]
-
-excludeParam<-c('GreVI','GroVI','VIx','VIn','EndoVI','EcoVI','SenVI')
-
-#a simple boxplot with parameter relevance
-ggplot(allErrorsExperiments|> 
-         filter(!parameter %in% excludeParam )) + 
-  geom_col(aes(x=reorder(factor(parameter),-muStar), y = muStar),
-               outlier.size=.5)+
-  theme_bw()+
-  theme(axis.text.x = element_text(angle=-90),
-        legend.position = "top")+
-  xlab("")
-ggsave("muStarErrors.png",height=5,width=9)
-
-
-#mu_sigma plot
-
-#compute mean and sd of the normalized msoil_type#compute mean and sd of the normalized metrics
-df_Errors_normalized_synth <- allErrorsExperiments |> 
-  group_by(parameter) |> 
-  summarise(muStar=mean(muStar),
-            muStarSD=sd(muStar),
-            sigma=mean(sigma),
-            sigmaSD=sd(sigma))
-unique(df_Errors_normalized_synth$parameter)
-
-
-main_plot<-ggplot(df_Errors_normalized_synth |> 
-                    filter(!parameter %in% excludeParam )) + 
-  geom_point(aes(x=muStar, y = sigma, color = parameter),size=0.5) +
-  geom_errorbarh(aes(xmin = muStar - muStarSD, xmax = muStar + muStarSD, 
-                     y = sigma, height = 0,color=parameter),linewidth=0.3) +
-  geom_errorbar(aes(ymin = sigma - sigmaSD, ymax = sigma + sigmaSD, 
-                    x = muStar, width = 0,color=parameter),linewidth=0.3) +
-  geom_text(aes(x = muStar, y = sigma, label = parameter,color=parameter), 
-            vjust = 1, hjust = 1, size = 3.5) +
-  theme_bw()+
-  theme(axis.text.x = element_text(angle=-90),
-        legend.position = "none", color = NA)+
-  labs(
-    x = "Mean of muStar (Normalized)",
-    y = "Mean of sigma (Normalized)",
-    title = "SWELL - sensitivity analysis with Morris method",
-    subtitle = "horizontal and vertical error bars are mean +- sd"
-  )
-
-main_plot
-ggsave("mu_sigma_Fruits.png",height = 5, width=10)
-
-#empty list
-uncertainty_list<-list()
-
-#general counter
-counter<-1
-
-exp<-1
-#TAKES ONE MINUTE!
-#loop on the list to build a single df 
-for(exp in 1:length(outDfsUncertainty))
-{
-  #select one experiment
-  thisExperimentList<-df_uncertainty[exp][[1]]
-  
-  #loop on the runs in this experiment
-  for(run in 1:length(thisExperimentList))
-  {
-    #take the data as dataframe
-    dfOutputs<-as.data.frame(thisExperimentList[run])
-    dfOutputs$run<-run
+    thisWeather <- weather_data |> 
+      filter(site == s)
     
-    #assign the df to the list
-    uncertainty_list[[counter]]<-dfOutputs
+    thisReference <- reference_data |> 
+      filter(site == s) |> 
+      mutate(Disease=NA) 
     
-    #increase the counter
-    counter<-counter+1
-  }
-}
-
-
-
-#read rds
-df_uncertainty <- readRDS('outDfsUncertainty.rds')
-# Initialize an empty list to store the combined DataFrames
-all_final_dfs <- list()
-
-# Loop through each of the six elements in the main list
-for (i in seq_along(df_uncertainty)) {
-  # Combine all data frames within the current element (list of lists)
-  combined_df <- do.call(rbind, df_uncertainty[[i]])
-  
-  # Add a column with the list index
-  combined_df$list_id <- i
-  
-  # Add the modified DataFrame to the results list
-  all_final_dfs[[i]] <- combined_df
-}
-
-# Combine all the final DataFrames into one
-final_combined_df <- do.call(rbind, all_final_dfs) |> 
-  mutate(site = str_extract(site, "(?<=/)[A-Z]{4}"))
-
-
-#compute synthetic measures
-library(data.table)
-
-testData<-final_combined_df |> filter(list_id<400,season<2009)
-
-summary(testData)
-
-# List of variables to include in the summary
-variables <- c("fIntPotState", "fIntDisState", "HTlatent", "HTsporulating", "HTdead", "HTaffected",
-               "bioDisState","yieldDisState",'bioPotState','yieldPotState')
-
-# Compute 25th, 50th (median), and 75th percentiles for all variables
-testData_summary <- testData %>%
-  filter(list_id < 400, season < 2009) %>%
-  group_by(daysAfterSowing, site, season) %>%
-  summarize(
-    across(
-      all_of(variables),
-      list(
-        median = ~median(.x, na.rm = TRUE),
-        lower = ~quantile(.x, 0.40, na.rm = TRUE),
-        upper = ~quantile(.x, 0.60, na.rm = TRUE)
-      ),
-      .names = "{.col}_{.fn}"
-    ),
-    .groups = "drop"
-  )
-
-# Plot all variables with ribbons for the IQR and lines for the median
-ggplot(testData_summary |> filter(site=='UKRO'), aes(x = daysAfterSowing)) +
-  geom_line(aes(y = fIntPotState_median), col = 'darkgreen') +
-  geom_ribbon(aes(ymin = fIntDisState_lower, ymax = fIntDisState_upper), fill = 'green', alpha = 0.3) +
-  geom_ribbon(aes(ymin = HTlatent_lower, ymax = HTlatent_upper), fill = 'green3', alpha = 1) +
-  geom_ribbon(aes(ymin = HTsporulating_lower, ymax = HTsporulating_upper), fill = 'grey66', alpha = 0.75) +
-  geom_ribbon(aes(ymin = HTdead_lower, ymax = HTdead_upper), fill = 'black', alpha = 0.75) +
-  geom_ribbon(aes(ymin = HTaffected_lower, ymax = HTaffected_upper), fill = 'red3', alpha = 0.75) +
-  facet_wrap(site ~ season, nrow = 2) +
-  theme_classic() +
-  theme(legend.position = 'none')
-
-# Plot all variables with ribbons for the IQR and lines for the median
-ggplot(testData_summary, aes(x = daysAfterSowing)) +
-  geom_line(aes(y = fIntPotState_median*20000), col = 'darkgreen') +
-  geom_line(aes(y = yieldPotState_median), col = 'red') +
-  geom_line(aes(y = bioPotState_median), col = 'blue') +
-  geom_ribbon(aes(ymin = fIntDisState_lower*20000, ymax = fIntDisState_upper*20000), fill = 'green', alpha = 0.3) +
-  geom_ribbon(aes(ymin = fIntDisState_lower*20000, ymax = fIntDisState_upper*20000), fill = 'green', alpha = 0.3) +
-  geom_ribbon(aes(ymin = yieldDisState_lower, 
-                  ymax = yieldDisState_upper), fill = 'red', alpha = 0.7) +
-  geom_ribbon(aes(ymin = bioDisState_lower, 
-                  ymax = bioDisState_upper), fill = 'blue', alpha = 0.7) +
-  facet_wrap(site ~ season, nrow = 6) +
-  theme_classic() +
-  theme(legend.position = 'none')
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Function to calculate the distance between two points (Haversine formula)
-calculate_distance <- function(lat1, lon1, lat2, lon2) {
-  # Convert degrees to radians
-  rad <- pi / 180
-  lat1 <- lat1 * rad
-  lon1 <- lon1 * rad
-  lat2 <- lat2 * rad
-  lon2 <- lon2 * rad
-  
-  # Haversine formula
-  dlat <- lat2 - lat1
-  dlon <- lon2 - lon1
-  a <- sin(dlat / 2)^2 + cos(lat1) * cos(lat2) * sin(dlon / 2)^2
-  c <- 2 * atan2(sqrt(a), sqrt(1 - a))
-  R <- 6371 # Earth's radius in kilometers
-  
-  return(R * c) # Distance in kilometers
-}
-
-# Function to find the closest file
-find_closest_file <- function(target_lat, target_lon, folder_path) {
-  # Get a list of files in the folder
-  files <- list.files(folder_path, pattern = "\\.csv$", full.names = TRUE)
-  
-  # Initialize variables to store the closest file and the minimum distance
-  closest_file <- NULL
-  min_distance <- Inf
-  
-  # Loop through each file
-  for (file in files) {
-    # Extract latitude and longitude from the filename
-    file_name <- basename(file)
-    coords <- strsplit(file_name, "_|\\.csv")[[1]]
-    file_lat <- as.numeric(coords[1])
-    file_lon <- as.numeric(coords[2])
+    thisManagement <- management_data |> 
+      filter(site == s)
     
-    # Calculate the distance
-    distance <- calculate_distance(target_lat, target_lon, file_lat, file_lon)
-    
-    # Update the closest file if the current distance is smaller
-    if (distance < min_distance) {
-      min_distance <- distance
-      closest_file <- file
+    #loop over parsets
+    par<-1
+    for(par in 1:length(unique(paramsSA$ID_run)))
+    {
+        thisPar<- paramsSA |> filter(ID_run == par) %>%
+          select(-Model,ID_run)
+        
+        #assign crop parameters  
+        paramCrop<-readRDS(paste0(getwd(),"//cropParameters//",s,'_parameters.rds'))
+        
+        paramDisease<-FraNchEstYN::df_to_parameters(thisPar)
+        if(parSet=='set_1'){
+          paramDisease$IsSplashBorne$value<-0
+          paramDisease$OuterInoculumShapeRelease$value<-0
+          
+        } else {
+          paramDisease$IsSplashBorne$value<-1
+          paramDisease$OuterInoculumShapeRelease$value<-0
+        }
+        
+        # Step 3: Perform a run with optimized parameters
+        df<-FraNchEstYN::franchestyn(weather_data = thisWeather,
+                        management_data = thisManagement,
+                        reference_data = thisReference,
+                        cropParameters = paramCrop,
+                        diseaseParameters = paramDisease,
+                        start_end = start_end,
+                        calibration = 'none')
+        
+        outputs<-df$outputs$simulation
+        summary<-df$outputs$summary |> 
+          summarise(DiseaseSeverity_mean = mean(DiseaseSeverity,na.rm=T),
+                    DiseaseSeverity_sd = sd(DiseaseSeverity,na.rm=T),
+                    YieldLoss_mean = mean(YieldLossPerc,na.rm=T),
+                    YieldLoss_sd = sd(YieldLossPerc,na.rm=T))
+      
+        # Extract yield gap 
+        outYieldLoss_mean[[par]] <- summary$YieldLoss_mean
+        outYieldLoss_sd[[par]] <- summary$YieldLoss_mean
+        outDisSev_mean[[par]] <- summary$DiseaseSeverity_mean
+        outDisSev_sd[[par]] <- summary$DiseaseSeverity_sd
+        
+        dailyOut<-outputs |> 
+          select(Site,DaysAfterSowing,
+                 LightInterception,LightInterceptionRef,LightIntHealthy,AGBattainable,YieldAttainable,YieldRef,
+                 HTtimeSinoculum,HTtimeRinfection,Susceptible,Latent,Sporulating,Dead,Affected,DiseaseSeverity,
+                 AGBactual,YieldActual) |> 
+          group_by(DaysAfterSowing) |> 
+          summarise(across(
+            where(is.numeric),
+            \(x) mean(x, na.rm = TRUE)
+          ), .groups = "drop")
+        
+        outDfs[[par]] <- dailyOut
     }
+    
+    # Process results for this experiment 
+    
+    outVarYieldLoss_mean <- unlist(outYieldLoss_mean, use.names = FALSE)
+    outVarYieldLoss_sd <-  unlist(outYieldLoss_sd, use.names = FALSE)
+    outVarDisSev_mean <- unlist(outDisSev_mean, use.names = FALSE)
+    outVarDisSev_sd <- unlist(outDisSev_sd, use.names = FALSE)
+    
+    # Compute sensitivity indices for fruits
+    resultsYieldLoss_mean<- tell(morris_df, as.numeric(outVarYieldLoss_mean))
+    outMorrisYieldLoss_mean[[s]] <- resultsYieldLoss_mean
+    resultsYieldLoss_sd<- tell(morris_df, as.numeric(outVarYieldLoss_sd))
+    outMorrisYieldLoss_sd[[s]] <- resultsYieldLoss_sd
+    resultsDisSev_mean<- tell(morris_df, as.numeric(outVarDisSev_mean))
+    outMorrisDisSev_mean[[s]] <- resultsDisSev_mean
+    resultsDisSev_sd<- tell(morris_df, as.numeric(outVarYieldLoss_mean))
+    outMorrisDisSev_sd[[s]] <- resultsDisSev_sd
+        
+    # Save uncertainty outputs for this soil and experiment
+    outDfsUncertainty[[s]] <- outDfs
   }
   
-  # Return the closest file
-  return(closest_file)
-}
+  ####save RDS objects outMorris outDfsUncertainty
+  saveRDS(outMorrisYieldLoss_mean, paste0("out//",parSet, "_outMorrisYieldLoss_mean.rds"))
+  saveRDS(outMorrisYieldLoss_sd, paste0("out//",parSet,'outMorrisYieldLoss_sd.rds'))
+  saveRDS(outMorrisDisSev_mean, paste0("out//",parSet,'outMorrisDisSev_mean.rds'))
+  saveRDS(outMorrisDisSev_sd, paste0("out//",parSet,'outMorrisDisSev_sd.rds'))
 
-##
-###create an empty list to store the results of the sensitivity runs
-#outDfsExperiments<-list(list())
-#outFruitsExperiments<- list(list())
-#outBrixExperiments<-list(list())
-#outMorris<-list()
-#outDfsUncertainty<-list()
-##
-###for debugging
-##parset<-1
-##idExp<-1
-##
-##read the design parametersDesign.rds
-#morris <- readRDS("parametersDesign.rds")
-#
-##select experiment
-#irrigation_df<-irrigation_df
-#
-#idExp<-1
-#
-##set soils for sensitivity analysis
-## Pre-allocate the lists with soil names
-#soil_names <- c("sand", "loam", "clay")
-##sand, silt, clay
-#fc <- c(.12,.25,.36)
-#wp <- c(.045,.12,.22)
-#bd<-c(1.65,1.5,1.35)
-#
-#toWriteTest<-toWrite %>% 
-#  filter(ID_run<4)
-#
-## Helper function to dynamically ensure a nested list structure
-#ensure_nested_list <- function(list_obj, outer_index, inner_index) {
-#  # Ensure the outer index exists
-#  if (is.null(list_obj[[outer_index]])) {
-#    list_obj[[outer_index]] <- list()
-#  }
-#  # Ensure the inner index exists
-#  if (is.null(list_obj[[outer_index]][[inner_index]])) {
-#    list_obj[[outer_index]][[inner_index]] <- list()
-#  }
-#  return(list_obj)
-#}
-#
-## Pre-allocate nested structures explicitly
-#outMorrisFruits <- vector("list", length(fc))  # One list per soil
-#names(outMorrisFruits) <- soil_names
-#
-#outMorrisBrix <- vector("list", length(fc))    # One list per soil
-#names(outMorrisBrix) <- soil_names
-#
-#outDfsUncertainty <- vector("list", length(fc))  # One list per soil
-#names(outDfsUncertainty) <- soil_names
-#
-## Initialize nested lists for each soil
-#for (soil in seq_along(fc)) {
-#  outMorrisFruits[[soil]] <- vector("list", length(unique(irrigation_df$ID)))
-#  outMorrisBrix[[soil]] <- vector("list", length(unique(irrigation_df$ID)))
-#  outDfsUncertainty[[soil]] <- vector("list", length(unique(irrigation_df$ID)))
-#}
-#
-#
-## Track total start time
-#start_time <- Sys.time()
-#
-## Main computation loop
-#for (soil in seq_along(fc)) {
-#  
-#  # Initialize experiments lists for this soil
-#  outFruitsExperiments <- vector("list", length(unique(toWrite$ID_run)))
-#  outBrixExperiments <- vector("list", length(unique(toWrite$ID_run)))
-#  outDfsExperiments <- vector("list", length(unique(toWrite$ID_run)))
-#  
-#  # Loop over experiments
-#  for (idExpIndex in seq_along(unique(irrigation_df$ID))) {
-#    idExp <- unique(irrigation_df$ID)[idExpIndex]
-#    
-#    # Retrieve current experiment's irrigation data
-#    thisIDirrigation <- irrigation_df |> filter(ID == idExp)
-#    
-#    # Loop over parameter sets
-#    for (parset in unique(toWrite$ID_run)) {
-#      
-#      # Get a single parameter set
-#      thisParset <- toWrite |> filter(ID_run == parset)
-#      
-#      # Build the param object
-#      param <- thisParset |> 
-#        select(-c(ID_run, Model)) |> 
-#        pivot_wider(names_from = parameter, values_from = value)
-#      
-#      # Add soil-specific parameters
-#      param$FieldCapacity <- fc[[soil]]
-#      param$WiltingPoint <- wp[[soil]]
-#      param$BulkDensity <- bd[[soil]]
-#      
-#      # Call the cumba_experiment function
-#      outputs <- cumba_experiment(
-#        weather |> 
-#          mutate(year = year(Date)) |> 
-#          filter(year == unique(thisIDirrigation$YEAR)),
-#        param,
-#        estimateRad = TRUE, 
-#        estimateET0 = TRUE, 
-#        thisIDirrigation
-#      )
-#      
-#      outputs$parset <- parset
-#      
-#      # Extract agbFruits and brix outputs
-#      agbFruits <- outputs |> 
-#        slice_tail(n = 1) |> 
-#        select(experiment, fruitsStateAct)
-#      
-#      brix <- outputs |> 
-#        slice_tail(n = 1) |> 
-#        select(experiment, brixAct)
-#      
-#      # Save outputs for this parameter set
-#      outFruitsExperiments[[parset]] <- agbFruits
-#      outBrixExperiments[[parset]] <- brix
-#      outDfsExperiments[[parset]] <- outputs
-#    }
-#    
-#    # Aggregate results for sensitivity analysis
-#    
-#    # Process fruits results for this experiment and soil
-#    outVarFruits <- lapply(outFruitsExperiments, "[[", "fruitsStateAct") |> 
-#      unlist(use.names = FALSE)
-#    
-#    # Compute sensitivity indices for fruits
-#    resultsFruits <- tell(morris_df, as.numeric(outVarFruits))
-#    outMorrisFruits[[soil]][[idExpIndex]] <- resultsFruits
-#    
-#    # Process brix results for this experiment and soil
-#    outVarBrix <- lapply(outBrixExperiments, "[[", "brixAct") |> 
-#      unlist(use.names = FALSE)
-#    
-#    # Compute sensitivity indices for brix
-#    resultsBrix <- tell(morris_df, as.numeric(outVarBrix))
-#    outMorrisBrix[[soil]][[idExpIndex]] <- resultsBrix
-#    
-#    # Save uncertainty outputs for this soil and experiment
-#    outDfsUncertainty[[soil]][[idExpIndex]] <- outDfsExperiments
-#  }
-#}
-##
-### Calculate and print the total elapsed time
-##total_elapsed_time <- Sys.time() - start_time
-##cat("Total elapsed time:", total_elapsed_time, "\n")
-##
-####save RDS objects outMorris outDfsUncertainty
-#saveRDS(outMorrisFruits, 'outMorrisFruits.rds')
-#saveRDS(outMorrisBrix, 'outMorrisBrix.rds')
-##
-#saveRDS(outDfsUncertainty, 'outDfsUncertainty.rds')
-#takes around 2 minutes
-outDfsUncertainty<-readRDS('outDfsUncertainty.rds')
-outMorrisFruits <- readRDS('outMorrisFruits.rds')
-outMorrisBrix <- readRDS('outMorrisBrix.rds')
+  saveRDS(outDfsUncertainty, paste0("out//",parSet,'outDfsUncertainty.rds'))
 
-#fill the dataframe
-exp<-1
-results_Fruits_list<-list(list())
-results_Brix_list<-list(list())
+  
+  exp<-1
+  results_yieldLoss_mean_list<-list()
+  results_yieldLoss_sd_list<-list()
+  results_disSev_mean_list<-list()
+  results_disSev_sd_list<-list()
+  
+  for(exp in 1:length(outMorrisYieldLoss_mean))
+  {
+    #dfs
+    dfmu_yieldLoss_mean<-as.data.frame(apply(outMorrisYieldLoss_mean[exp][[1]][[11]], 2, mean))
+    dfmu_yieldLoss_sd<-as.data.frame(apply(outMorrisYieldLoss_sd[exp][[1]][[11]], 2, mean))
+    dfmu_disSev_mean<-as.data.frame(apply(outMorrisDisSev_mean[exp][[1]][[11]], 2, mean))
+    dfmu_disSev_sd<-as.data.frame(apply(outMorrisDisSev_sd[exp][[1]][[11]], 2, mean))
+ 
+    # Rename the single column that was generated to "mean_values"
+    colnames(dfmu_yieldLoss_mean) <- "mu"
+    colnames(dfmu_yieldLoss_sd) <- "mu"
+    colnames(dfmu_disSev_mean) <- "mu"
+    colnames(dfmu_disSev_sd) <- "mu"
+    
+    #complete the dfs
+    #yield loss mean
+    dfmu_yieldLoss_mean$parameter <- rownames(dfmu_yieldLoss_mean)
+    dfmu_yieldLoss_mean$experiment <- exp
+    dfmu_yieldLoss_mean$muStar<-as.data.frame(apply(outMorrisYieldLoss_mean[exp][[1]][[11]], 2, 
+                                             function(x) mean(abs(x))))[,1]
+    dfmu_yieldLoss_mean$sigma<-as.data.frame(apply(outMorrisYieldLoss_mean[exp][[1]][[11]], 2, sd))[,1]
+    
+    #yield loss sd
+    dfmu_yieldLoss_sd$parameter <- rownames(dfmu_yieldLoss_sd)
+    dfmu_yieldLoss_sd$experiment <- exp
+    dfmu_yieldLoss_sd$muStar<-as.data.frame(apply(outMorrisYieldLoss_sd[exp][[1]][[11]], 2, 
+                                                    function(x) mean(abs(x))))[,1]
+    dfmu_yieldLoss_sd$sigma<-as.data.frame(apply(outMorrisYieldLoss_sd[exp][[1]][[11]], 2, sd))[,1]
+    
+    #dissev mean
+    dfmu_disSev_mean$parameter <- rownames(dfmu_disSev_mean)
+    dfmu_disSev_mean$experiment <- exp
+    dfmu_disSev_mean$muStar<-as.data.frame(apply(outMorrisDisSev_mean[exp][[1]][[11]], 2, 
+                                                    function(x) mean(abs(x))))[,1]
+    dfmu_disSev_mean$sigma<-as.data.frame(apply(outMorrisDisSev_mean[exp][[1]][[11]], 2, sd))[,1]
+    
+    #dissev sd
+    dfmu_disSev_sd$parameter <- rownames(dfmu_disSev_sd)
+    dfmu_disSev_sd$experiment <- exp
+    dfmu_disSev_sd$muStar<-as.data.frame(apply(outMorrisDisSev_sd[exp][[1]][[11]], 2, 
+                                                    function(x) mean(abs(x))))[,1]
+    dfmu_disSev_sd$sigma<-as.data.frame(apply(outMorrisDisSev_sd[exp][[1]][[11]], 2, sd))[,1]
+    
+    # Reset row names to ensure they are not included in the final result
+    rownames(dfmu_yieldLoss_mean) <- NULL
+    rownames(dfmu_yieldLoss_sd) <- NULL
+    rownames(dfmu_disSev_mean) <- NULL
+    rownames(dfmu_disSev_sd) <- NULL
+    
+    
+    # Rearrange the columns into the desired order
+    new_order <- c("experiment", "parameter", "mu", "muStar", "sigma")
+    dfmu_yieldLoss_mean <- dfmu_yieldLoss_mean[, new_order]
+    dfmu_yieldLoss_sd <- dfmu_yieldLoss_sd[, new_order]
+    dfmu_disSev_mean <- dfmu_disSev_mean[, new_order]
+    dfmu_disSev_sd <- dfmu_disSev_sd[, new_order]
+    
+    # Store results in the predefined list
+    results_yieldLoss_mean_list[[exp]] <- list(dfmu_yieldLoss_mean)
+    results_yieldLoss_sd_list[[exp]] <- list(dfmu_yieldLoss_sd)
+    results_disSev_mean_list[[exp]] <- list(dfmu_disSev_mean)
+    results_disSev_sd_list[[exp]] <- list(dfmu_disSev_sd)
+    
+  }
 
-
-#fruits
-thisoutMorrisFruitsSand<-outMorrisFruits$sand
-thisoutMorrisFruitsLoam<-outMorrisFruits$loam
-thisoutMorrisFruitsClay<-outMorrisFruits$clay
-#brix
-thisoutMorrisBrixSand<-outMorrisBrix$sand
-thisoutMorrisBrixLoam<-outMorrisBrix$loam
-thisoutMorrisBrixClay<-outMorrisBrix$clay
-
-for(exp in 1:length(thisoutMorrisFruitsSand))
-{
-  #fruits
-  dfFruitsSand<-as.data.frame(apply(thisoutMorrisFruitsSand[exp][[1]][[11]], 2, mean))
-  dfFruitsLoam<-as.data.frame(apply(thisoutMorrisFruitsLoam[exp][[1]][[11]], 2, mean))
-  dfFruitsClay<-as.data.frame(apply(thisoutMorrisFruitsClay[exp][[1]][[11]], 2, mean))
-  #brix
-  dfBrixSand<-as.data.frame(apply(thisoutMorrisBrixSand[exp][[1]][[11]], 2, mean))
-  dfBrixLoam<-as.data.frame(apply(thisoutMorrisBrixLoam[exp][[1]][[11]], 2, mean))
-  dfBrixClay<-as.data.frame(apply(thisoutMorrisBrixClay[exp][[1]][[11]], 2, mean))
+  # Combine all data frames into one
+  all_yieldLoss_mean_Experiments <- do.call(rbind, lapply(results_yieldLoss_mean_list, function(x) {
+    do.call(rbind, x)  # Combine sand, loam, clay within each experiment
+  }))
+  all_yieldLoss_sd_Experiments <- do.call(rbind, lapply(results_yieldLoss_sd_list, function(x) {
+    do.call(rbind, x)  # Combine sand, loam, clay within each experiment
+  }))
+  all_disSev_mean_Experiments <- do.call(rbind, lapply(results_disSev_mean_list, function(x) {
+    do.call(rbind, x)  # Combine sand, loam, clay within each experiment
+  }))
+  all_disSev_sd_Experiments <- do.call(rbind, lapply(results_disSev_sd_list, function(x) {
+    do.call(rbind, x)  # Combine sand, loam, clay within each experiment
+  }))
   
-  # Rename the single column that was generated to "mean_values"
-  colnames(dfFruitsSand) <- "mu"
-  colnames(dfFruitsLoam) <- "mu"
-  colnames(dfFruitsClay) <- "mu"
-  colnames(dfBrixSand) <- "mu"
-  colnames(dfBrixLoam) <- "mu"
-  colnames(dfBrixClay) <- "mu"
-  
-  #Fruits dataset
-  dfFruitsSand$parameter <- rownames(dfFruitsSand)
-  dfFruitsSand$experiment <- exp
-  dfFruitsSand$muStar<-as.data.frame(apply(thisoutMorrisFruitsSand[exp][[1]][[11]], 2, 
-                                   function(x) mean(abs(x))))[,1]
-  dfFruitsSand$sigma<-as.data.frame(apply(thisoutMorrisFruitsSand[exp][[1]][[11]], 2, sd))[,1]
-  
-  dfFruitsLoam$parameter <- rownames(dfFruitsLoam)
-  dfFruitsLoam$experiment <- exp
-  dfFruitsLoam$muStar<-as.data.frame(apply(thisoutMorrisFruitsLoam[exp][[1]][[11]], 2, 
-                                 function(x) mean(abs(x))))[,1]
-  dfFruitsLoam$sigma<-as.data.frame(apply(thisoutMorrisFruitsLoam[exp][[1]][[11]], 2, sd))[,1]
-  
-  dfFruitsClay$parameter <- rownames(dfFruitsClay)
-  dfFruitsClay$experiment <- exp
-  dfFruitsClay$muStar<-as.data.frame(apply(thisoutMorrisFruitsClay[exp][[1]][[11]], 2, 
-                                     function(x) mean(abs(x))))[,1]
-  dfFruitsClay$sigma<-as.data.frame(apply(thisoutMorrisFruitsClay[exp][[1]][[11]], 2, sd))[,1]
-  
-  #Brix dataset
-  dfBrixSand$parameter <- rownames(dfBrixSand)
-  dfBrixSand$experiment <- exp
-  dfBrixSand$muStar<-as.data.frame(apply(thisoutMorrisBrixSand[exp][[1]][[11]], 2, 
-                                   function(x) mean(abs(x))))[,1]
-  dfBrixSand$sigma<-as.data.frame(apply(thisoutMorrisBrixSand[exp][[1]][[11]], 2, sd))[,1]
-  
-  dfBrixLoam$parameter <- rownames(dfBrixLoam)
-  dfBrixLoam$experiment <- exp
-  dfBrixLoam$muStar<-as.data.frame(apply(thisoutMorrisBrixLoam[exp][[1]][[11]], 2, 
-                                 function(x) mean(abs(x))))[,1]
-  dfBrixLoam$sigma<-as.data.frame(apply(thisoutMorrisBrixLoam[exp][[1]][[11]], 2, sd))[,1]
-  
-  dfBrixClay$parameter <- rownames(dfBrixClay)
-  dfBrixClay$experiment <- exp
-  dfBrixClay$muStar<-as.data.frame(apply(thisoutMorrisBrixClay[exp][[1]][[11]], 2, 
-                                     function(x) mean(abs(x))))[,1]
-  dfBrixClay$sigma<-as.data.frame(apply(thisoutMorrisBrixClay[exp][[1]][[11]], 2, sd))[,1]
-  
-  # Reset row names to ensure they are not included in the final result
-  rownames(dfFruitsSand) <- NULL
-  rownames(dfFruitsLoam) <- NULL
-  rownames(dfFruitsClay) <- NULL
-  rownames(dfBrixSand) <- NULL
-  rownames(dfBrixLoam) <- NULL
-  rownames(dfBrixClay) <- NULL
-  
-  # Rearrange the columns into the desired order
-  new_order <- c("experiment", "parameter", "mu", "muStar", "sigma")
-  dfFruitsSand <- dfFruitsSand[, new_order]
-  dfFruitsLoam <- dfFruitsLoam[, new_order]
-  dfFruitsClay <- dfFruitsClay[, new_order]
-  dfBrixSand <- dfBrixSand[, new_order]
-  dfBrixLoam <- dfBrixLoam[, new_order]
-  dfBrixClay <- dfBrixClay[, new_order]
-  
-  # Store results in the predefined list
-  results_Fruits_list[[exp]] <- list(
-    sand = dfFruitsSand,
-    loam = dfFruitsLoam,
-    clay = dfFruitsClay
+  #acronyms for parameters
+  new_acronyms <- c(
+    "OuterInoculumMax"              = "OutI",
+    "PathogenSpread"                = "PatSp",
+    "WetnessDurationOptimum"       = "WDopt",
+    "WetnessDurationMinimum"       = "WDmin",
+    "DryCriticalInterruption"      = "D50",
+    "Tmin"                          = "Tmin",
+    "Topt"                          = "Topt",
+    "Tmax"                          = "Tmax",
+    "RelativeHumidityCritical"     = "RHcr",
+    "Rain50Detachment"             = "R50d",
+    "RelativeHumidityNotLimiting"  = "RHnl",
+    "HydroThermalTimeOnset"        = "HTons",
+    "CyclePercentageOnset"         = "CYons",
+    "LatencyDuration"              = "LatD",
+    "SporulationDuration"          = "SpoD",
+    "LightStealerDamage"           = "LSdmg",
+    "RUEreducerDamage"             = "RUEdmg",
+    "SenescenceAcceleratorDamage" = "SENdmg",
+    "AssimilateSappersDamage"      = "ASSdmg",
+    "OuterInoculumShapeParameter"  = "Ishape"
   )
   
-  # Store results in the predefined list
-  results_Brix_list[[exp]] <- list(
-    sand = dfBrixSand,
-    loam = dfBrixLoam,
-    clay = dfBrixClay
-  )
+  # Substituting the parameter column in the data frame
+  all_yieldLoss_mean_Experiments$parameter <- new_acronyms[all_yieldLoss_mean_Experiments$parameter]
+  all_yieldLoss_sd_Experiments$parameter <- new_acronyms[all_yieldLoss_sd_Experiments$parameter]
+  all_disSev_mean_Experiments$parameter <- new_acronyms[all_disSev_mean_Experiments$parameter]
+  all_disSev_sd_Experiments$parameter <- new_acronyms[all_disSev_sd_Experiments$parameter]
+  
+  saveRDS(all_yieldLoss_mean_Experiments, paste0("out//",parSet, 'all_yieldLoss_mean_Experiments.rds'))
+  saveRDS(all_yieldLoss_sd_Experiments, paste0("out//",parSet, 'all_yieldLoss_sd_Experiments.rds'))
+  saveRDS(all_disSev_mean_Experiments, paste0("out//",parSet, 'all_disSev_mean_Experiments.rds'))
+  saveRDS(all_disSev_sd_Experiments, paste0("out//",parSet, 'all_disSev_sd_Experiments.rds'))
+  
 }
 
+disSev_set1<-readRDS('out//set_1all_disSev_mean_Experiments.rds') |> 
+  mutate(set='set_1')
+disSev_set2<-readRDS('out//set_2all_disSev_mean_Experiments.rds')|> 
+  mutate(set='set_2')
 
-# Combine all data frames into one
-allFruitsExperiments <- do.call(rbind, lapply(results_Fruits_list, function(x) {
-  do.call(rbind, x)  # Combine sand, loam, clay within each experiment
-}))
-allBrixExperiments <- do.call(rbind, lapply(results_Brix_list, function(x) {
-  do.call(rbind, x)  # Combine sand, loam, clay within each experiment
-}))
+disSev_morris<-rbind(disSev_set1,disSev_set2) %>%
+  mutate(site_name = sites[experiment],
+         site =substr(site_name,1,4))
 
+ggplot(disSev_morris |> 
+         filter(!parameter%in%c('Ishape')) |> 
+         mutate(facet_strip=paste0(site,"_",set)),aes(x=reorder(parameter,-muStar)))+
+  geom_col(aes(y=muStar,fill=set),position='dodge')+
+  #coord_flip()+
+  lemon::facet_rep_wrap(~facet_strip,scales='free_y',ncol=4,repeat.tick.labels = T)+
+  theme_classic()+
+  theme(legend.position='none',
+        axis.text.x = element_text(angle=90,vjust=0,hjust=1,size=10))+
+  xlab('')
 
-# Assuming `allExperiments` is your combined data frame
-# Step 1: Extract row names
-rownames_col <- rownames(allFruitsExperiments)
+yieldLoss_set1<-readRDS('out//set_1all_yieldLoss_mean_Experiments.rds') |> 
+  mutate(set='set_1')
+yieldLoss_set2<-readRDS('out//set_2all_yieldLoss_mean_Experiments.rds')|> 
+  mutate(set='set_2')
 
-# Step 2: Split the row names to extract the soil type (before the dot)
-soil_type_col <- sub("\\..*", "", rownames_col)
+yieldLoss_morris<-rbind(yieldLoss_set1,yieldLoss_set2) %>%
+  mutate(site_name = sites[experiment],
+         site =substr(site_name,1,4))
 
-# Step 3: Add the soil type as a new column
-allFruitsExperiments$soil_type <- soil_type_col
-allBrixExperiments$soil_type <- soil_type_col
-
-
-# Step 4: Remove the row names by resetting them to numeric indices
-rownames(allFruitsExperiments) <- NULL
-rownames(allBrixExperiments) <- NULL
-
-
-# Step 5: Reorder the columns to place `soil_type` as the first column
-new_order <- c("soil_type", setdiff(names(allFruitsExperiments), "soil_type"))
-allFruitsExperiments <- allFruitsExperiments[, new_order]
-allBrixExperiments<-allBrixExperiments[, new_order]
-
-# Original names and improved acronyms
-new_acronyms <- c(
-  "Tbase" = "Tb",              # Base temperature
-  "Topt" = "Topt",               # Optimal temperature
-  "Tmax" = "Tmax",               # Maximum temperature
-  "Theat" = "Theat",              # Heat threshold
-  "Tcold" = "Tcold",              # Cold threshold
-  "FIntMax" = "IntMax",           # Fruit intensity max
-  "CycleLength" = "CycleL",        # Cycle length
-  "TransplantingLag" = "TraLag", # Transplanting lag
-  "FloweringLag" = "FloLag",     # Flowering lag
-  "HalfIntGrowth" = "SloGro",     # Half intensity growth
-  "HalfIntSenescence" = "SloSen", # Half intensity senescence
-  "InitialInt" = "IntTra",      # Initial intensity
-  "RUE" = "RUE",               # Radiation use efficiency (unchanged)
-  "KcIni" = "KcIni",             # Initial crop coefficient
-  "KcMax" = "KcMax",             # Maximum crop coefficient
-  "RootIncrease" = "RootInc",       # Root increase
-  "RootDepthMax" = "RootMax",      # Root depth max
-  "RootDepthInitial" = "RootIni",  # Root depth initial
-  "WaterStressSensitivity" = "WSsens", # Water stress sensitivity
-  "FloweringSlope" = "SloFlo",     # Flowering slope
-  "FloweringMax" = "MaxFlo",       # Flowering max
-  "k0" = "k0",                 # k0 (unchanged)
-  "FruitWaterContentMin" = "FruWCmin", # Fruit water content min
-  "FruitWaterContentMax" = "FruWCmax", # Fruit water content max
-  "FruitWaterContentInc" = "FruWCinc", # Fruit water content increase
-  "FruitWaterContentDecreaseMax" = "FruDec" # Fruit water content decrease max
-)
-
-# Substituting the parameter column in the data frame
-allFruitsExperiments$parameter <- new_acronyms[allFruitsExperiments$parameter]
-allBrixExperiments$parameter <- new_acronyms[allBrixExperiments$parameter]
+ggplot(yieldLoss_morris |> 
+         filter(!parameter%in%c('Ishape')) |> 
+         mutate(facet_strip=paste0(site,"_",set)),aes(x=reorder(parameter,-muStar)))+
+  geom_col(aes(y=muStar,fill=set),position='dodge')+
+  #coord_flip()+
+  lemon::facet_rep_wrap(~facet_strip,scales='free_y',ncol=4,repeat.tick.labels = T)+
+  theme_classic()+
+  theme(legend.position='none',
+        axis.text.x = element_text(angle=90,vjust=0,hjust=1,size=10))+
+  xlab('')
 
 
-#a simple boxplot with parameter relevance
-ggplot(allFruitsExperiments) + 
-  geom_boxplot(aes(x=reorder(factor(parameter),-muStar), y = muStar,fill=soil_type),
-               outlier.size=.5)+
-  theme_bw()+
-  theme(axis.text.x = element_text(angle=-90),
-        legend.position = "top")+
-  xlab("")+
-  scale_fill_manual(values=c("gold","brown","brown4"))
-ggsave("muStarFruits.png",height=5,width=9)
+#TODO: ANALYSIS
 
-#a simple boxplot with parameter relevance
-ggplot(allBrixExperiments) + 
-  geom_boxplot(aes(x=reorder(factor(parameter),-muStar), 
-                   y = muStar,fill=soil_type),
-               outlier.size=.5)+
-  theme_bw()+
-  theme(axis.text.x = element_text(angle=-90),
-        legend.position = "top")+
-  xlab("")+
-  scale_fill_manual(values=c("gold","brown","brown4"))
-ggsave("muStarBrix.png",height=5,width=9)
+#compute mean and sd of the normalized metrics
+diSev_mean_synth <- disSev_morris |> 
+    ungroup() |> 
+    group_by(parameter) |> 
+    dplyr::summarise(mu=mean(muStar,na.rm=T),
+              muSD=sd(muStar,na.rm=T),
+              sig=mean(sigma,na.rm=T),
+              sigSD=sd(sigma,na.rm=T))
 
-# Normalize the senstivity metrics by `experiment` for better comparison
-df_Fruits_normalized <- allFruitsExperiments %>%
-  group_by(experiment,soil_type) %>%
-  mutate(
-    mu_norm = (mu - min(mu)) / (max(mu) - min(mu)),
-    muStar_norm = (muStar - min(muStar)) / (max(muStar) - min(muStar)),
-    sigma_norm = (sigma - min(sigma)) / (max(sigma) - min(sigma))
-  ) %>%
+allIndices<-rbind(disSev_morris |> mutate(variable='DisSev'),
+                  yieldLoss_morris |> mutate(variable='YieldLoss'))
+
+library(ggrepel)
+
+# Step 1: Find top 7 parameters per site × variable
+top7_labels <- allIndices %>%
+  mutate(strip_label=paste0(site,"_",set,"_",variable)) |> 
+  filter(!parameter %in% c("Ishape")) %>%
+  group_by(strip_label) %>%
+  slice_max(muStar, n = 7, with_ties = FALSE) %>%
   ungroup()
 
-#plot the normalized sensitivity metrics
-ggplot(df_Fruits_normalized) + 
-  geom_boxplot(aes(x=reorder(factor(parameter),-muStar_norm), 
-                   y = muStar_norm,fill=soil_type))+
-  theme(axis.text.x = element_text(angle=-90))+
-  theme_bw()+
-  theme(axis.text.x = element_text(angle=-90),
-        legend.position = "top")+
-  xlab("")+
-  scale_fill_manual(values=c("gold","brown","brown4"))
-ggsave("muStarFruitsNormalized.png",height=5,width=9)
-
-
-# Normalize the senstivity metrics by `experiment` for better comparison
-df_Brix_normalized <- allBrixExperiments %>%
-  group_by(experiment,soil_type) %>%
-  mutate(
-    mu_norm = (mu - min(mu)) / (max(mu) - min(mu)),
-    muStar_norm = (muStar - min(muStar)) / (max(muStar) - min(muStar)),
-    sigma_norm = (sigma - min(sigma)) / (max(sigma) - min(sigma))
-  ) %>%
-  ungroup()
-
-#plot the normalized sensitivity metrics
-ggplot(df_Brix_normalized) + 
-  geom_boxplot(aes(x=reorder(factor(parameter),-muStar_norm), 
-                   y = muStar_norm,fill=soil_type))+
-  theme(axis.text.x = element_text(angle=-90))+
-  theme_bw()+
-  theme(axis.text.x = element_text(angle=-90),
-        legend.position = "top")+
-  xlab("")+
-  scale_fill_manual(values=c("gold","brown","brown4"))
-ggsave("muStarBrixNormalized.png",height=5,width=9)
-
-
-#compute mean and sd of the normalized msoil_type#compute mean and sd of the normalized metrics
-df_Fruits_normalized_synth <- df_Fruits_normalized |> 
-  group_by(parameter,soil_type) |> 
-  summarise(muStar=mean(muStar_norm),
-            muStarSD=sd(muStar_norm),
-            sigma=mean(sigma_norm),
-            sigmaSD=sd(sigma_norm))
-
-#main sensitivity plot
-# Define a custom color palette for soil types
-soil_colors <- c("sand" = "#F4A460", "loam" = "#8B4513", "clay" = "#D2691E") 
-
-main_plot<-ggplot(df_Fruits_normalized_synth) + 
-  geom_point(aes(x=muStar, y = sigma, color = parameter),size=0.5) +
-  geom_errorbarh(aes(xmin = muStar - muStarSD, xmax = muStar + muStarSD, 
-                     y = sigma, height = 0,color=parameter),linewidth=0.3) +
-  geom_errorbar(aes(ymin = sigma - sigmaSD, ymax = sigma + sigmaSD, 
-                    x = muStar, width = 0,color=parameter),linewidth=0.3) +
-  geom_text(aes(x = muStar, y = sigma, label = parameter,color=parameter), 
-            vjust = 1, hjust = 1, size = 3.5) +
-  theme_bw()+
-  theme(axis.text.x = element_text(angle=-90),
-        legend.position = "none", color = NA)+
+# Step 4: Plot
+ggplot(allIndices %>% 
+         mutate(strip_label=paste0(site,"_",set,"_",variable)) |> 
+         filter(!parameter %in% c('Ishape'))) + 
+  geom_point(aes(x = muStar, y = sigma, color = set), size = 0.5) +
+  geom_text_repel(data = top7_labels,
+                  aes(x = muStar, y = sigma, label = parameter,color=set),
+                  size = 3,
+            max.overlaps = 100,
+            box.padding = 0.1,
+            point.padding = 0.1,
+            segment.size = 0.1) +
+  theme_bw() +
+  theme(
+    axis.text.x = element_text(angle = -90),
+    legend.position = "none",
+    panel.grid.minor = element_blank()
+  ) +
   labs(
-    x = "Mean of muStar (Normalized)",
-    y = "Mean of sigma (Normalized)",
-    title = "cumbà - sensitivity analysis with Morris method",
-    subtitle = "horizontal and vertical error bars are mean +- sd"
-  )+
-  facet_wrap(~soil_type,nrow=1)
-
-main_plot
-ggsave("mu_sigma_Fruits.png",height = 5, width=10)
+    x = "Mean of muStar",
+    y = "Mean of sigma",
+    title = "FraNchEstYN - Morris sensitivity analysis"
+  ) +
+  facet_wrap(~ strip_label, scales = 'free',ncol=6)
 
 
-#compute mean and sd of the normalized msoil_type
-df_Brix_normalized_synth <- df_Brix_normalized |> 
-  group_by(parameter,soil_type) |> 
-  summarise(muStar=mean(muStar_norm),
-            muStarSD=sd(muStar_norm),
-            sigma=mean(sigma_norm),
-            sigmaSD=sd(sigma_norm))
 
-#main sensitivity plot
-#Define a custom color palette for soil types
-soil_colors <- c("sand" = "#F4A460", "loam" = "#8B4513", "clay" = "#D2691E") 
+# Read the nested lists
+outDfs_set1 <- readRDS('out//set_1outDfsUncertainty.rds')
+outDfs_set2 <- readRDS('out//set_2outDfsUncertainty.rds')
 
-main_plot<-ggplot(df_Brix_normalized_synth) + 
-  geom_point(aes(x=muStar, y = sigma, color = parameter),size=0.5) +
-  geom_errorbarh(aes(xmin = muStar - muStarSD, xmax = muStar + muStarSD, 
-                     y = sigma, height = 0,color=parameter),linewidth=0.3) +
-  geom_errorbar(aes(ymin = sigma - sigmaSD, ymax = sigma + sigmaSD, 
-                    x = muStar, width = 0,color=parameter),linewidth=0.3) +
-  geom_text(aes(x = muStar, y = sigma, label = parameter,color=parameter), 
-            vjust = 1, hjust = 1, size = 3.5) +
-  theme_bw()+
-  theme(axis.text.x = element_text(angle=-90),
-        legend.position = "none", color = NA)+
-  labs(
-    x = "Mean of muStar (Normalized)",
-    y = "Mean of sigma (Normalized)",
-    title = "cumbà - sensitivity analysis with Morris method",
-    subtitle = "horizontal and vertical error bars are mean +- sd"
-  )+
-  facet_wrap(~soil_type,nrow=1)
-
-main_plot
-ggsave("mu_sigma_Brix.png",height = 5, width=10)
-
-  # Create inset plot to better see differences in parameters relevance
-#inset_plot <- ggplot(df_normalized_synth) + 
-#  geom_point(aes(x=muStar, y = sigma))+
-#  geom_errorbarh(aes(xmin = muStar - muStarSD, xmax = muStar + muStarSD, 
-#                     y = sigma, height = 0)) +
-#  geom_errorbar(aes(ymin = sigma - sigmaSD, ymax = sigma + sigmaSD, 
-#                    x = muStar, width = 0)) +
-#  geom_text(aes(x = muStar, y = sigma, label = parameter), 
-#            vjust = 1, hjust = 1, size = 2.5, color = "black") +
-#  coord_cartesian(xlim = c(0, .17), ylim = c(0, .17)) +
-#  theme_bw() +
-#  facet_wrap(~soil_type)
-#
-## Combine the plots with patchwork
-#(main_plot +
-#    inset_element(inset_plot, 
-#                  left = 0, right = 0.4, top = 1, bottom = 0.4))
-#
-#TAKES SOME MINUTES!!!
-#uncertainty analysis
-#df_uncertainty <- readRDS('outDfsUncertainty.rds')
-
-#empty list
-uncertainty_listSand<-list()
-uncertainty_listLoam<-list()
-uncertainty_listClay<-list()
-
-#general counter
-counter<-1
-outDfsUncertaintySand<-outDfsUncertainty$sand
-outDfsUncertaintyLoam<-outDfsUncertainty$loam
-outDfsUncertaintyClay<-outDfsUncertainty$clay
-
-#TAKES ONE MINUTE!
-#loop on the list to build a single df 
-for(exp in 1:length(outDfsUncertaintySand))
-{
-  #select one experiment
-  thisExperimentSandList<-outDfsUncertaintySand[exp][[1]]
-  thisExperimentLoamList<-outDfsUncertaintyLoam[exp][[1]]
-  thisExperimentClayList<-outDfsUncertaintyClay[exp][[1]]
+# Function to add 'set' and flatten inner list of dfs with identifiers
+flatten_and_tag <- function(nested_list, set_name) {
+  # nested_list is a list of lists of data.frames
   
-  #loop on the runs in this experiment
-  for(run in 1:length(thisExperimentSandList))
-  {
-    #take the data as dataframe
-    dfSand<-as.data.frame(thisExperimentSandList[run])
-    dfLoam<-as.data.frame(thisExperimentLoamList[run])
-    dfClay<-as.data.frame(thisExperimentClayList[run])
+  # Use map2 to get names of outer list as experiment ids
+  map2_dfr(nested_list, names(nested_list), function(inner_list, experiment_name) {
+    # inner_list: list of dfs per experiment
+    # experiment_name: outer list name
     
-    #assign the df to the list
-    uncertainty_listSand[[counter]]<-dfSand
-    uncertainty_listLoam[[counter]]<-dfLoam
-    uncertainty_listClay[[counter]]<-dfClay
-    
-    #increase the counter
-    counter<-counter+1
-  }
-}
-
-#TAKES ONE MINUTE!!!!
-# Combine all data frames into one
-allExperimentsUncertaintySand <- do.call(rbind, uncertainty_listSand)
-allExperimentsUncertaintyLoam <- do.call(rbind, uncertainty_listLoam)
-allExperimentsUncertaintyClay <- do.call(rbind, uncertainty_listClay)
-
-saveRDS(allExperimentsUncertaintySand, "testUncertaintySand.rds")
-saveRDS(allExperimentsUncertaintyLoam, "testUncertaintyLoam.rds")
-saveRDS(allExperimentsUncertaintyClay, "testUncertaintyClay.rds")
-
-# Define the desired percentiles
-percentiles <- c(0.10, 0.25, 0.40, 0.5, 0.60, 0.75, 0.90)
-
-#TAKES SEVERAL MINUTES!!!!!!
-#compute synthetic measures
-library(data.table)
-
-# Convert to data.table
-dtSand <- as.data.table(allExperimentsUncertaintySand)
-dtLoam <- as.data.table(allExperimentsUncertaintyLoam)
-dtClay <- as.data.table(allExperimentsUncertaintyClay)
-
-library(future)
-library(furrr)
-
-# Set up parallel processing
-plan(multisession) # Automatically uses available cores
-
-# Function to compute quantiles for a group
-compute_quantiles <- function(data, percentiles) {
-  lapply(data, function(col) {
-    if (is.numeric(col)) {
-      sapply(percentiles, function(p) quantile(col, probs = p, na.rm = TRUE))
-    } else {
-      NULL
-    }
+    # For each run/dataframe, add run and experiment info + set
+    map2_dfr(inner_list, seq_along(inner_list), function(df, run_number) {
+      df %>%
+        mutate(set = set_name,
+               experiment = experiment_name,
+               run = run_number)
+    })
   })
 }
 
-# Ensure proper types for grouping variables
-dtSand[, experiment := as.character(experiment)]
-dtSand[, doy := as.character(doy)]
+# Apply to both sets
+df_set1 <- flatten_and_tag(outDfs_set1, "set_1")
+df_set2 <- flatten_and_tag(outDfs_set2, "set_2")
 
-# Specify numeric columns for .SD
-numeric_cols <- names(dtSand)[sapply(dtSand, is.numeric)]
+# Combine into one dataframe
+outDfs <- bind_rows(df_set1, df_set2)
 
-# Compute quantiles
-resultSand <- dtSand[, lapply(.SD, function(col) {
-  if (is.numeric(col)) {
-    # Generate quantiles for each percentile
-    quantiles <- sapply(percentiles, function(p) quantile(col, probs = p, na.rm = TRUE))
-    
-    # Create a data.table with the corresponding percentiles
-    data.table(percentile = percentiles, quantile = quantiles)
-  } else {
-    NULL
-  }
-}), by = .(experiment, doy), .SDcols = numeric_cols]
-
-# Flatten the list of data.tables into one data.table
-resultSand <- rbindlist(resultSand)
-
+#takes 16 secs
+outDfs_synth <- outDfs %>%
+  group_by(experiment, set, DaysAfterSowing) %>%
+  summarise(across(where(is.numeric),
+                   list(
+                     q25 = ~quantile(., 0.25, na.rm = TRUE),
+                     q40 = ~quantile(., 0.40, na.rm = TRUE),
+                     median = ~quantile(., 0.50, na.rm = TRUE),
+                     q60 = ~quantile(., 0.60, na.rm = TRUE),
+                     q75 = ~quantile(., 0.75, na.rm = TRUE)
+                   ),
+                   .names = "{col}_{fn}"),
+            .groups = "drop") 
+  
 
 
-#write the outputs
-write_rds(resultSand,'uncertainty_synth_out_sand.rds')
+outDfs_synth_plot<-outDfs_synth |> 
+  mutate(site=substr(experiment,1,4)) |> 
+  filter((site=='FIJO'&DaysAfterSowing<140)|
+           (site=='ININ'&DaysAfterSowing<150)|
+           (site=='ITPO'&DaysAfterSowing<210&DaysAfterSowing>70)|
+           (site=='TRIZ'&DaysAfterSowing<200&DaysAfterSowing>70)|
+           (site=='UKRO'&DaysAfterSowing<310&DaysAfterSowing>180)|
+           (site=='USMA'&DaysAfterSowing<150&DaysAfterSowing>55))
+           
 
-df_synth<-readRDS('uncertainty_synth_out_sand.rds')
-head(df_synth)
-df_synth$doy<-as.numeric(as.character(df_synth$doy))
+# Plot all variables with ribbons for the IQR and lines for the median
+ggplot(outDfs_synth_plot |> 
+         filter(DaysAfterSowing>50) |> 
+         mutate(stripLabel=paste0(site,"_",set)), aes(x = DaysAfterSowing)) +
+  #geom_line(aes(y = LightInterception_median)) +
+  geom_area(aes(y = HTtimeRinfection_median),fill='green2',linewidth=.5,alpha=.3) +
+  geom_ribbon(aes(ymin = DiseaseSeverity_q40, ymax = DiseaseSeverity_q60), alpha = 0.4,fill='darkslateblue') +
+  geom_line(aes(y = DiseaseSeverity_median),col='darkslateblue',linewidth=.9) +
+  geom_ribbon(aes(ymin = Latent_q40, ymax = Latent_q60), alpha = 0.7,fill='orange') +
+  geom_line(aes(y = Latent_median),col='orange',linewidth=.5) +
+  geom_ribbon(aes(ymin = Sporulating_q40, ymax = Sporulating_q60), alpha = 0.7,fill='orange4') +
+  geom_line(aes(y = Sporulating_median),col='orange4',linewidth=.5) +
+ # geom_ribbon(aes(ymin = Susceptible_q40, ymax = Susceptible_q60), alpha = 0.4,fill='green2') +
+  #geom_line(aes(y = Susceptible_median),col='green2',linewidth=.5) +
+  #geom_line(aes(y=Dead_median),fill='red4',alpha=.3)+
 
-ggplot(df_synth,aes(x=doy))+
-  geom_col(aes(y=1000,fill=cycleCompletion),width=2,alpha=.5)+
-  #geom_col(aes(y=-400,fill=cycleCompletion),width=2,alpha=.5)+
-  stat_summary(geom='ribbon',aes(y=carbonStateAct),
-              fill='red',alpha=.5)+
-  stat_summary(geom='ribbon',aes(y=fIntAct*100),
-              fill='green4',alpha=.4)+
-  #geom_ribbon(aes(ymin=-rootState*5,ymax=-rootState*5),
-  #            fill='brown')+
-  #geom_ribbon(aes(ymin=300-(wc2mm+wc1mm+wc3mm)/3*10,
-  #                ymax=300-(wc2mm+wc1mm+wc3mm)/3*10),
-  #            fill='blue',alpha=.2) +
-  #geom_ribbon(aes(ymin=-100+wc1mm,ymax=-100+wc1mm),
-  #            fill='cyan')+
-  #geom_ribbon(aes(ymin=waterStress*100 ,ymax=waterStress*100),
-  #            fill='gold')+
-  #geom_ribbon(aes(ymin=floweringRateAct*100 ,
-  #                ymax=floweringRateAct*100),
-  #            fill='pink')+
-  #stat_summary(aes(y=floweringRateIde*100),
-  #          col='pink4')+
-  #geom_ribbon(aes(ymin=fruitsStateAct,
-  #                ymax=fruitsStateAct),
-  #            fill='black')+
-  geom_col(aes(y=irrigation),fill='blue')+
-  geom_col(aes(y=p),fill='cyan4')+
-  facet_wrap(~experiment)+
-  scale_fill_gradient(low = "white", high = "green")  +
-  theme_classic()+
-  theme(legend.position = 'none')
+  facet_wrap(~stripLabel,ncol=4,scales='free') +
+  theme_classic() +
+  theme(legend.position = "none")+
+  ylab('Disease severity, latent and infectious tissue')+
+  xlab('Days after sowing')
+  
 
 
+site_sowing_dates <- c(
+  FIJO = 127,
+  ININ = 299,
+  ITPO = 323,
+  TRIZ = 320,
+  UKRO = 289,
+  USMA = 360
+)
+
+
+ref_data_avg <- reference_data |> 
+  mutate(
+    sowing_doy = site_sowing_dates[site],
+    DaysAfterSowing = if_else(
+      site != "FIJO",
+      if_else(DOY < sowing_doy, DOY + (365-sowing_doy), DOY - sowing_doy),
+      DOY - sowing_doy  # For FIJO, just use DOY - sowingDOY
+    )
+  ) |> 
+  ungroup() |> 
+  group_by(site, DaysAfterSowing) |> 
+  summarise(across(where(is.numeric),
+                   list(median = ~quantile(., 0.50, na.rm = TRUE)),
+                   .names = "{col}_{fn}"),
+            .groups = "drop") |> 
+  as.data.frame()
 
 
 
+outDfs_yield_plot<-outDfs_synth |> 
+  mutate(site=substr(experiment,1,4)) |> 
+  left_join(ref_data_avg,by=c('DaysAfterSowing',"site")) |> 
+  filter((site=='FIJO'&DaysAfterSowing<120)|
+           (site=='ININ'&DaysAfterSowing<150)|
+           (site=='ITPO'&DaysAfterSowing<220)|
+           (site=='TRIZ'&DaysAfterSowing<210)|
+           (site=='UKRO'&DaysAfterSowing<310)|
+           (site=='USMA'&DaysAfterSowing<150)) 
+
+  
+
+ggplot(outDfs_yield_plot |> mutate(stripLabel=paste0(site,"_",set)) , aes(x = DaysAfterSowing)) +
+  #geom_area(aes(y = HTtimeRinfection_median), alpha = .5,fill='blue') +
+  geom_line(aes(y = LightInterception_median), col = 'black', size = .5,linetype=3) +
+
+   geom_line(aes(y = Susceptible_median),col='green4',linewidth=.5) +
 
 
-
-#Loam
-# Compute quantiles in parallel for each numeric column
-resultLoam <- dtLoam[, lapply(.SD, function(col) {
-  if (is.numeric(col)) {
-    sapply(percentiles, function(p) quantile(col, probs = p, na.rm = TRUE))
-  }
-}), by = .(experiment, doy)]
-
-# Add column names
-setnames(resultLoam, old = names(result)[-c(1, 2)], 
-         new = paste0(rep(names(dtLoam)[sapply(dtLoam, is.numeric)], each = length(percentiles)),
-                      "_p", rep(percentiles * 100, length.out = sum(sapply(dtLoam, is.numeric)))))
-
-#Clay
-# Compute quantiles in parallel for each numeric column
-resultClay <- dtClay[, lapply(.SD, function(col) {
-  if (is.numeric(col)) {
-    sapply(percentiles, function(p) quantile(col, probs = p, na.rm = TRUE))
-  }
-}), by = .(experiment, doy)]
-
-# Add column names
-setnames(resultClay, old = names(result)[-c(1, 2)], 
-         new = paste0(rep(names(dtClay)[sapply(dtClay, is.numeric)], each = length(percentiles)),
-                      "_p", rep(percentiles * 100, length.out = sum(sapply(dtClay, is.numeric)))))
-
+  #geom_point(aes(y = YieldAttainable_median.y/10000), fill = 'black', size = .3,alpha = .2) +
+  geom_area(aes(y = LightIntHealthy_median), fill = 'green', size = .3,alpha = .5) +
+  geom_ribbon(aes(ymin = Susceptible_q40, ymax = Susceptible_q60), alpha = .5,fill='green4') +
+  #geom_line(aes(y = DiseaseSeverity_median), alpha = .2, fill = 'slateblue') +
+  geom_line(aes(y = YieldAttainable_median.x / 10000),linetype=2) +
+  geom_ribbon(aes(ymin = YieldActual_q40 / 10000, ymax = YieldActual_q60 / 10000), fill = 'red', alpha = 0.8) +
+ # geom_ribbon(aes(ymin = YieldActual_q25 / 10000, ymax = YieldActual_q75 / 10000), fill = 'darkslateblue', alpha = 0.4) +
+  geom_line(aes(y = YieldActual_median / 10000), col = 'red3', linewidth = 1) +
+  facet_wrap(~ stripLabel, ncol = 4, scales = 'free_x') +
+  #geom_ribbon(aes(ymin = HTtimeRinfection_q40, ymax = HTtimeRinfection_q60), alpha = .4,fill='blue') +
+  
+  ylim(0, 1)+
+  scale_y_continuous(
+    name = "Light interception, Susceptible tissue, Pathogen suitability",
+    sec.axis = sec_axis(~ . * 10, name = "Yield (Mg/ha)")
+  ) +
+  theme_classic() +
+  theme(legend.position = "none") 
 

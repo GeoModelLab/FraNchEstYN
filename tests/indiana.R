@@ -2,14 +2,11 @@
 library(tidyverse)
 library(FraNchEstYN)
 
-weather_data<-read.csv(paste0(getwd(),'\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\weather\\daily\\Indiana.csv'))
-#weather_data<-read.csv(paste0(getwd(),'\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\weather\\hourly\\Indiana.csv'))
-weather_data$site <- 'Indiana'
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
-management_data <- read.csv(paste0(getwd(),'\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\management\\mgt_indiana.csv'))
-
-reference_data<-read.csv(paste0(getwd(),"\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\reference\\Indiana.csv")) |>
-  dplyr::rename(Disease = thisDisease)
+weather_data<- weather_indiana
+management_data <- management_indiana
+reference_data<-reference_indiana
 
 # we do not need to calibrate the crop model here, but we have light interception data so we will disable all parameters related to cardinal temperatures and biomass and yield formation and we keep the ones regulating the shape of light interception (canopy dynamics)
 thisCropParam <- cropParameters$wheat

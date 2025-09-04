@@ -1,0 +1,27 @@
+model, param, value
+crop,TbaseCrop,4.73238504407202
+crop,CycleLength,2348.759603545148
+crop,FloweringStart,62.00766083510281
+crop,HalfIntGrowth,21.631864670607637
+crop,HalfIntSenescence,53.457971901530236
+crop,SlopeGrowth,0.003492645070802634
+crop,SlopeSenescence,0.002846690863599088
+crop,PartitioningMaximum,0.8653477607954241
+disease,OuterInoculum,0.04395484165832638
+disease,PathogenSpread,0.05884783449472507
+disease,WetnessDurationOptimum,44.3397642435144
+disease,WetnessDurationMinimum,11.261680880450065
+disease,DryCriticalInterruption,16.408193249354756
+disease,Tmin,7.539138898771604
+disease,Topt,22.081203564614547
+disease,Tmax,31.472758952175916
+disease,RelativeHumidityCritical,66.82744973242528
+disease,Rain50Detachment,13.621608774200237
+disease,RelativeHumidityNotLimiting,91.72248834444962
+disease,HydroThermalTimeOnset,5.697668352544772
+disease,CyclePercentageOnset,30.81016400571093
+disease,LatencyDuration,16.314260097045
+disease,SporulationDuration,25.763334469998828
+disease,virtualVisualLesion,1.6866803135119603
+disease,RUEreductionFactor,1.181722372744545
+disease,AssimilateSappersMax,21.80000734733236

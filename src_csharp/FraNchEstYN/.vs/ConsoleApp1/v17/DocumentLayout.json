@@ -1,0 +1,190 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\projects\\ConsoleApp1\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{18A0B18F-B468-4618-BDDF-2C8DA62A303A}|ConsoleApp1\\ConsoleApp1.csproj|c:\\projects\\consoleapp1\\consoleapp1\\optimizer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18A0B18F-B468-4618-BDDF-2C8DA62A303A}|ConsoleApp1\\ConsoleApp1.csproj|solutionrelative:consoleapp1\\optimizer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18A0B18F-B468-4618-BDDF-2C8DA62A303A}|ConsoleApp1\\ConsoleApp1.csproj|c:\\projects\\consoleapp1\\consoleapp1\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18A0B18F-B468-4618-BDDF-2C8DA62A303A}|ConsoleApp1\\ConsoleApp1.csproj|solutionrelative:consoleapp1\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18A0B18F-B468-4618-BDDF-2C8DA62A303A}|ConsoleApp1\\FraNchEstYN.csproj|c:\\projects\\consoleapp1\\consoleapp1\\franchestynconfig.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{18A0B18F-B468-4618-BDDF-2C8DA62A303A}|ConsoleApp1\\FraNchEstYN.csproj|solutionrelative:consoleapp1\\franchestynconfig.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18A0B18F-B468-4618-BDDF-2C8DA62A303A}|ConsoleApp1\\ConsoleApp1.csproj|c:\\projects\\consoleapp1\\consoleapp1\\readers\\weatherreader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18A0B18F-B468-4618-BDDF-2C8DA62A303A}|ConsoleApp1\\ConsoleApp1.csproj|solutionrelative:consoleapp1\\readers\\weatherreader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18A0B18F-B468-4618-BDDF-2C8DA62A303A}|ConsoleApp1\\ConsoleApp1.csproj|c:\\projects\\consoleapp1\\consoleapp1\\models\\epidemiology.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18A0B18F-B468-4618-BDDF-2C8DA62A303A}|ConsoleApp1\\ConsoleApp1.csproj|solutionrelative:consoleapp1\\models\\epidemiology.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18A0B18F-B468-4618-BDDF-2C8DA62A303A}|ConsoleApp1\\ConsoleApp1.csproj|c:\\projects\\consoleapp1\\consoleapp1\\data\\data.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18A0B18F-B468-4618-BDDF-2C8DA62A303A}|ConsoleApp1\\ConsoleApp1.csproj|solutionrelative:consoleapp1\\data\\data.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18A0B18F-B468-4618-BDDF-2C8DA62A303A}|ConsoleApp1\\FraNchEstYN.csproj|c:\\projects\\consoleapp1\\consoleapp1\\franchestyn.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{18A0B18F-B468-4618-BDDF-2C8DA62A303A}|ConsoleApp1\\FraNchEstYN.csproj|solutionrelative:consoleapp1\\franchestyn.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18A0B18F-B468-4618-BDDF-2C8DA62A303A}|ConsoleApp1\\ConsoleApp1.csproj|c:\\projects\\consoleapp1\\consoleapp1\\files\\parameters\\parameters.csv||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{18A0B18F-B468-4618-BDDF-2C8DA62A303A}|ConsoleApp1\\ConsoleApp1.csproj|solutionrelative:consoleapp1\\files\\parameters\\parameters.csv||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18A0B18F-B468-4618-BDDF-2C8DA62A303A}|ConsoleApp1\\ConsoleApp1.csproj|c:\\projects\\consoleapp1\\consoleapp1\\readers\\referencereader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18A0B18F-B468-4618-BDDF-2C8DA62A303A}|ConsoleApp1\\ConsoleApp1.csproj|solutionrelative:consoleapp1\\readers\\referencereader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18A0B18F-B468-4618-BDDF-2C8DA62A303A}|ConsoleApp1\\ConsoleApp1.csproj|c:\\projects\\consoleapp1\\consoleapp1\\data\\simulationunit.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18A0B18F-B468-4618-BDDF-2C8DA62A303A}|ConsoleApp1\\ConsoleApp1.csproj|solutionrelative:consoleapp1\\data\\simulationunit.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "optimizer.cs",
+              "DocumentMoniker": "C:\\projects\\ConsoleApp1\\ConsoleApp1\\optimizer.cs",
+              "RelativeDocumentMoniker": "ConsoleApp1\\optimizer.cs",
+              "ToolTip": "C:\\projects\\ConsoleApp1\\ConsoleApp1\\optimizer.cs",
+              "RelativeToolTip": "ConsoleApp1\\optimizer.cs",
+              "ViewState": "AgIAAL0CAAAAAAAAAAAkwMcCAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-26T08:36:24.243Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "FraNchEstYNConfig.json",
+              "DocumentMoniker": "C:\\projects\\ConsoleApp1\\ConsoleApp1\\FraNchEstYNConfig.json",
+              "RelativeDocumentMoniker": "ConsoleApp1\\FraNchEstYNConfig.json",
+              "ToolTip": "C:\\projects\\ConsoleApp1\\ConsoleApp1\\FraNchEstYNConfig.json",
+              "RelativeToolTip": "ConsoleApp1\\FraNchEstYNConfig.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAfAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-03-26T08:42:56.174Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "parameters.csv",
+              "DocumentMoniker": "C:\\projects\\ConsoleApp1\\ConsoleApp1\\files\\parameters\\parameters.csv",
+              "RelativeDocumentMoniker": "ConsoleApp1\\files\\parameters\\parameters.csv",
+              "ToolTip": "C:\\projects\\ConsoleApp1\\ConsoleApp1\\files\\parameters\\parameters.csv",
+              "RelativeToolTip": "ConsoleApp1\\files\\parameters\\parameters.csv",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002120|",
+              "WhenOpened": "2025-03-26T08:56:20.795Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "FraNchEstYN.csproj",
+              "DocumentMoniker": "C:\\projects\\ConsoleApp1\\ConsoleApp1\\FraNchEstYN.csproj",
+              "RelativeDocumentMoniker": "ConsoleApp1\\FraNchEstYN.csproj",
+              "ToolTip": "C:\\projects\\ConsoleApp1\\ConsoleApp1\\FraNchEstYN.csproj",
+              "RelativeToolTip": "ConsoleApp1\\FraNchEstYN.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-03-26T08:35:56.434Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "data.cs",
+              "DocumentMoniker": "C:\\projects\\ConsoleApp1\\ConsoleApp1\\data\\data.cs",
+              "RelativeDocumentMoniker": "ConsoleApp1\\data\\data.cs",
+              "ToolTip": "C:\\projects\\ConsoleApp1\\ConsoleApp1\\data\\data.cs",
+              "RelativeToolTip": "ConsoleApp1\\data\\data.cs",
+              "ViewState": "AgIAACoAAAAAAAAAAAAowCoAAAAiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-26T08:31:38.18Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "epidemiology.cs",
+              "DocumentMoniker": "C:\\projects\\ConsoleApp1\\ConsoleApp1\\models\\epidemiology.cs",
+              "RelativeDocumentMoniker": "ConsoleApp1\\models\\epidemiology.cs",
+              "ToolTip": "C:\\projects\\ConsoleApp1\\ConsoleApp1\\models\\epidemiology.cs",
+              "RelativeToolTip": "ConsoleApp1\\models\\epidemiology.cs",
+              "ViewState": "AgIAAJUAAAAAAAAAAAAkwGsAAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-26T08:32:00.678Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\projects\\ConsoleApp1\\ConsoleApp1\\Program.cs",
+              "RelativeDocumentMoniker": "ConsoleApp1\\Program.cs",
+              "ToolTip": "C:\\projects\\ConsoleApp1\\ConsoleApp1\\Program.cs",
+              "RelativeToolTip": "ConsoleApp1\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAkAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-26T08:19:38.822Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "weatherReader.cs",
+              "DocumentMoniker": "C:\\projects\\ConsoleApp1\\ConsoleApp1\\readers\\weatherReader.cs",
+              "RelativeDocumentMoniker": "ConsoleApp1\\readers\\weatherReader.cs",
+              "ToolTip": "C:\\projects\\ConsoleApp1\\ConsoleApp1\\readers\\weatherReader.cs",
+              "RelativeToolTip": "ConsoleApp1\\readers\\weatherReader.cs",
+              "ViewState": "AgIAACUAAAAAAAAAAAAQwAEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-26T08:39:08.563Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "referenceReader.cs",
+              "DocumentMoniker": "C:\\projects\\ConsoleApp1\\ConsoleApp1\\readers\\referenceReader.cs",
+              "RelativeDocumentMoniker": "ConsoleApp1\\readers\\referenceReader.cs",
+              "ToolTip": "C:\\projects\\ConsoleApp1\\ConsoleApp1\\readers\\referenceReader.cs",
+              "RelativeToolTip": "ConsoleApp1\\readers\\referenceReader.cs",
+              "ViewState": "AgIAACIAAAAAAAAAAAAQwAIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-26T08:45:51.675Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "simulationUnit.cs",
+              "DocumentMoniker": "C:\\projects\\ConsoleApp1\\ConsoleApp1\\data\\simulationUnit.cs",
+              "RelativeDocumentMoniker": "ConsoleApp1\\data\\simulationUnit.cs",
+              "ToolTip": "C:\\projects\\ConsoleApp1\\ConsoleApp1\\data\\simulationUnit.cs",
+              "RelativeToolTip": "ConsoleApp1\\data\\simulationUnit.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-26T08:41:37.142Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

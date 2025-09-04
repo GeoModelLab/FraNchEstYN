@@ -19,8 +19,6 @@ thisDiseaseParam <- FraNchEstYN::diseaseParameters$brown_rust
 
 start_end = c(1980,1985)
 
-# source("..//..//R//Main.R")
-
 df<-franchestyn(weather_data = weather_data,
                 cropModel_data = cropModel_data,
                 diseaseParameters = thisDiseaseParam,
@@ -45,7 +43,6 @@ ggplot(outputs, aes(x=as.Date(Date,format='%m/%d/%Y'))) +
   xlab('Date')
 
 #change some disease parameters
-
 thisDiseaseParam<-diseaseParameters$brown_rust
 thisDiseaseParam$OuterInoculumMax$value<-0.08
 thisDiseaseParam$OuterInoculumShapeRelease$value<-1
@@ -90,28 +87,3 @@ ggplot(outputs |> filter(GrowingSeason==1982), aes(x=as.Date(Date,format='%m/%d/
   facet_wrap(~GrowingSeason,ncol=3,scales='free_x')+
   theme_bw()+
   xlab('Date')
-
-
-
-
-
-
-# add fungicide scheduling
-management_data <- data.frame(
-  site      = rep("Policoro"),
-  crop      = rep("wheat"),
-  variety = rep("Generic"),
-  year      = 1981,
-  #treatment = "",
-  # treatment_2 = 70,
-  # treatment_3 = 80,
-  # treatment_4 = 90,
-  # treatment_5 = 100,
-  # treatment_6 = 110,
-  # treatment_7 = 125,
-  stringsAsFactors = FALSE
-)
-
-
-
-# add the message for

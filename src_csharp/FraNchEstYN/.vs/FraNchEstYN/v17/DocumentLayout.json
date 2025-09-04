@@ -1,0 +1,491 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|c:\\github\\franchestyn\\src_csharp\\franchestyn\\franchestyn\\optimizer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|solutionrelative:franchestyn\\optimizer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|c:\\github\\franchestyn\\src_csharp\\franchestyn\\franchestyn\\utilities.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|solutionrelative:franchestyn\\utilities.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|c:\\github\\franchestyn\\src_csharp\\franchestyn\\franchestyn\\models\\crop.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|solutionrelative:franchestyn\\models\\crop.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|c:\\github\\franchestyn\\src_csharp\\franchestyn\\franchestyn\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|solutionrelative:franchestyn\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|c:\\github\\franchestyn\\src_csharp\\franchestyn\\franchestyn\\readers\\weatherreader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|solutionrelative:franchestyn\\readers\\weatherreader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|c:\\github\\franchestyn\\src_csharp\\franchestyn\\franchestyn\\franchestynconfig_ok.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|solutionrelative:franchestyn\\franchestynconfig_ok.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|c:\\github\\franchestyn\\src_csharp\\franchestyn\\franchestyn\\readers\\paramreader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|solutionrelative:franchestyn\\readers\\paramreader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|c:\\github\\franchestyn\\src_csharp\\franchestyn\\franchestyn\\readers\\referencereader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|solutionrelative:franchestyn\\readers\\referencereader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|c:\\github\\franchestyn\\src_csharp\\franchestyn\\franchestyn\\models\\fungicide.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|solutionrelative:franchestyn\\models\\fungicide.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|c:\\github\\franchestyn\\src_csharp\\franchestyn\\franchestyn\\models\\disease.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|solutionrelative:franchestyn\\models\\disease.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|c:\\github\\franchestyn\\src_csharp\\franchestyn\\franchestyn\\data\\data.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|solutionrelative:franchestyn\\data\\data.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|c:\\github\\franchestyn\\src_csharp\\franchestyn\\franchestyn\\data\\simulationunit.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|solutionrelative:franchestyn\\data\\simulationunit.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Program Files\\R\\R-4.4.2\\library\\FraNchEstYN\\bin\\FraNchEstYNConfig.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|c:\\github\\franchestyn\\src_csharp\\franchestyn\\franchestyn\\franchestynconfig.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|solutionrelative:franchestyn\\franchestynconfig.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|c:\\github\\franchestyn\\src_csharp\\franchestyn\\franchestyn\\files\\reference\\referencedata.csv||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|solutionrelative:franchestyn\\files\\reference\\referencedata.csv||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|c:\\github\\franchestyn\\src_csharp\\franchestyn\\franchestyn\\files\\management\\sowing.csv||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|solutionrelative:franchestyn\\files\\management\\sowing.csv||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|c:\\github\\franchestyn\\src_csharp\\franchestyn\\franchestyn\\files\\weather\\daily\\fijo0qxx.csv||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|solutionrelative:franchestyn\\files\\weather\\daily\\fijo0qxx.csv||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Administrator\\OneDrive - CREA\\Desktop\\FraNchEstYNConfig.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|c:\\github\\franchestyn\\src_csharp\\franchestyn\\franchestyn\\files\\parameters\\franchestynparameters.csv||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|solutionrelative:franchestyn\\files\\parameters\\franchestynparameters.csv||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|c:\\github\\franchestyn\\src_csharp\\franchestyn\\franchestyn\\files\\cropmodel\\cropmodeldata.csv||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|solutionrelative:franchestyn\\files\\cropmodel\\cropmodeldata.csv||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|c:\\github\\franchestyn\\src_csharp\\franchestyn\\franchestyn\\files\\parameters\\franchestynparametersforpackage.csv||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|solutionrelative:franchestyn\\files\\parameters\\franchestynparametersforpackage.csv||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|c:\\github\\franchestyn\\src_csharp\\franchestyn\\franchestyn\\files\\weather\\hourly\\indiana.csv||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|solutionrelative:franchestyn\\files\\weather\\hourly\\indiana.csv||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Administrator\\AppData\\Local\\SourceServer\\0f600a3ba28817650f0dd08c73757290db706158d8a5978dc67f464af4917938\\Dictionary.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Administrator\\AppData\\Local\\Temp\\.vsdbgsrc\\042c01f6454a5d21e54c8d57ede09a3e9a1c391feaf87d31130aef76cb85cd3d\\Program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Administrator\\Downloads\\DiseaseSimulation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|c:\\github\\franchestyn\\src_csharp\\franchestyn\\franchestyn\\franchestyn.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|",
+      "RelativeMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|solutionrelative:franchestyn\\franchestyn.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|c:\\github\\franchestyn\\src_csharp\\franchestyn\\franchestyn\\files\\reference\\collobiano.csv||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|solutionrelative:franchestyn\\files\\reference\\collobiano.csv||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|c:\\github\\franchestyn\\src_csharp\\franchestyn\\franchestyn\\files\\reference\\slucia.csv||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{F5FE33FC-15D9-459B-A200-F028431DC22C}|FraNchEstYN\\FraNchEstYN.csproj|solutionrelative:franchestyn\\files\\reference\\slucia.csv||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\simoneugomaria.brega\\OneDrive - CREA\\Documenti\\git\\FRaNchEstYn\\test\\c#\\FraNchEstYN\\FraNchEstYN\\files\\reference\\Disease\\Christnach.csv||{8B382828-6202-11D1-8870-0000F87579D2}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "data.cs",
+              "DocumentMoniker": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\data\\data.cs",
+              "RelativeDocumentMoniker": "FraNchEstYN\\data\\data.cs",
+              "ToolTip": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\data\\data.cs",
+              "RelativeToolTip": "FraNchEstYN\\data\\data.cs",
+              "ViewState": "AgIAAGsAAAAAAAAAAAA8wHYAAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-19T12:11:43.371Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "simulationUnit.cs",
+              "DocumentMoniker": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\data\\simulationUnit.cs",
+              "RelativeDocumentMoniker": "FraNchEstYN\\data\\simulationUnit.cs",
+              "ToolTip": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\data\\simulationUnit.cs",
+              "RelativeToolTip": "FraNchEstYN\\data\\simulationUnit.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-10T00:24:33.873Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "optimizer.cs",
+              "DocumentMoniker": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\optimizer.cs",
+              "RelativeDocumentMoniker": "FraNchEstYN\\optimizer.cs",
+              "ToolTip": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\optimizer.cs",
+              "RelativeToolTip": "FraNchEstYN\\optimizer.cs",
+              "ViewState": "AgIAAFkAAAAAAAAAAAAAwHcCAABSAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-03T16:24:05.893Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "crop.cs",
+              "DocumentMoniker": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\models\\crop.cs",
+              "RelativeDocumentMoniker": "FraNchEstYN\\models\\crop.cs",
+              "ToolTip": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\models\\crop.cs",
+              "RelativeToolTip": "FraNchEstYN\\models\\crop.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADQBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-19T12:12:22.548Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "paramReader.cs",
+              "DocumentMoniker": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\readers\\paramReader.cs",
+              "RelativeDocumentMoniker": "FraNchEstYN\\readers\\paramReader.cs",
+              "ToolTip": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\readers\\paramReader.cs",
+              "RelativeToolTip": "FraNchEstYN\\readers\\paramReader.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-09T15:26:36.753Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "weatherReader.cs",
+              "DocumentMoniker": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\readers\\weatherReader.cs",
+              "RelativeDocumentMoniker": "FraNchEstYN\\readers\\weatherReader.cs",
+              "ToolTip": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\readers\\weatherReader.cs",
+              "RelativeToolTip": "FraNchEstYN\\readers\\weatherReader.cs",
+              "ViewState": "AgIAAEUCAAAAAAAAAAAkwGkCAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-10T03:27:26.717Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "FraNchEstYNConfig_ok.json",
+              "DocumentMoniker": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\FraNchEstYNConfig_ok.json",
+              "RelativeDocumentMoniker": "FraNchEstYN\\FraNchEstYNConfig_ok.json",
+              "ToolTip": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\FraNchEstYNConfig_ok.json",
+              "RelativeToolTip": "FraNchEstYN\\FraNchEstYNConfig_ok.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-06-19T12:14:26.436Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\Program.cs",
+              "RelativeDocumentMoniker": "FraNchEstYN\\Program.cs",
+              "ToolTip": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\Program.cs",
+              "RelativeToolTip": "FraNchEstYN\\Program.cs",
+              "ViewState": "AgIAAIABAAAAAAAAAAAAwIIAAAAEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-03T16:23:59.585Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "utilities.cs",
+              "DocumentMoniker": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\utilities.cs",
+              "RelativeDocumentMoniker": "FraNchEstYN\\utilities.cs",
+              "ToolTip": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\utilities.cs",
+              "RelativeToolTip": "FraNchEstYN\\utilities.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAD0AAAA+AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-09T06:22:54.424Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "disease.cs",
+              "DocumentMoniker": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\models\\disease.cs",
+              "RelativeDocumentMoniker": "FraNchEstYN\\models\\disease.cs",
+              "ToolTip": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\models\\disease.cs",
+              "RelativeToolTip": "FraNchEstYN\\models\\disease.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAABNAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-19T13:12:33.263Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "fungicide.cs",
+              "DocumentMoniker": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\models\\fungicide.cs",
+              "RelativeDocumentMoniker": "FraNchEstYN\\models\\fungicide.cs",
+              "ToolTip": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\models\\fungicide.cs",
+              "RelativeToolTip": "FraNchEstYN\\models\\fungicide.cs",
+              "ViewState": "AgIAADcAAAAAAAAAAAAQwAkAAAA4AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-16T13:53:20.195Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "referenceReader.cs",
+              "DocumentMoniker": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\readers\\referenceReader.cs",
+              "RelativeDocumentMoniker": "FraNchEstYN\\readers\\referenceReader.cs",
+              "ToolTip": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\readers\\referenceReader.cs",
+              "RelativeToolTip": "FraNchEstYN\\readers\\referenceReader.cs",
+              "ViewState": "AgIAAEEBAAAAAAAAAAAUwBwBAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-09T15:01:37.952Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "FraNchEstYNConfig.json",
+              "DocumentMoniker": "C:\\Program Files\\R\\R-4.4.2\\library\\FraNchEstYN\\bin\\FraNchEstYNConfig.json",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\Program Files\\R\\R-4.4.2\\library\\FraNchEstYN\\bin\\FraNchEstYNConfig.json",
+              "ToolTip": "C:\\Program Files\\R\\R-4.4.2\\library\\FraNchEstYN\\bin\\FraNchEstYNConfig.json",
+              "RelativeToolTip": "..\\..\\..\\..\\Program Files\\R\\R-4.4.2\\library\\FraNchEstYN\\bin\\FraNchEstYNConfig.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAABAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-09-02T07:09:37.055Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "FIJO0QXX.csv",
+              "DocumentMoniker": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\weather\\daily\\FIJO0QXX.csv",
+              "RelativeDocumentMoniker": "FraNchEstYN\\files\\weather\\daily\\FIJO0QXX.csv",
+              "ToolTip": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\weather\\daily\\FIJO0QXX.csv",
+              "RelativeToolTip": "FraNchEstYN\\files\\weather\\daily\\FIJO0QXX.csv",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADwsAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002120|",
+              "WhenOpened": "2025-09-01T12:27:51.174Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "franchestynParameters.csv",
+              "DocumentMoniker": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\parameters\\franchestynParameters.csv",
+              "RelativeDocumentMoniker": "FraNchEstYN\\files\\parameters\\franchestynParameters.csv",
+              "ToolTip": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\parameters\\franchestynParameters.csv",
+              "RelativeToolTip": "FraNchEstYN\\files\\parameters\\franchestynParameters.csv",
+              "ViewState": "AgIAAA0AAAAAAAAAAAAqwBkAAABzAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002120|",
+              "WhenOpened": "2025-08-09T15:31:42.429Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "cropModelData.csv",
+              "DocumentMoniker": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\cropModel\\cropModelData.csv",
+              "RelativeDocumentMoniker": "FraNchEstYN\\files\\cropModel\\cropModelData.csv",
+              "ToolTip": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\cropModel\\cropModelData.csv",
+              "RelativeToolTip": "FraNchEstYN\\files\\cropModel\\cropModelData.csv",
+              "ViewState": "AgIAALsXAAAAAAAAAAAkwN8XAAAiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002120|",
+              "WhenOpened": "2025-08-26T14:02:02.905Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "FraNchEstYNConfig.json",
+              "DocumentMoniker": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\FraNchEstYNConfig.json",
+              "RelativeDocumentMoniker": "FraNchEstYN\\FraNchEstYNConfig.json",
+              "ToolTip": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\FraNchEstYNConfig.json",
+              "RelativeToolTip": "FraNchEstYN\\FraNchEstYNConfig.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-09-02T06:58:03.217Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "referenceData.csv",
+              "DocumentMoniker": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\reference\\referenceData.csv",
+              "RelativeDocumentMoniker": "FraNchEstYN\\files\\reference\\referenceData.csv",
+              "ToolTip": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\reference\\referenceData.csv",
+              "RelativeToolTip": "FraNchEstYN\\files\\reference\\referenceData.csv",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAFgAAAA7AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002120|",
+              "WhenOpened": "2025-08-19T09:43:30.342Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "sowing.csv",
+              "DocumentMoniker": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\management\\sowing.csv",
+              "RelativeDocumentMoniker": "FraNchEstYN\\files\\management\\sowing.csv",
+              "ToolTip": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\management\\sowing.csv",
+              "RelativeToolTip": "FraNchEstYN\\files\\management\\sowing.csv",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002120|",
+              "WhenOpened": "2025-09-01T13:25:55.395Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "FraNchEstYNConfig.json",
+              "DocumentMoniker": "C:\\Users\\Administrator\\OneDrive - CREA\\Desktop\\FraNchEstYNConfig.json",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\Users\\Administrator\\OneDrive - CREA\\Desktop\\FraNchEstYNConfig.json",
+              "ToolTip": "C:\\Users\\Administrator\\OneDrive - CREA\\Desktop\\FraNchEstYNConfig.json",
+              "RelativeToolTip": "..\\..\\..\\..\\Users\\Administrator\\OneDrive - CREA\\Desktop\\FraNchEstYNConfig.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAPAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-09-01T12:29:27.284Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "Indiana.csv",
+              "DocumentMoniker": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\weather\\hourly\\Indiana.csv",
+              "RelativeDocumentMoniker": "FraNchEstYN\\files\\weather\\hourly\\Indiana.csv",
+              "ToolTip": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\weather\\hourly\\Indiana.csv",
+              "RelativeToolTip": "FraNchEstYN\\files\\weather\\hourly\\Indiana.csv",
+              "ViewState": "AgIAABgAAAAAAAAAAAAAAAcAAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002120|",
+              "WhenOpened": "2025-08-11T14:21:33.818Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "franchestynParametersForPackage.csv",
+              "DocumentMoniker": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\parameters\\franchestynParametersForPackage.csv",
+              "RelativeDocumentMoniker": "FraNchEstYN\\files\\parameters\\franchestynParametersForPackage.csv",
+              "ToolTip": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\parameters\\franchestynParametersForPackage.csv",
+              "RelativeToolTip": "FraNchEstYN\\files\\parameters\\franchestynParametersForPackage.csv",
+              "ViewState": "AgIAAGkAAAAAAAAAAAAAAIQAAABgAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002120|",
+              "WhenOpened": "2025-08-20T06:57:04.178Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "Dictionary.cs",
+              "DocumentMoniker": "C:\\Users\\Administrator\\AppData\\Local\\SourceServer\\0f600a3ba28817650f0dd08c73757290db706158d8a5978dc67f464af4917938\\Dictionary.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\Users\\Administrator\\AppData\\Local\\SourceServer\\0f600a3ba28817650f0dd08c73757290db706158d8a5978dc67f464af4917938\\Dictionary.cs",
+              "ToolTip": "C:\\Users\\Administrator\\AppData\\Local\\SourceServer\\0f600a3ba28817650f0dd08c73757290db706158d8a5978dc67f464af4917938\\Dictionary.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\Users\\Administrator\\AppData\\Local\\SourceServer\\0f600a3ba28817650f0dd08c73757290db706158d8a5978dc67f464af4917938\\Dictionary.cs",
+              "ViewState": "AgIAAGABAAAAAAAAAAAmwBsEAAAZAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-11T06:05:01.438Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
+              "Title": "DiseaseSimulation.cs",
+              "DocumentMoniker": "C:\\Users\\Administrator\\Downloads\\DiseaseSimulation.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\Users\\Administrator\\Downloads\\DiseaseSimulation.cs",
+              "ToolTip": "C:\\Users\\Administrator\\Downloads\\DiseaseSimulation.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\Users\\Administrator\\Downloads\\DiseaseSimulation.cs",
+              "ViewState": "AgIAAAMHAAAAAAAAAAAAAK8GAABgAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-10T21:40:26.281Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
+              "Title": "FraNchEstYN",
+              "DocumentMoniker": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\FraNchEstYN.csproj",
+              "RelativeDocumentMoniker": "FraNchEstYN\\FraNchEstYN.csproj",
+              "ToolTip": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\FraNchEstYN.csproj",
+              "RelativeToolTip": "FraNchEstYN\\FraNchEstYN.csproj",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-08-10T16:34:25.554Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\Administrator\\AppData\\Local\\Temp\\.vsdbgsrc\\042c01f6454a5d21e54c8d57ede09a3e9a1c391feaf87d31130aef76cb85cd3d\\Program.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\Users\\Administrator\\AppData\\Local\\Temp\\.vsdbgsrc\\042c01f6454a5d21e54c8d57ede09a3e9a1c391feaf87d31130aef76cb85cd3d\\Program.cs",
+              "ToolTip": "C:\\Users\\Administrator\\AppData\\Local\\Temp\\.vsdbgsrc\\042c01f6454a5d21e54c8d57ede09a3e9a1c391feaf87d31130aef76cb85cd3d\\Program.cs [Read Only]",
+              "RelativeToolTip": "..\\..\\..\\..\\Users\\Administrator\\AppData\\Local\\Temp\\.vsdbgsrc\\042c01f6454a5d21e54c8d57ede09a3e9a1c391feaf87d31130aef76cb85cd3d\\Program.cs [Read Only]",
+              "ViewState": "AgIAAA0BAAAAAAAAAAAmwCEBAAAQAAAAAQAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-11T09:00:01.31Z",
+              "EditorCaption": " [Read Only]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 26,
+              "Title": "Collobiano.csv",
+              "DocumentMoniker": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\reference\\Collobiano.csv",
+              "RelativeDocumentMoniker": "FraNchEstYN\\files\\reference\\Collobiano.csv",
+              "ToolTip": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\reference\\Collobiano.csv",
+              "RelativeToolTip": "FraNchEstYN\\files\\reference\\Collobiano.csv",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAACIAAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002120|",
+              "WhenOpened": "2025-08-10T14:08:36.132Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 27,
+              "Title": "SLucia.csv",
+              "DocumentMoniker": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\reference\\SLucia.csv",
+              "RelativeDocumentMoniker": "FraNchEstYN\\files\\reference\\SLucia.csv",
+              "ToolTip": "C:\\GitHub\\FraNchEstYN\\src_csharp\\FraNchEstYN\\FraNchEstYN\\files\\reference\\SLucia.csv",
+              "RelativeToolTip": "FraNchEstYN\\files\\reference\\SLucia.csv",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAnAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002120|",
+              "WhenOpened": "2025-08-10T01:36:11.904Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 28,
+              "Title": "Christnach.csv",
+              "DocumentMoniker": "C:\\Users\\simoneugomaria.brega\\OneDrive - CREA\\Documenti\\git\\FRaNchEstYn\\test\\c#\\FraNchEstYN\\FraNchEstYN\\files\\reference\\Disease\\Christnach.csv",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\Users\\simoneugomaria.brega\\OneDrive - CREA\\Documenti\\git\\FRaNchEstYn\\test\\c#\\FraNchEstYN\\FraNchEstYN\\files\\reference\\Disease\\Christnach.csv",
+              "ToolTip": "C:\\Users\\simoneugomaria.brega\\OneDrive - CREA\\Documenti\\git\\FRaNchEstYn\\test\\c#\\FraNchEstYN\\FraNchEstYN\\files\\reference\\Disease\\Christnach.csv",
+              "RelativeToolTip": "..\\..\\..\\..\\Users\\simoneugomaria.brega\\OneDrive - CREA\\Documenti\\git\\FRaNchEstYn\\test\\c#\\FraNchEstYN\\FraNchEstYN\\files\\reference\\Disease\\Christnach.csv",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002120|",
+              "WhenOpened": "2025-08-09T09:11:09.176Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

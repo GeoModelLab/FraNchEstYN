@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "FraNchEstYN": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\\\GitHub\\\\FraNchEstYN\\\\src_csharp\\\\FraNchEstYN\\\\FraNchEstYN\\\\bin\\\\Debug\\\\net8.0\\\\FraNchEstYNConfig.json\""
+    }
+  }
+}

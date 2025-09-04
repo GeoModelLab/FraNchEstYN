@@ -591,7 +591,7 @@ franchestyn <- function(weather_data,
       management_user$site <- sites[1]
     }
     if (!"variety" %in% names(management_user)) {
-      management_user$variety <- "All"
+      management_user$variety <- "Generic"
     }
 
     # sowing DOY (optional)
@@ -999,8 +999,8 @@ franchestyn <- function(weather_data,
 
     ## ---- deep copy originals BEFORE updating --------------------------------
     deep_copy <- function(x) unserialize(serialize(x, NULL))
-    origCropParameters    <- if (exists("cropParameters"))    deep_copy(cropParameters)    else NULL
-    origDiseaseParameters <- if (exists("diseaseParameters")) deep_copy(diseaseParameters) else NULL
+    origCropParameters    <- deep_copy(cropParameters)
+    origDiseaseParameters <- deep_copy(diseaseParameters)
 
     ## ---- apply calibrated values (do NOT touch originals) -------------------
     update_param_list <- function(param_list, calib_df, clamp = TRUE) {
