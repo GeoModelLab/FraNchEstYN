@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FraNchEstYN")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+27ff2b766a22b5c32ed42af08f4b23d414aad756")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4d72f946fdbb182350e4c9a79cca708efd8fc3c0")]
 [assembly: System.Reflection.AssemblyProductAttribute("FraNchEstYN")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FraNchEstYN")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

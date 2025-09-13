@@ -37,12 +37,19 @@ public class paramReader
             // Column 6: parameter value (can be boolean or numeric)
             string rawValue = line[6].Trim();
 
-            // Simple boolean detection: true/false/1/0 (case-insensitive)
-            bool isBoolParam =
-                rawValue.Equals("true", StringComparison.OrdinalIgnoreCase) ||
-                rawValue.Equals("false", StringComparison.OrdinalIgnoreCase) ||
-                rawValue.Equals("1", StringComparison.OrdinalIgnoreCase) ||
-                rawValue.Equals("0", StringComparison.OrdinalIgnoreCase);
+            // Column 0 is the parameter name
+            string paramName = line[0];
+
+            // Special handling: only treat as bool if param is IsSplashBorne
+            bool isBoolParam = false;
+            if (paramName.Equals("IsSplashBorne", StringComparison.OrdinalIgnoreCase))
+            {
+                isBoolParam =
+                    rawValue.Equals("true", StringComparison.OrdinalIgnoreCase) ||
+                    rawValue.Equals("false", StringComparison.OrdinalIgnoreCase) ||
+                    rawValue.Equals("1", StringComparison.OrdinalIgnoreCase) ||
+                    rawValue.Equals("0", StringComparison.OrdinalIgnoreCase);
+            }
 
             if (isBoolParam)
             {
@@ -64,6 +71,7 @@ public class paramReader
             // Dictionary key composed from columns 0 and 1: "Name_Class"
             nameParam[line[0] + "_" + line[1]] = parameter;
         }
+
 
         return nameParam;
     }

@@ -67,23 +67,83 @@ dfValid<-franchestyn(weather_data = weather_data,
                      personality = 'farmer')
 
 outputs<-dfValid$outputs$simulation
-ggplot(outputs |> filter(GrowingSeason==1982), aes(x=as.Date(Date,format='%m/%d/%Y'))) +
-  #geom_area(aes(y=HTtimeRinoculum),fill='yellow4',size=.2,alpha=.3)+
- # geom_area(aes(y=HTtimeSinoculum),fill='yellow4',size=.2,alpha=.3)+
-    geom_area(aes(y=Latent),fill='gold',alpha=.7)+
-    geom_area(aes(y=Sporulating),fill='orange',alpha=.2)+
-    geom_line(aes(y=Susceptible),col='green4',size=.5)+
-   geom_line(aes(y=Affected),col='red',size=1)+
-    geom_line(aes(y=Dead),fill='red4',alpha=.5)+
-   geom_line(aes(y=LightInterception),col='red',size=1)+
-   geom_line(aes(y=LightIntHealthy),col='black',size=1)+
-   geom_line(aes(y=YieldActual/8000),col='black',size=1)+
-    geom_line(aes(y=YieldAttainable/8000),col='red',size=1)+
-    geom_line(aes(y=AGBactual/10000),col='black',size=1)+
-    geom_line(aes(y=AGBattainable/10000),col='red',size=1)+
-    geom_line(aes(y=DiseaseSeverity),col='blue',size=1)+
-  # geom_line(aes(y=FungicideEfficacy),col='blue',size=1)+
-  # geom_line(aes(y=OuterInoculum),col='blue',size=1)+
-  facet_wrap(~GrowingSeason,ncol=3,scales='free_x')+
-  theme_bw()+
-  xlab('Date')
+library(ggplot2)
+library(dplyr)
+
+library(ggplot2)
+library(dplyr)
+
+ggplot(outputs %>% filter(GrowingSeason == 1984),
+       aes(x = as.Date(Date, format = "%m/%d/%Y"))) +
+
+  # Inoculum pressure
+  geom_area(aes(y = HTtimeRinoculum, fill = "Pathogen suitability"),
+            alpha = 0.1, color = NA) +
+
+  # Infection stages
+  geom_area(aes(y = Latent, fill = "Latent"), alpha = 0.7) +
+  geom_area(aes(y = Sporulating, fill = "Sporulating"), alpha = 0.5) +
+  geom_area(aes(y = Dead, fill = "Dead"), alpha = 0.3) +
+
+  # Dynamics (scaled 0–1)
+  geom_line(aes(y = LightInterception, color = "Attainable Light Interception"),
+            , linetype = "dashed",size = .8) +
+  geom_line(aes(y = LightIntHealthy, color = "Actual Light Interception"), size = 1.2) +
+  geom_line(aes(y = DiseaseSeverity, color = "Disease severity"), size = 1.2) +
+  geom_line(aes(y = Susceptible, color = "Susceptible plants"), , linetype = "dotted",size = 1) +
+  #geom_line(aes(y = Affected, color = "Affected plants"), size = 1) +
+
+  # Yield & biomass scaled to [0–1] for plotting
+  geom_line(aes(y = YieldActual/20000, color = "Actual yield"), size = 1.2) +
+  geom_line(aes(y = YieldAttainable/20000, color = "Attainable yield"),
+            size = .8, linetype = "dashed") +
+  geom_line(aes(y = (AGBactual-2000)/20000, color = "Actual biomass"), size = 1.2) +
+  geom_line(aes(y = (AGBattainable-2000)/20000, color = "Attainable biomass"),
+            size =.8, linetype = "dashed") +
+
+  # Facet by year
+  #facet_wrap(~GrowingSeason, ncol = 3, scales = "free_x") +
+
+  # Color scales
+  scale_fill_manual(name = "Host tissue stages",
+                    values = c("Pathogen suitability" = "yellow4",
+                               "Latent" = "gold",
+                               "Sporulating" = "orange",
+                               "Dead" = "gold3")) +
+  scale_color_manual(name = "",
+                     values = c("Disease severity" = "red",
+                                "Susceptible plants" = "green4",
+                                "Affected plants" = "red",
+                                "Actual yield" = "black",
+                                "Attainable yield" = "darkgrey",
+                                "Actual biomass" = "black",
+                                "Attainable biomass" = "darkgrey",
+                                "Attainable light int." = "darkgrey",
+                                "Actual light int." = "black")) +
+
+  # Axes
+  scale_y_continuous(
+    name = "Disease dynamics (0–1 scale)",
+    limits = c(0, 1),
+    sec.axis = sec_axis(~ . * 24000,
+                        name = "Yield & Biomass (kg ha⁻¹)")
+  ) +
+  scale_x_date(
+    name = "Date",
+    date_breaks = "30 days",
+    date_labels = "%b %d",
+    limits = as.Date(c("1984-11-25", "1985-06-15"))
+  ) +
+  # Theme
+  theme_bw(base_size = 14) +
+  theme(
+    legend.position = "bottom",
+    legend.box = "vertical",
+    legend.title = element_text(face = "bold"),
+    panel.grid.major = element_line(color = "grey90"),
+    panel.grid.minor = element_blank(),
+    strip.text = element_text(face = "bold", size = 14)
+  ) +
+
+  labs(x = "Date",
+       title = "Disease Progression, Yield and Biomass")

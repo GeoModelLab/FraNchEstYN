@@ -1,11 +1,11 @@
 model, param, value
-crop,TbaseCrop,3.4092768346029043
-crop,CycleLength,3947.0697650828515
-crop,FloweringStart,57.35191978445823
-crop,HalfIntGrowth,23.1052965790894
-crop,HalfIntSenescence,75.7274273302088
-crop,SlopeGrowth,0.0117714338246911
-crop,SlopeSenescence,0.04024322629477267
+crop,TbaseCrop,0
+crop,CycleLength,3581.516752352048
+crop,FloweringStart,53.07647892912609
+crop,HalfIntGrowth,32.41571473038421
+crop,HalfIntSenescence,92.50674242383243
+crop,SlopeGrowth,0.01060042815853079
+crop,SlopeSenescence,0.006046822018678428
 crop,RadiationUseEfficiency,2.499915211663536
 disease,OuterInoculum,0.13141338127921
 disease,PathogenSpread,0.04159048891690372
@@ -28,7 +28,7 @@ disease,SenescenceAccelerationMax,27.659068751144446
 disease,AssimilateSappersMax,13.789460191769301
 crop,ToptCrop,21.827871442749633
 crop,TmaxCrop,34.90636411616654
-crop,PartitioningMaximum,0.9126735017310997
+crop,PartitioningMaximum,0
 disease,OuterInoculumMax,0.028112276316425523
 disease,OuterInoculumShapeParameter,0.9732972374625859
 crop,VarietalResistance,0.0841899439546046

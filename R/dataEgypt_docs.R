@@ -23,3 +23,29 @@
 #' data(reference_egypt)
 #' head(reference_egypt)
 "reference_egypt"
+
+#' Daily weather dataset for Sharkiya, Egypt (2013–2015)
+#'
+#' This dataset provides daily weather observations for Sharkiya, Egypt, covering
+#' the same period as the wheat yellow rust severity and yield trials
+#' (`reference_egypt`). It includes maximum and minimum temperatures, rainfall,
+#' and metadata such as site and latitude.
+#'
+#' @format A data frame with 8 variables:
+#' \describe{
+#'   \item{Site}{Trial site ("Sharkiya")}
+#'   \item{TMAX}{Daily maximum temperature (°C)}
+#'   \item{TMIN}{Daily minimum temperature (°C)}
+#'   \item{RAIN}{Daily rainfall (mm)}
+#'   \item{year}{Calendar year (numeric)}
+#'   \item{month}{Calendar month (1–12)}
+#'   \item{day}{Calendar day of month (1–31)}
+#'   \item{lat}{Latitude of trial site (decimal degrees)}
+#' }
+#'
+#' @source Digitized from Sharkiya daily weather records (2013–2015).
+#'
+#' @examples
+#' data(weather_egypt)
+#' head(weather_egypt)
+"weather_egypt"

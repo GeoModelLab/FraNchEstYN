@@ -1,20 +1,20 @@
 {
   "settings": {
     "startYear": 2012,
-    "endYear": 2014,
+    "endYear": 2015,
     "sites": [
-      "Hossana"
+      "Sharkiya"
     ],
-    "isCalibration": "false",
-    "calibrationVariable": "none",
+    "isCalibration": "true",
+    "calibrationVariable": "crop",
     "varieties": [
       "Generic"
     ],
     "cropModel": "no",
     "simplexes": 3,
     "disease": "thisDisease",
-    "iterations": 999,
-    "weatherTimeStep": "hourly"
+    "iterations": 333,
+    "weatherTimeStep": "daily"
   },
   "paths": {
     "weatherDir": "C:\\Program Files\\R\\R-4.4.2\\library\\FraNchEstYN\\bin\\files\\weather",

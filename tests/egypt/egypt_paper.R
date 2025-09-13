@@ -1,62 +1,15 @@
+# Remove objects from the Global Environment----
+rm(list=ls())
+
+#libraries
 library(tidyverse)
 library(FraNchEstYN)
 
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
-#weather data
-# weather_data <- nasapower::get_power(
-#     community     = "ag",
-#     lonlat        = c(31.5145167, 30.6150167),
-#     dates         = c(paste0(2013, '-01-01'),
-#                       paste0(2015, '-12-31')),
-#     temporal_api  = "hourly",
-#     pars          = c("T2M", "RH2M", "PRECTOTCORR")
-#   ) %>%
-#     rename(Temp = T2M,rh = RH2M, RAIN = PRECTOTCORR) %>%
-#     mutate(
-#          year  = YEAR,
-#          month = MO,
-#          day   = DY,
-#          hour = HR,
-#          site = 'Sharkiya'
-#        ) %>%
-#        select(site, Temp, rh, RAIN, year, month, day, hour)
-#
-# write.csv(weather_data, file = 'SharkiyaWeather.csv')
-# Ra_MJ <- function(doy, lat_deg) {
-#   lat_rad <- lat_deg * pi / 180
-#   dr  <- 1 + 0.033 * cos(2 * pi / 365 * doy)           # inverse relative distance Earth-Sun
-#   delta <- 0.409 * sin(2 * pi / 365 * doy - 1.39)      # solar declination
-#   ws  <- acos(-tan(lat_rad) * tan(delta))              # sunset hour angle
-#   Gsc <- 0.0820                                        # MJ m^-2 min^-1
-#   Ra  <- (24 * 60 / pi) * Gsc * dr *
-#     (ws * sin(lat_rad) * sin(delta) + cos(lat_rad) * cos(delta) * sin(ws))
-#   return(Ra)  # MJ m^-2 day^-1
-# }
-#   weather_data <- nasapower::get_power(
-#     community     = "ag",
-#     lonlat        = c(31.5145167, 30.6150167),
-#     dates         = c(paste0(2013, '-01-01'),
-#                       paste0(2015, '-12-31')),
-#     temporal_api  = "daily",
-#     pars          = c("T2M_MAX", "T2M_MIN", "PRECTOTCORR")
-#   ) %>%
-#     rename(TMAX = T2M_MAX, TMIN = T2M_MIN,
-#            RAIN = PRECTOTCORR, DATE = YYYYMMDD) %>%
-#     mutate(
-#       year  = year(DATE),
-#       month = month(DATE),
-#       day   = day(DATE),                        # extraterrestrial radiation
-#       Site = 'Sharkiya'
-#     ) %>%
-#     select(Site, TMAX, TMIN, RAIN, year, month, day)
-#
-# write.csv(weather_data, file = "SharkiyaWeatherDaily.csv")
-
-weather_data<-read.csv('SharkiyaWeatherDaily.csv') |>
-  mutate(lat = 30.6150167)
-
-
+#load weather data
+weather_data<- weather_egypt
+#build management data
 management_data <- data.frame(
   crop        = c("wheat"),
   variety     = c("Generic"),
@@ -66,34 +19,35 @@ management_data <- data.frame(
   stringsAsFactors = FALSE
 )
 
-reference_data<-reference_egypt
+#load reference data and select the most susceptible variety
+reference_data<-reference_egypt |>
+  filter(variety == 'sids12')
 
+#load default wheat parameters
 thisCropParameters<-FraNchEstYN::cropParameters$wheat
-thisCropParameters$SlopeGrowth$min<-0.005
+#adjust cycle length limit
 thisCropParameters$CycleLength$min<-3000
 thisCropParameters$CycleLength$max<-4500
+thisCropParameters$FloweringStart$max<-60
 
-
+#load default yellow rust parameters
 thisDiseaseParam <- FraNchEstYN::diseaseParameters$yellow_rust
-start_year<-2012
-end_year<-2015
-iterations <- 1
-start_end<-c(start_year,end_year)
+#define sim start and end
+start_end<-c(2012,2015)
 
-thisReference_data<-reference_data |>
-  filter(variety=='sids12')
-
+#crop model calibration
 df<-FraNchEstYN::franchestyn(weather_data = weather_data,
                 management_data = management_data,
-                reference_data = thisReference_data,
+                reference_data = reference_data,
                 cropParameters = thisCropParameters,
                 diseaseParameters = thisDiseaseParam,
                 calibration="crop", #'all', 'crop', 'disease'
                 start_end = start_end,
-                iterations=999)
+                iterations=333)
 
 df$diagnostics$calibration$plots
 parameters<-df$diagnostics$calibration$plots
+options(scipen=999)
 outputs<-df$outputs$simulation
 metrics<-df$diagnostics$metrics
 
