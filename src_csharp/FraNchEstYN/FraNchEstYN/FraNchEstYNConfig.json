@@ -1,12 +1,12 @@
 {
   "settings": {
-    "startYear": 2012,
-    "endYear": 2015,
+    "startYear": 2023,
+    "endYear": 2024,
     "sites": [
-      "Sharkiya"
+      "Mantova"
     ],
-    "isCalibration": "true",
-    "calibrationVariable": "crop",
+    "isCalibration": "false",
+    "calibrationVariable": "none",
     "varieties": [
       "Generic"
     ],
@@ -14,7 +14,7 @@
     "simplexes": 3,
     "disease": "thisDisease",
     "iterations": 333,
-    "weatherTimeStep": "daily"
+    "weatherTimeStep": "hourly"
   },
   "paths": {
     "weatherDir": "C:\\Program Files\\R\\R-4.4.2\\library\\FraNchEstYN\\bin\\files\\weather",

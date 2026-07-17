@@ -249,105 +249,69 @@ plot_df <- final_outputs_joined %>%
   )
 
 
-ggplot(plot_df |> filter(planting_period%in%c(1,2,3,4,5,6,7,8,9,10,11,12)), aes(x = Doy)) +
-  # healthy interception as area
-  stat_summary(geom='area',aes(y = LightIntHealthy, fill = "Healthy interception"),
-            alpha = 0.3, na.rm = TRUE) +
-  # light interception
-  geom_line(aes(y = LightInterception, colour = "Light interception"),linewidth = 0.5) +
-  # disease severity
-  geom_line(aes(y = DiseaseSeverity, colour = "Disease severity"),linewidth = 0.5) +
-  geom_point(aes(y = DisSev/100, fill = "Disease severity"),
-             shape = 21, size = 2, stroke = 0.2, na.rm = TRUE) +
-  # yield
-  geom_line(aes(y = YieldActual / yield_scale, colour = "Yield"),
-            linewidth = 0.4, na.rm = TRUE) +
-  geom_point(aes(y = Yield / yield_scale, colour = "Yield"),
-             shape = 22, size = 2, stroke = 0.2, na.rm = TRUE) +
-  facet_grid(GrowingSeason~ planting_period,
-             scales = "free_x") +
+ggplot(plot_df |> filter(planting_period %in% 1:12),
+       aes(x = Doy)) +
+
+  # --- canopy and interception ---
+  geom_line(aes(y = LightInterception, color = "Attainable light interception"),
+            size = 0.5, linetype = 2) +
+  geom_line(aes(y = LightIntHealthy, color = "Actual light interception"),
+            size = 0.5) +
+
+  # --- disease severity ---
+  geom_line(aes(y = DiseaseSeverity, color = "Disease severity"), size = 0.5) +
+  geom_point(aes(y = DisSev/100, color = "Reference disease severity"),
+             shape = 21, fill='blue',size = 2, na.rm = TRUE) +
+
+  # --- yield (secondary axis) ---
+  geom_line(aes(y = YieldActual / yield_scale, color = "Simulated actual yield"),
+            size = 0.5) +
+  geom_point(aes(y = Yield / yield_scale, color = "Reference actual yield"),
+             shape = 21,fill='red', size = 2, na.rm = TRUE) +
+
+  facet_grid(GrowingSeason ~ planting_period, scales = "free_x") +
+
+  # --- y-axis with dual scaling ---
   scale_y_continuous(
     name = "Disease severity / Light interception (0–1)",
-    sec.axis = sec_axis(~ . * yield_scale, name = "Yield (kg/ha)")
+    sec.axis = sec_axis(~ . * yield_scale,
+                        name = expression("Yield (kg ha"^{-1}*")"))
   ) +
+
+  # --- x-axis in DOY with months ---
   scale_x_continuous(
     breaks = seq(0, 366, by = 45),
     labels = function(x) month.abb[ceiling(x/45)],
     expand = c(0.1, 0.1)
   ) +
-  scale_colour_manual(
-    name = NULL,
-    values = c("Disease severity" = "blue",
-               "Yield" = "black",
-               "Light interception" = "darkgreen")
-  ) +
-  scale_fill_manual(
-    name = NULL,
-    values = c("Disease severity" = "blue",
-               "Yield" = "black",
-               "Healthy interception" = "green3")
-  ) +
-  theme_classic(base_size = 12) +
-  theme(
-    strip.background = element_rect(fill = "white", colour = "grey80"),
-    strip.placement = "outside",
-    strip.text = element_text(size = 10),
-    legend.position = "top",
-    panel.spacing.x = unit(0.1, "lines"),
-    axis.text.x = element_text(size = 8),
-    axis.text.x.top = element_blank(),
-    axis.ticks.x.top = element_blank()
-  ) +
-  xlab("")
 
+  # --- legend styling ---
+  scale_color_manual(
+    name = "",
+    values = c(
+      "Attainable light interception" = "darkgreen",
+      "Actual light interception"     = "forestgreen",
+      "Disease severity"              = "blue",
+      "Reference disease severity"    = "blue",
+      "Simulated actual yield"        = "red",
+      "Reference actual yield"        = "red"
+    )
+  ) +
 
-ggplot(plot_df |> filter(planting_period%in%c(1,2,3,4,5,6,7,8,9,10,11,12)), aes(x = Doy)) +
-  # healthy interception as area
-  stat_summary(geom='area',aes(y = LightIntHealthy, fill = "Healthy interception"),
-               alpha = 0.3, na.rm = TRUE) +
-  # light interception
-  stat_summary(aes(y = LightInterception, colour = "Light interception"),linewidth = 0.5) +
-  # disease severity
-  stat_summary(geom='line',aes(y = DiseaseSeverity, colour = "Disease severity"),linewidth = 0.5) +
-  stat_summary(geom='point',aes(y = DisSev/100, fill = "Disease severity"),
-             shape = 21, size = 1, stroke = 0.2, na.rm = TRUE) +
-  # yield
-  stat_summary(geom='line',aes(y = YieldActual / yield_scale, colour = "Yield"),
-            linewidth = 0.4, na.rm = TRUE) +
-  stat_summary(geom='point',aes(y = Yield / yield_scale, colour = "Yield"),
-             shape = 22, size = 1, stroke = 0.2, na.rm = TRUE) +
-  facet_wrap(~ planting_period, ncol=4,
-             scales = "free_x") +
-  scale_y_continuous(
-    name = "Disease severity / Light interception (0–1)",
-    sec.axis = sec_axis(~ . * yield_scale, name = "Yield (kg/ha)")
-  ) +
-  scale_x_continuous(
-    breaks = seq(0, 366, by = 45),
-    labels = function(x) month.abb[ceiling(x/45)],
-    expand = c(0.1, 0.1)
-  ) +
-  scale_colour_manual(
-    name = NULL,
-    values = c("Disease severity" = "blue",
-               "Yield" = "black",
-               "Light interception" = "darkgreen")
-  ) +
-  scale_fill_manual(
-    name = NULL,
-    values = c("Disease severity" = "blue",
-               "Yield" = "black",
-               "Healthy interception" = "green3")
-  ) +
-  theme_classic(base_size = 12) +
+  labs(x = "", color = "Variables") +
+
+  theme_minimal(base_size = 14) +
   theme(
-    strip.background = element_rect(fill = "white", colour = "grey80"),
-    strip.placement = "outside",
-    strip.text = element_text(size = 10),
-    legend.position = "top",
-    panel.spacing.x = unit(0.1, "lines"),
-    axis.text.x = element_text(size = 8),
-    axis.text.x.top = element_blank(),
-    axis.ticks.x.top = element_blank()
-  ) +
-  xlab("")
+    legend.position = "bottom",
+    legend.box = "horizontal",
+    strip.text = element_text(face = "bold", size = 9),
+    axis.text.x = element_text(size = 11, angle = 45, hjust = 1),
+    panel.grid.major     = element_blank(),
+    panel.grid.minor     = element_blank(),
+    axis.title.y         = element_text(size = 12),
+    axis.text.y          = element_text(size = 12),       # left axis title size
+    axis.title.y.right = element_text(size = 11,angle=90),    # right axis title size
+    strip.text.x = element_text(size=12), # right axis text size
+    legend.text = element_text(size = 13)
+  )
+ggsave('figure3.png',height=8,width=11)

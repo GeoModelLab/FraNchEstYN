@@ -202,6 +202,7 @@ public class weatherReader
             string[] precA = { "prec", "precip", "precipitation", "prectotcorr", "rain", "rainfall" };
             string[] rhA = { "rh", "humidity", "relhumidity", "relativehumidity" };
             string[] radA = { "rad", "radiation", "solar", "solarrad" };
+            string[] lwA = { "lw", "leafWetness", "leaf_wet"};
             string[] latA = { "latitude", "lat" };
 
             // Either Y/M/D/H or Date/H must be present
@@ -225,6 +226,7 @@ public class weatherReader
             int rhIdx = GetIdx(normCols, rhA, optional: true);
             int radIdx = GetIdx(normCols, radA, optional: true);
             int latIdx = GetIdx(normCols, latA, optional: true);
+            int lwIDx = GetIdx(normCols, lwA, optional: true);  
 
             // File-level guard: we need either hourly Rad or a Latitude to estimate it
             if (radIdx < 0 && latIdx < 0)
@@ -291,6 +293,7 @@ public class weatherReader
                 }
 
                 // Radiation: keep if provided; otherwise 0 for now (to be backfilled per day if possible)
+                
                 gw.rad = (radIdx >= 0 && TryParseFloat(RemoveQuotes(line[radIdx]), out float radh)) ? radh : 0f;
 
                 // Latitude (required later for radiation estimation if rad is missing)
@@ -298,7 +301,14 @@ public class weatherReader
                     gw.latitude = lat;
 
                 // Leaf wetness: simple rule combining high RH and/or measurable precipitation
-                gw.leafWetness = (gw.relativeHumidity > 90f || gw.precipitation >= 0.2f) ? 1 : 0;
+                if (lwIDx >= 0 && TryParseFloat(RemoveQuotes(line[lwIDx]), out float lw))
+                {
+                    gw.leafWetness = lw;
+                }
+                else
+                {
+                    gw.leafWetness = (gw.relativeHumidity > 90f || gw.precipitation >= 0.2f) ? 1 : 0;
+                }
 
                 // Group by calendar day for possible per-day radiation estimation
                 DateTime dayKey = ts.Date;
@@ -343,7 +353,7 @@ public class weatherReader
                     rec.rad = rd.gsrHourly[h];
 
                 // Re-evaluate leaf wetness after radiation fill (keeps the same rule)
-                rec.leafWetness = (rec.relativeHumidity > 90f || rec.precipitation >= 0.2f) ? 1 : 0;
+                //rec.leafWetness = (rec.relativeHumidity > 90f || rec.precipitation >= 0.2f) ? 1 : 0;
 
                 // Store the hourly record if not already present
                 if (!gridWeathersHourly.ContainsKey(rec.date))

@@ -1,9 +1,9 @@
 {
   "settings": {
-    "startYear": 2012,
-    "endYear": 2014,
+    "startYear": 2023,
+    "endYear": 2024,
     "sites": [
-      "Hossana"
+      "Mantova"
     ],
     "isCalibration": "false",
     "calibrationVariable": "none",
@@ -13,7 +13,7 @@
     "cropModel": "no",
     "simplexes": 3,
     "disease": "thisDisease",
-    "iterations": 999,
+    "iterations": 333,
     "weatherTimeStep": "hourly"
   },
   "paths": {

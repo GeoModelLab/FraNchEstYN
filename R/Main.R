@@ -1037,6 +1037,11 @@ franchestyn <- function(weather_data,
       updatedCropParameters <- NULL
     }
 
+    # If we're calibrating 'disease' only, ignore crop parameters
+    if (tolower(calibrationModel) == "crop") {
+      updatedDiseaseParameters <- NULL
+    }
+
     ## ---- flatten helpers ----------------------------------------------------
     .is_param_leaf <- function(x) {
       is.list(x) && all(c("min","max","value","calibration") %in% names(x))

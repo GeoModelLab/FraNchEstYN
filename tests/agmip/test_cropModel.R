@@ -17,7 +17,7 @@ reference_data<-NULL
 cropParameters<-NULL
 thisDiseaseParam <- FraNchEstYN::diseaseParameters$brown_rust
 
-start_end = c(1980,1985)
+start_end = c(1980,2010)
 
 df<-franchestyn(weather_data = weather_data,
                 cropModel_data = cropModel_data,
@@ -44,7 +44,7 @@ ggplot(outputs, aes(x=as.Date(Date,format='%m/%d/%Y'))) +
 
 #change some disease parameters
 thisDiseaseParam<-diseaseParameters$brown_rust
-thisDiseaseParam$OuterInoculumMax$value<-0.08
+thisDiseaseParam$OuterInoculumMax$value<-0.02
 thisDiseaseParam$OuterInoculumShapeRelease$value<-1
 #change some damage mechanisms
 thisDiseaseParam$RUEreducerDamage$value<-0.1

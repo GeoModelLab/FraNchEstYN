@@ -238,68 +238,91 @@ sim$fungicide <- factor(
   labels = c("no treat", "2 treat", "3 treat", "7 treat")  # new names
 )
 
-#ggplot(sim, aes(x = as.Date(Date,format='%m/%d/%Y'))) +
-ggplot(sim, aes(x = DaysAfterSowing)) +
-  # light interception
-  geom_line(aes(y = LightIntHealthy, colour = "Light interception (healthy)"),
-            alpha = 1, na.rm = TRUE) +
-  geom_line(aes(y = LightInterception, colour = "Light interception (diseased)"),
-            linewidth = 0.5, linetype = 2, na.rm = TRUE) +
-  # disease severity
-  geom_line(aes(y = FungicideEfficacy, colour = "Fungicide efficacy"),
-            linewidth = 0.4, na.rm = TRUE) +
-  geom_area(aes(y = FungicideEfficacy, fill = "Fungicide efficacy"),
-            alpha = 0.5, na.rm = TRUE) +
-  geom_line(aes(y = DiseaseSeverity, colour = "Disease severity"),
-            linewidth = 0.8, na.rm = TRUE) +
-  geom_point(aes(y = DiseaseSeverityRef, colour = "Disease severity"),
-             shape = 21, size = 2.5, stroke = 0.2, na.rm = TRUE) +
-  # yield
-  geom_line(aes(y = YieldAttainable / yield_scale, colour = "Yield attainable"),
-            linewidth = 0.4, linetype=2,na.rm = TRUE) +
-  geom_point(aes(y = YieldRef / yield_scale, colour = "Yield attainable"),
-             shape = 22, size = 2.3, stroke = 0.2, na.rm = TRUE) +
-  geom_line(aes(y = YieldActual / yield_scale, colour = "Yield actual"),
-            linewidth = 0.8, na.rm = TRUE) +
-  geom_point(aes(y = YieldActualRef / yield_scale, colour = "Yield actual"),
-             shape = 21, size = 2.3, alpha = 0.5, stroke = 0.2, na.rm = TRUE) +
 
-  # axis scales
+# Assumes:
+#   sim : tidy daily outputs (one row/day) with columns
+#         DaysAfterSowing, LightIntHealthy, LightInterception,
+#         DiseaseSeverity, DiseaseSeverityRef,
+#         FungicideEfficacy, YieldAttainable, YieldActual,
+#         YieldRef, YieldActualRef, Site, variety, fungicide
+#   yield_scale : numeric (e.g., 6000) to map yield to the left axis (0–1)
+
+ggplot(sim, aes(x = DaysAfterSowing)) +
+  # --- crop canopy / interception ---
+  geom_line(aes(y = LightIntHealthy,     colour = "Actual light interception"), linewidth = 0.6) +
+  geom_line(aes(y = LightInterception,   colour = "Attainable light interception"),
+            linewidth = 0.5, linetype = 2) +
+
+  # --- disease & fungicide ---
+  geom_area(aes(y = FungicideEfficacy, fill   = "Fungicide efficacy"), alpha = 0.35) +
+  geom_line(aes(y = FungicideEfficacy, colour = "Fungicide efficacy"), linewidth = 0.5) +
+  geom_line(aes(y = DiseaseSeverity, colour = "Disease severity"), linewidth = 0.8) +
+  geom_point(aes(y = DiseaseSeverityRef, colour = "Reference disease severity"),
+             shape = 21, size = 2.2, stroke = 0.25, na.rm = TRUE) +
+
+  # --- yield on secondary axis ---
+  geom_line(aes(y = YieldAttainable / yield_scale, colour = "Simulated attainable yield"),
+            linewidth = 0.5, linetype = 2, na.rm = TRUE) +
+  geom_point(aes(y = YieldRef / yield_scale, colour = "Reference attainable yield"),
+             shape = 4, size = 2, stroke = 0.3, na.rm = TRUE) +
+  geom_line(aes(y = YieldActual / yield_scale, colour = "Simulated actual yield"),
+            linewidth = 0.8, na.rm = TRUE) +
+  geom_point(aes(y = YieldActualRef / yield_scale, colour = "Reference actual yield"),
+             shape = 4, size = 2, stroke = 0.3, na.rm = TRUE) +
+
+  # --- facets & axes ---
+  facet_grid(variety ~ Site + fungicide, switch = "y") +
   scale_y_continuous(
-    name = "Disease severity / Light interception (0–1)",
-    sec.axis = sec_axis(~ . * yield_scale, name = "Yield (kg/ha)")
+    name    = "Disease severity / Light interception (0–1)",
+    sec.axis = sec_axis(~ . * yield_scale, name = expression("Yield (kg ha"^{-1}*")"))
   ) +
 
-  # manual legend
+  # --- unified color/fill scales (same palette used in other figures) ---
   scale_colour_manual(
-    name = "Variables",
+    name = NULL,
     values = c(
-      "Light interception (healthy)" = "green",
-      "Light interception (diseased)" = "black",
-      "Fungicide efficacy" = "gold3",
-      "Disease severity" = "darkslateblue",
-      "Yield attainable" = "red",
-      "Yield actual" = "red"
+      "Attainable light interception" = "green4",
+      "Actual light interception"     = "green4",
+      "Disease severity"              = "darkslateblue",
+      "Reference disease severity"    = "darkslateblue",
+      "Fungicide efficacy"            = "goldenrod3",
+      "Simulated attainable yield"    = "grey40",
+      "Reference attainable yield"    = "grey40",
+      "Simulated actual yield"        = "red3",
+      "Reference actual yield"        = "red3"
     )
   ) +
   scale_fill_manual(
-    name = "Area variables",
-    values = c("Fungicide efficacy" = "gold3")
+    name = NULL,
+    values = c("Fungicide efficacy" = "goldenrod3")
   ) +
 
-  facet_grid(variety ~ Site + fungicide, switch = "y") +  # strip labels on the right
-
-  theme_classic(base_size = 12) +
+  labs(x = "Days after sowing") +
+  theme_minimal(base_size = 12) +
   theme(
-    strip.background = element_rect(fill = "white", colour = "grey80"),
-    strip.placement = "outside",
-    strip.text = element_text(size = 10),
-    strip.switch.pad.grid = unit(0.1, "lines"),
-    legend.position = "top",
-    panel.spacing.x = unit(0.1, "lines"),
-    axis.text.x = element_text(size = 8),
-    axis.text.x.top = element_blank(),
-    axis.ticks.x.top = element_blank()
-  ) +
-  xlab("")
+    legend.position        = "bottom",
+    legend.box             = "horizontal",
+    legend.key.height      = unit(0.35, "cm"),
+    legend.key.width       = unit(0.9,  "cm"),
+    legend.text = element_text(size = 13),
+    strip.background       = element_rect(fill = "white", colour = "grey80"),
+    strip.placement        = "outside",
+    strip.text             = element_text(size = 13),
+    panel.spacing.x        = unit(0.12, "lines"),
+    axis.text.x.top        = element_blank(),
+    axis.ticks.x.top       = element_blank(),
+    panel.grid.major     = element_blank(),
+    panel.grid.minor     = element_blank(),
+    axis.title.x         = element_text(size = 13),
+    axis.title.y         = element_text(size = 13),
+    axis.title.y.right = element_text(size = 13,angle=90),    # right axis title size
+    axis.text.y          = element_text(size = 11),
+    axis.text.x          = element_text(size = 11)
+  )+
+  guides(
+    colour = guide_legend(ncol = 2, byrow = TRUE),   # wrap legend in 2 rows
+    fill   = guide_legend(ncol = 2, byrow = TRUE)
+  )
+ggsave('figure4.png',height=7,width=10)
+
 
