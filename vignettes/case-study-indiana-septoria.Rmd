@@ -5,7 +5,7 @@ vignette: >
   %\VignetteIndexEntry{Septoria on wheat in Indiana}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-css: vignette.css   # <--- add this line
+css: vignette.css
 ---
 
 <style>
@@ -85,14 +85,13 @@ kable(
 
 ## ⚙️ Parameters
 
-In FraNchEstYN, **crop** and **disease** processes are controlled by parameter sets referred to  physiological and epidemiological traits.  
+In FraNchEstYN, **crop** and **disease** processes are controlled by parameter sets describing physiological and epidemiological traits.  
 
 In this vignette we are only interested in **canopy light interception and disease severity**, not yield formation.
 
 - For wheat: start from defaults, disable calibration of traits unrelated to light interception, and keep canopy dynamics active.
 
 - For Septoria: start from defaults, and disable calibration of yield-loss damage mechanisms.
-Therefore, we:
 
 ```{r parameters}
 # Load default parameters for wheat
@@ -104,7 +103,8 @@ thisCropParam <- set_calibration_flags(
   disable = c("PartitioningMaximum",
               "TbaseCrop", "TmaxCrop", "ToptCrop",
               "FloweringStart",
-              "RadiationUseEfficiency")
+              "RadiationUseEfficiency",
+              "CycleLength", "HalfIntSenescence")
 )
 
 # Load default parameters for Septoria
@@ -116,8 +116,11 @@ thisDiseaseParam <- set_calibration_flags(
   disable = c("RUEreducerDamage",
               "LightStealerDamage",
               "SenescenceAcceleratorDamage",
-              "AssimilateSappersDamage")
+              "AssimilateSappersDamage",
+              "Topt", "Tmax",
+              "RelativeHumidityCritical", "RelativeHumidityNotLimiting")
 )
+thisDiseaseParam$OuterInoculumShapeRelease$value <- 2
 ```
 
 ## 🔧 Calibration model call
@@ -127,19 +130,20 @@ engine**. Here we fit both crop and disease model parameters simultaneously,
 using the Indiana datasets.
 
 Key settings:
-- **start_end**: simulation period (1971–1992 in this example)  
+
+- **start_end**: simulation period (1971–1991, as in the article)  
 - **api_key**: required for external API calls, but *not used here*  
 - **franchy_message**: set to `FALSE` to silence fun messages 😉  
-- **iterations**: number of optimization iterations (`666` here, the devil’s number 👹)  
+- **iterations**: number of optimization iterations (`999`, as in the article)  
 - **calibration**: scope of calibration (`"all"` means crop + disease)  
 
 This returns a model object df containing diagnostics, parameters, and simulation outputs.
 
 ```{r calibration, eval=T, echo=TRUE, message=FALSE, warning=FALSE, results='hide'}
-start_end <- c(1971, 1992)
+start_end <- c(1971, 1991)
 api_key <- "xxx"         # not used here for LLM
 franchy_message <- FALSE
-iterations <- 100        # the more iterations, the longer it takes but results are safer
+iterations <- 999        # as in the article; the more iterations, the safer the results
 calibration <- "all"     # calibrate both crop and disease
 
 df <- franchestyn(
@@ -166,9 +170,9 @@ Plots show parameter ranges, defaults, and calibrated values:
 - 🔵 **Blue vertical line** = default value  
 - 🔴 **Red dot** = calibrated value (if calibration was enabled)  
 
-Note: crop parameters here remain at defaults (blue line only), while disease parameters include calibrated values.
+Note: only the crop parameters controlling canopy light interception are calibrated; all other crop parameters remain at their defaults (blue line only).
 
-```{r diagnostics, eval=T,fig.width =10, fig.height=7}
+```{r diagnostics, eval=T,fig.width =10, fig.height=7, fig.alt=c("Parameter ranges, default values and calibrated values for the wheat crop parameters in Indiana", "Parameter ranges, default values and calibrated values for the Septoria disease parameters in Indiana")}
 df$diagnostics$calibration$plots$crop
 df$diagnostics$calibration$plots$disease
 ```
@@ -184,7 +188,27 @@ metrics_ds <- df$diagnostics$metrics %>%
   arrange(GrowingSeason) %>%
   mutate(across(where(is.numeric), ~round(.x, 3)))
 
-# Overall row (mean across seasons; n is total obs)
+# Overall row: all observations pooled across seasons
+sim_obs <- df$outputs$simulation %>%
+  filter(!is.na(as.numeric(DiseaseSeverityRef))) %>%
+  transmute(obs = as.numeric(DiseaseSeverityRef), sim = DiseaseSeverity)
+
+overall <- with(sim_obs, tibble(
+  GrowingSeason = "Overall",
+  n    = length(obs),
+  Bias = mean(sim - obs),
+  MAE  = mean(abs(sim - obs)),
+  RMSE = sqrt(mean((sim - obs)^2)),
+  r    = cor(obs, sim),
+  R2   = cor(obs, sim)^2,
+  NSE  = 1 - sum((obs - sim)^2) / sum((obs - mean(obs))^2)
+)) %>%
+  mutate(across(where(is.numeric), ~round(.x, 3)))
+
+metrics_ds <- bind_rows(
+  metrics_ds %>% mutate(GrowingSeason = as.character(GrowingSeason)),
+  overall
+)
 
 kable(metrics_ds,
       caption = "Calibration metrics for disease severity (DisSev)",
@@ -198,6 +222,9 @@ kable(metrics_ds,
 
 ### 🗂️ Season summary
 A compact table of disease severity outcomes for each growing season: final severity, peak, timing, and area-under-curve.
+In all model outputs, `GrowingSeason` is the **sowing** year: season 1972 is the
+crop sown in autumn 1972 and harvested in 1973 (the year used in
+`reference_indiana` and in the article).
 ```{r summary-table, echo=FALSE, message=FALSE, warning=FALSE}
 summary <- df$outputs$summary
 
@@ -211,7 +238,7 @@ summary %>%
 
 ### 🗺️️ Multi-season overview (static)
 Facetted plots across seasons showing dynamics of inoculum, latent and sporulating tissue, canopy light interception, and disease severity vs. observations.
-```{r chart1, echo=FALSE, message=FALSE, warning=FALSE,fig.width =10, fig.height=7}
+```{r chart1, echo=FALSE, message=FALSE, warning=FALSE,fig.width =10, fig.height=7, fig.alt="Simulated and observed Septoria tritici blotch severity, inoculum, latent and sporulating tissue and canopy light interception for each growing season in Indiana, 1971 to 1991"}
 outputs <- df$outputs$simulation
 
 ggplot(outputs, aes(x = as.Date(Date, format = "%m/%d/%Y"))) +
@@ -251,9 +278,9 @@ ggplot(outputs, aes(x = as.Date(Date, format = "%m/%d/%Y"))) +
 ```
 
 
-### 🎯 1972 deep-dive (interactive)
-An interactive plot of the 1972 season lets us hover over state variables and observed values.
-```{r chart2, echo=FALSE, message=FALSE, warning=FALSE,fig.width =10, fig.height=7}
+### 🎯 1972–73 deep-dive (interactive)
+An interactive plot of the 1972–73 season (sown in autumn 1972, observed and harvested in 1973) lets us hover over state variables and observed values.
+```{r chart2, echo=FALSE, message=FALSE, warning=FALSE,fig.width =10, fig.height=7, fig.alt="Interactive plot of simulated and observed Septoria severity and canopy light interception in Indiana for the 1972 season"}
 season_outputs <- outputs %>% dplyr::filter(GrowingSeason == 1972)
 
 p <- ggplot(season_outputs, aes(x = as.Date(Date, format = "%m/%d/%Y"))) +
@@ -271,7 +298,7 @@ p <- ggplot(season_outputs, aes(x = as.Date(Date, format = "%m/%d/%Y"))) +
              shape = 21, size = 3) +
   labs(
     x = "Date", y = "State variable / Severity",
-    title = "1972 Season",
+    title = "1972–73 season (GrowingSeason = 1972)",
     color = "Legend", fill = "Legend"
   ) +
   scale_fill_manual(values = c(
@@ -309,6 +336,30 @@ plotly::ggplotly(p) %>%
 
 ```
 
+
+## 🔄 Leave-one-out cross-validation (LOOCV)
+
+This vignette runs the full-dataset calibration only. The article also reports
+a leave-one-season-out cross-validation over the 19 growing seasons with
+observations (sown 1972–1990, harvested 1973–1991): each season is withheld in
+turn, the model is calibrated on the remaining 18 seasons (333 iterations per
+fold) and the withheld season is then predicted with calibration switched off.
+
+Note that in `reference_indiana` the column `year` is the **harvest** year,
+whereas simulation outputs are labelled by `GrowingSeason` (the **sowing**
+year). When withholding a season, remove the reference rows with
+`year == GrowingSeason + 1`.
+
+The four disease parameters fixed above (`Topt`, `Tmax`,
+`RelativeHumidityCritical`, `RelativeHumidityNotLimiting`), together with crop
+`CycleLength` and `HalfIntSenescence`, were identified in a preliminary LOOCV
+run as having negligible variability across folds (CV < 5%).
+
+LOOCV results (Willmott's d, Pearson r, RMSE, MBE) are shown in Figure 5 and
+discussed in Section 3.3.2 of the article. The LOOCV takes about 45 minutes and
+is not run here; the full script is available in the package repository
+(`tests/submission/revision/file analysis/indiana/indiana.R`).
+
 ## 📝 Key take-home messages
 
 - FraNchEstYN successfully calibrated disease severity for Septoria tritici in Indiana across two decades of observations.
@@ -328,11 +379,9 @@ This vignette showed how to calibrate Septoria tritici blotch severity in Indian
 
 🎛️ Experiment with calibration scope:
 
-"all" → calibrate both crop and disease models
-
-"crop" or "disease" → focus on one component only
+- `"all"` → calibrate both crop and disease models
+- `"crop"` or `"disease"` → focus on one component only
 
 📊 Analyze uncertainty: increase the number of iterations or run multiple calibration replicates to assess stability of parameter estimates.
 
 🛠️ Extend the pipeline: integrate with your own management practices or link outputs to yield-loss models.
-.

@@ -1,0 +1,15 @@
+/* Wider layout: use more of the screen for text, plots and tables */
+@media (min-width: 1200px) {
+  .container, .container-lg, .container-xl, .container-xxl {
+    max-width: 1700px;
+  }
+}
+
+/* Main column wider, "On this page" sidebar narrower */
+@media (min-width: 768px) {
+  .row > main.col-md-9 { flex: 0 0 auto; width: 80%; }
+  .row > aside.col-md-3 { flex: 0 0 auto; width: 20%; }
+}
+
+/* Smaller font in wide tables */
+.table { font-size: 85%; }

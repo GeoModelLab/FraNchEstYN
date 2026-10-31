@@ -41,3 +41,4 @@
 ^.*\.Rproj$
 ^src_csharp/
 ^.*\.csv$
+^_to_delete$

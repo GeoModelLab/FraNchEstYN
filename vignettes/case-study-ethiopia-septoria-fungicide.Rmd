@@ -16,14 +16,14 @@ caption { white-space: nowrap; }
 
 ## 🎯 Goal
 
-This vignette demonstrates how to use **FraNchEstYN** to simulate yield losses under different fungicide treatment for *Septoria tritici* in Ethiopia, using data from fungicide trials on three varieties and two locations in 2012.  
+This vignette demonstrates how to use **FraNchEstYN** to simulate yield losses under different fungicide treatment for *Septoria tritici* in Ethiopia, using data from fungicide trials on three varieties at two locations (2012–2013).  
 
-The workflow has three main steps:
+The workflow has two main steps:
 
 1. **Crop and disease calibration**: adjust crop and disease parameters using the most susceptible variety.  
 2. **Adapt varietal resistance and fungicide scheduling**: simulate alternative fungicide schedules and varietal resistance levels.  
 
-Data are released with the package and were digitized from [trial reports](https://core.ac.uk/download/pdf/234661852.pdf) including weather (NASA POWER), reference disease observations, and management metadata.
+Reference disease and yield observations and management metadata were digitized from the [trial report](https://core.ac.uk/download/pdf/234661852.pdf) (Said and Hussien, 2016); hourly weather comes from NASA POWER. All datasets are released with the package.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
@@ -50,75 +50,95 @@ glimpse(weather_ethiopia)
 
 ## 📑 Disease and yield data
 
-Reference observations come from fungicide trials. We filter here for the Gambo variety in one site (Hossana
-) without fungicide (susceptible baseline). We will then apply the calibrated parameters on the other site (Agecha).
+Reference observations come from fungicide trials at two sites (Agecha and
+Hossana). As in the article, calibration uses the susceptible cultivar Gambo
+without fungicide at **both sites**. To pool the two sites into a single
+calibration run, the Hossana seasons are shifted forward by one year so that
+they do not overlap with the Agecha seasons; all sites are then labelled `"all"`.
 
 ```{r load_referencedata, include=T}
 data(reference_ethiopia)
 reference_data <- reference_ethiopia %>%
-  filter(variety == "Gambo", fungicide == "no", site == 'Hossana')
+  mutate(year = ifelse(site == "Hossana", year + 1, year),
+         site = "all") %>%
+  filter(variety == "Gambo", fungicide == "no") %>%
+  select(site, year, variety, DOY:YieldAttainable)
 head(reference_data)
 ```
 
 ## 🧰 Management data
 
-Basic management metadata (crop, sowing DOY, fungicide schedules) are included as management_ethiopia.
+Basic management metadata (crop, sowing DOY, fungicide schedules) are included
+as management_ethiopia. For calibration we use a single untreated schedule,
+valid for all years and for the pooled site.
 
 ```{r load_mandata, include=T}
 data(management_ethiopia)
-management_data<-management_ethiopia |> 
-  filter(site=='Hossana',fungicide=='no')
-
 head(management_ethiopia)
+
+management_data <- management_ethiopia |>
+  mutate(year = "all", site = "all") |>
+  slice_head() |>
+  select(-c(treatment, fungicide, variety))
 ```
 
 ## 🌾🦠 Step 1 — Crop and disease calibration
-We first calibrate crop parameters (cycle length, base/optimum temperature, RUE) together with key disease parameters for Septoria (senescence acceleration, light stealer damage).
-Calibration is performed on Gambo without fungicide.
+We first calibrate crop parameters (cycle length, flowering start and RUE; base and optimum temperatures are fixed) together with key disease parameters for Septoria (senescence acceleration, light stealer damage).
+Calibration is performed on the untreated Gambo plots of both sites.
 
 ```{r crop_disease_calib,  eval=TRUE, message=FALSE, warning=FALSE, results='hide'}
+# Crop: fixed cardinal temperatures and senescence; calibrate cycle length,
+# radiation use efficiency and flowering start (settings used in the article)
 thisCropParameters <- FraNchEstYN::disable_all_calibration(cropParameters$wheat)
-thisCropParameters$TbaseCrop$value <- 2
-thisCropParameters$ToptCrop$value  <- 21
-thisCropParameters$CycleLength$calibration <- TRUE
-thisCropParameters$CycleLength$min <- 2100
-thisCropParameters$CycleLength$max <- 2300
+thisCropParameters$TbaseCrop$value                    <- 2
+thisCropParameters$ToptCrop$value                     <- 21
+thisCropParameters$HalfIntSenescence$value            <- 90
+thisCropParameters$CycleLength$calibration            <- TRUE
+thisCropParameters$CycleLength$min                    <- 2100
+thisCropParameters$CycleLength$max                    <- 2200
 thisCropParameters$RadiationUseEfficiency$calibration <- TRUE
-thisCropParameters$HalfIntSenescence$value<-90
+thisCropParameters$FloweringStart$calibration         <- TRUE
+thisCropParameters$FloweringStart$min                 <- 45
 
+# Disease: Septoria defaults with the settings used in the article
 thisDiseaseParam <- diseaseParameters$septoria
+thisDiseaseParam$AssimilateSappersDamage$calibration     <- FALSE
+thisDiseaseParam$AssimilateSappersDamage$value           <- 0
 thisDiseaseParam$SenescenceAcceleratorDamage$calibration <- TRUE
-thisDiseaseParam$SenescenceAcceleratorDamage$max <- 0.1
-thisDiseaseParam$LightStealerDamage$min <- 0.1
-thisDiseaseParam$AssimilateSappersDamage$calibration<-F
-thisDiseaseParam$AssimilateSappersDamage$value<-0
-thisDiseaseParam$OuterInoculumShapeRelease$value<-1
-thisDiseaseParam$LightStealerDamage$min<-0
-thisDiseaseParam$LightStealerDamage$max<-.3
-thisDiseaseParam$HydroThermalTimeOnset$max<-5
-thisDiseaseParam$CyclePercentageOnset$max<-10
-thisDiseaseParam$CyclePercentageOnset$min<-0
+thisDiseaseParam$SenescenceAcceleratorDamage$max         <- 0.1
+thisDiseaseParam$OuterInoculumMax$min                    <- 0.06
+thisDiseaseParam$Topt$min                                <- 20
+thisDiseaseParam$OuterInoculumShapeRelease$value         <- 1
+thisDiseaseParam$LightStealerDamage$min                  <- 0
+thisDiseaseParam$LightStealerDamage$max                  <- 0.3
+thisDiseaseParam$HydroThermalTimeOnset$max               <- 5
+thisDiseaseParam$CyclePercentageOnset$max                <- 10
+thisDiseaseParam$CyclePercentageOnset$min                <- 0
+thisDiseaseParam$PathogenSpread$max                      <- 0.3
 
-
-weather_ethiopia_singlesite <- weather_ethiopia |> 
-  filter(Site =='Hossana')
+# Weather: same one-year shift for Hossana, pooled site, no 29 February in 2013
+weather_calib <- weather_ethiopia |>
+  mutate(YEAR = ifelse(Site == "Hossana", YEAR + 1, YEAR),
+         site = "all") |>
+  select(-Site) |>
+  filter(!(YEAR == 2013 & MO == 2 & DY == 29))
 
 df_calib <- franchestyn(
-  weather_data      = weather_ethiopia_singlesite,
+  weather_data      = weather_calib,
   management_data   = management_data,
   reference_data    = reference_data,
   cropParameters    = thisCropParameters,
   diseaseParameters = thisDiseaseParam,
   calibration       = "all",
-  start_end         = c(2012,2012),
+  start_end         = c(2012, 2014),
   iterations        = 999
 )
 
 sim <- df_calib$outputs$simulation
 ```
 
-## 📊 Plot after calibration (single site = Hossana)
-```{r plot_hossana,  eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.height=5}
+## 📊 Plot after calibration (Gambo, no fungicide, both sites)
+```{r plot_hossana,  eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.height=5, fig.alt="Simulated and observed Septoria severity, light interception and yield for untreated cultivar Gambo in Ethiopia after calibration, one panel per season"}
 yield_scale <- 4000
 
 ggplot(sim, aes(x = DaysAfterSowing)) +
@@ -179,13 +199,14 @@ ggplot(sim, aes(x = DaysAfterSowing)) +
     strip.text = element_text(size = 10),
     axis.text.x = element_text(size = 8)
   ) +
-  labs(title="Calibration on Hossana (Gambo, no fungicide)", x="")
+  labs(title="Calibration (Gambo, no fungicide; one panel per pooled season)", x="") +
+  facet_wrap(~ GrowingSeason)
 
 
 ```
 
-💊 Step 2 — Varietal resistance and fungicide schedules
-We now extend simulations to the other site (Agecha), all varieties (Gambo, Galama, Alidoro) and fungicide schedules (no, 2, 3, 7). Only Varietal Resistance is adjusted per cultivar, while fungicide efficacy is applied through parameterized protectant functions.
+## 💊 Step 2 — Varietal resistance and fungicide schedules
+We now simulate both sites, all varieties (Gambo, Galama, Alidoro) and fungicide schedules (no, 2, 3, 7) with the calibrated crop and disease parameters, without further calibration. As in the article, only varietal resistance differs between cultivars (Gambo = 0, Galama = 0.25, Alidoro = 0.5), and fungicide parameters are set a priori to the package defaults for a protectant fungicide.
 
 ```{r fungicide_calib,  eval=TRUE, message=FALSE, warning=FALSE, results='hide'}
 #calibrated parameters
@@ -196,50 +217,49 @@ calibDisease <- FraNchEstYN::disable_all_calibration(df_calib$parameters$disease
 # Initialize empty list to store all simulation outputs
 outputsSim <- list()
 
+# Fungicide: protectant; these are the package default values (fungicideParameters$protectant), set a priori as in the article
 fungicideParam <- FraNchEstYN::disable_all_calibration(FraNchEstYN::fungicideParameters$protectant)
-fungicideParam$TenacityFactor$value<-0.05
-fungicideParam$DegradationRate$value<-0.02
-fungicideParam$InitialEfficacy$value<-1
-fungicideParam$AShapeParameter$value<-3
-fungicideParam$BShapeParameter$value<-8
+fungicideParam$TenacityFactor$value  <- 0.05
+fungicideParam$DegradationRate$value <- 0.02
+fungicideParam$InitialEfficacy$value <- 1
+fungicideParam$AShapeParameter$value <- 3
+fungicideParam$BShapeParameter$value <- 8
 
-# 🔁 Loop over sites (e.g., Hossana, Agecha)
-for (s in unique(reference_ethiopia$site)) {
-  
+# Varietal resistance per cultivar (0 = susceptible)
+varietal_resistance <- c(Gambo = 0, Galama = 0.25, Alidoro = 0.5)
+
+# 🔁 Loop over management schedules (site × fungicide treatment)
+for (i in seq_len(nrow(management_ethiopia))) {
+  thisScheduling <- management_ethiopia[i, ]
+
   # 🔁 Loop over varieties (Gambo, Galama, Alidoro)
   for (var in unique(reference_ethiopia$variety)) {
-    
-    # 🔁 Loop over fungicide treatments (no, 2, 3, 7)
-    for (f in unique(management_ethiopia$fungicide)) {
-      
-      # Filter datasets for this site–variety–fungicide combination
-      ref_sub <- reference_ethiopia %>%
-        filter(site == s, variety == var, fungicide == f)   # observed disease + yield
-      man_sub <- management_ethiopia %>%
-        filter(site == s, fungicide == f)                   # management schedule
-      weather_sub <- weather_ethiopia %>%
-        filter(Site == s)                                   # weather for this site
-      
-      # Skip this combination if any dataset is missing
-      if (nrow(ref_sub) == 0 | nrow(man_sub) == 0 | nrow(weather_sub) == 0) next
-      
-      # Run simulation with FraNchEstYN
-      res <- franchestyn(
-        weather_data        = weather_sub,
-        management_data     = man_sub,
-        reference_data      = ref_sub,
-        cropParameters      = calibCrop,
-        diseaseParameters   = calibDisease,
-        fungicideParameters = fungicideParam,
-        calibration         = "none",   # no further calibration, just simulate
-        start_end           = c(2012,2012),
-      )
-      
-      # If simulation produced outputs, store them in the list
-      if (!is.null(res$outputs$simulation)) {
-        outputsSim[[paste(s, var, f, sep = "_")]] <- res$outputs$simulation %>%
-          mutate(site = s, variety = var, fungicide = f)  # tag outputs with metadata
-      }
+
+    calibCrop$VarietalResistance$value <- varietal_resistance[[var]]
+
+    # observed disease + yield for this site–variety–fungicide combination
+    ref_sub <- reference_ethiopia %>%
+      filter(site == thisScheduling$site, variety == var,
+             fungicide == thisScheduling$fungicide) %>%
+      select(-variety)
+
+    res <- franchestyn(
+      weather_data        = weather_ethiopia %>% filter(Site == thisScheduling$site),
+      management_data     = thisScheduling %>% select(-variety),
+      reference_data      = ref_sub,
+      cropParameters      = calibCrop,
+      diseaseParameters   = calibDisease,
+      fungicideParameters = fungicideParam,
+      calibration         = "none",   # no further calibration, just simulate
+      start_end           = c(2012, 2014)
+    )
+
+    # If simulation produced outputs, store them in the list
+    if (!is.null(res$outputs$simulation)) {
+      outputsSim[[paste(thisScheduling$site, var, thisScheduling$fungicide, sep = "_")]] <-
+        res$outputs$simulation %>%
+        mutate(site = thisScheduling$site, variety = var,
+               fungicide = thisScheduling$fungicide)
     }
   }
 }
@@ -249,9 +269,9 @@ sim_all <- bind_rows(outputsSim)
 
 ```
 
-📊 Plot after looping across sites, varieties, fungicides 
+### 📊 Simulations across sites, varieties and fungicide schedules
 
-```{r fungicide_plot,  eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=6}
+```{r fungicide_plot,  eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=6, fig.alt="Simulated and observed Septoria severity, fungicide efficacy and yield in Ethiopia by site, cultivar and fungicide schedule"}
 
 sim_all$fungicide <- factor(sim_all$fungicide,
   levels=c("no","2","3","7"),
@@ -329,7 +349,7 @@ ggplot(sim_all, aes(x = DaysAfterSowing)) +
 
 FraNchEstYN successfully reproduced Septoria epidemics and yield losses observed in Ethiopia fungicide trials.
 
-Calibration on the susceptible variety Gambo at Hossana provided a baseline that transferred well to Agecha and to other varieties.
+Calibration on the susceptible variety Gambo (untreated plots, both sites) provided a baseline that transferred well to the other varieties and to the fungicide schedules, which were never used in calibration.
 
 Varietal resistance and fungicide scheduling strongly influenced epidemic progress and yield protection, with more resistant varieties and intensive spray schedules delaying disease development and sustaining yields.
 

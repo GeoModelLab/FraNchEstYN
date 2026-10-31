@@ -19,8 +19,12 @@ navbar:
       text: "Reference"
       href: reference/index.html
     articles:
-      text: "Articles"
+      text: "Case studies"
       menu:
+        - text: "Quick start"
+          href: articles/quick-start.html
+        - text: "-------"
+        - text: "Case studies"
         - text: "Septoria on wheat in Indiana"
           href: articles/case-study-indiana-septoria.html
         - text: "Wheat blast on wheat in Brazil"
@@ -68,6 +72,7 @@ reference:
       - weather_indiana
       - reference_indiana
       - reference_egypt
+      - weather_egypt
       - reference_brazil
       - reference_ethiopia
       - weather_ethiopia
@@ -81,6 +86,10 @@ reference:
       - compute_error_metrics
 
 articles:
+  - title: "Quick start"
+    contents:
+      - quick-start
+
   - title: "Case studies"
     contents:
       - case-study-indiana-septoria

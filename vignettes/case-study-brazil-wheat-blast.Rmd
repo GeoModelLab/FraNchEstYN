@@ -20,15 +20,11 @@ This vignette demonstrates how to use **FraNchEstYN** to estimate wheat yield lo
 
 The workflow follows three progressive steps:
 
-1. Disease calibration: fit epidemiological parameters on a subset of planting periods.
-2. Parameter averaging: derive robust mean disease parameters across planting periods.
-3. Validation: apply averaged disease parameters to all planting periods, and compare simulated vs observed disease severity and yield.
+1. Calibration: fit crop and disease parameters on a subset of planting periods (1, 5 and 10).
+2. Parameter averaging: derive robust mean crop and disease parameters across planting periods.
+3. Validation: apply the averaged parameters to all planting periods, and compare simulated vs observed disease severity and yield.
 
-We start from an already published Brazil wheat parameter set (Santos et al. 2023), use open access EPAMIG experimental data across 12 sowing dates × 6 years, and weather from NASA POWER.
-
-We use open access EPAMIG experiments (12 sowing dates × 6 years for cultivar
-*BRILHANTE*), weather data from NASA POWER, and a published Brazil wheat parameter set
-(Santos *et al.* 2023).
+We start from the Brazil wheat parameter set bundled with the package (`cropParameters_brazil`), and use open-access EPAMIG experimental data (dos Santos *et al.*, 2023; 12 sowing dates × 6 years for cultivar *BRILHANTE*) with daily weather from NASA POWER.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
@@ -93,19 +89,25 @@ head(weather_data)
 
 ## 📑 Management and reference datasets
 For convenience, the package already includes the management and reference datasets, derived from the open-access EPAMIG wheat trials (cultivar BRILHANTE, multiple sowing dates and years).
-The original dataset is publicly available at [OSF repository](https://doi.org/10.1007/s10658-022-02614-7)
+The original experiments are described in [dos Santos *et al.* (2023)](https://doi.org/10.1007/s10658-022-02614-7).
 
 ```{r reference_loading}
 # comes with the package
 data("reference_brazil")
 data("management_brazil")
+
+# a single cultivar (BRILHANTE) is simulated: label it "Generic" so that
+# management, reference and crop parameters refer to the same variety
+reference_brazil  <- reference_brazil  |> mutate(variety = "Generic")
+management_brazil <- management_brazil |> mutate(variety = "Generic",
+                                                 site    = "Sertaozinho")
 ```
 
-A preview of their structure is shown in the vignette.
+A preview of their structure:
 ```{r showReference, echo=FALSE, message=FALSE, warning=FALSE}
 # quick check of structure + a tiny preview
-stopifnot(all(c("site","variety","year","DOY","disease","fint",
-                "yieldActual","yieldAttainable") %in% names(reference_egypt)))
+stopifnot(all(c("site","variety","year","doy","Disease","fint",
+                "yieldActual","planting_period") %in% names(reference_brazil)))
 
 kable(
   reference_brazil |>
@@ -115,8 +117,8 @@ kable(
 ) |> 
   kableExtra::kable_styling(full_width = FALSE, bootstrap_options = c("striped","condensed"))
 
-stopifnot(all(c("site","variety","year","DOY","disease","fint",
-                "yieldActual","yieldAttainable") %in% names(reference_egypt)))
+stopifnot(all(c("crop","variety","sowingDOY","year",
+                "planting_period") %in% names(management_brazil)))
 
 kable(
   management_brazil |>
@@ -127,97 +129,109 @@ kable(
   kableExtra::kable_styling(full_width = FALSE, bootstrap_options = c("striped","condensed"))
 ```
 
-## 🦠 Step 1 – Disease calibration on selected sowing dates
+## 🦠 Step 1 — Crop and disease calibration on selected sowing dates
 
-We start from already optimized crop parameters and disable crop calibration so only
-disease parameters are adjusted.
+As in the published analysis, crop and disease parameters are calibrated
+together (`calibration = "all"`) on three sowing dates, and the remaining
+sowing dates are kept for validation.
 
 👉 The idea is:
 
-- Select a subset of sowing dates (here planting periods 1, 3, 5, 7, 9, 11) for calibration.
+- Select a subset of sowing dates (planting periods 1, 5 and 10, as in the article) for calibration.
+- For the crop, calibrate only cycle length, flowering start and radiation use efficiency.
+- For wheat blast, start from the default parameters with the same settings used in the article.
 - Run franchestyn separately for each planting period.
-- Collect the estimated disease parameters from each run.
-- Compute mean and standard deviation across experiments.
-- Rebuild a consistent list-of-lists parameter set using the averaged values using the custom function in the package.
+- Collect the estimated crop and disease parameters from each run.
+- Average them across planting periods and rebuild consistent parameter sets.
 
 ```{r crop-calibration, eval=TRUE, message=FALSE, warning=FALSE, results='hide'}
 # --------------------------------------------------------------
-# 📌 Step 1: Disease calibration on selected sowing dates
+# 📌 Step 1: Crop + disease calibration on selected sowing dates
 # --------------------------------------------------------------
 
-# 1. Load a baseline crop parameter set for Brazil
-#    (already calibrated from literature, bundled as an .rds)
-data("cropParameters_brazil.rda")
+# 1. Load the Brazil wheat parameter set bundled with the package
+data("cropParameters_brazil")
 
-# 2. Disable calibration for crop parameters
-#    👉 we want to calibrate ONLY the disease model
-cropParameters_brazil <- FraNchEstYN::disable_all_calibration(cropParameters_brazil)
+# 2. Crop: calibrate only phenology and radiation use efficiency
+thisCropParam <- FraNchEstYN::disable_all_calibration(cropParameters_brazil)
+thisCropParam$CycleLength$calibration            <- TRUE
+thisCropParam$CycleLength$min                    <- 1500
+thisCropParam$CycleLength$max                    <- 2500
+thisCropParam$RadiationUseEfficiency$calibration <- TRUE
+thisCropParam$FloweringStart$calibration         <- TRUE
 
-#we load default parameters for wheat blast
-thisDiseaseParam<-diseaseParameters$wheat_blast
-thisDiseaseParam$AssimilateSappersDamage$calibration <- F
-thisDiseaseParam$AssimilateSappersDamage$value <- 0
+# 3. Disease: default wheat blast parameters, with the settings used in the article
+thisDiseaseParam <- diseaseParameters$wheat_blast
+thisDiseaseParam$SenescenceAcceleratorDamage$calibration <- FALSE
+thisDiseaseParam$SenescenceAcceleratorDamage$value       <- 0
+thisDiseaseParam$SenescenceAcceleratorDamage$max         <- 0.5
+thisDiseaseParam$LightStealerDamage$calibration          <- FALSE
+thisDiseaseParam$LightStealerDamage$value                <- 0
+thisDiseaseParam$AssimilateSappersDamage$value           <- 0
+thisDiseaseParam$AssimilateSappersDamage$calibration     <- TRUE
+thisDiseaseParam$CyclePercentageOnset$min                <- 20
+thisDiseaseParam$OuterInoculumShapeRelease$value         <- 1
+thisDiseaseParam$OuterInoculumShapeParameter$value       <- 0
+thisDiseaseParam$IsSplashBorne$value                     <- 0
 
-
-# 3. Define the study period
+# 4. Study period and calibration sowing dates
 start_end <- c(2011, 2020)
+pps <- c(1, 5, 10)
 
-# 4. Choose a subset of sowing dates ("planting periods") for calibration
-#    These are representative experiments used to estimate disease parameters.
-pps <- c(1, 3, 5, 7, 9, 11)
+all_parameters_crop    <- list()
+all_parameters_disease <- list()
 
-# Container for disease parameters from each planting period
-all_parameters <- list()
-
-# 5. Loop over each planting period in the calibration set
+# 5. Calibrate on each planting period
 for (pp in pps) {
-  
-  # --- Run the model ---
+
   df <- FraNchEstYN::franchestyn(
     weather_data      = weather_data,
     management_data   = management_brazil |> filter(planting_period == pp),
-    reference_data    = reference_brazil|> filter(planting_period == pp),
-    cropParameters    = cropParameters_brazil,
+    reference_data    = reference_brazil  |> filter(planting_period == pp),
+    cropParameters    = thisCropParam,
     diseaseParameters = thisDiseaseParam,
-    calibration       = "disease",  # focus calibration on epidemiology
+    calibration       = "all",     # crop + disease
     start_end         = start_end,
-    iterations        = 555         # MCMC iterations
+    iterations        = 999        # simplex iterations
   )
-  
-  # --- Extract disease parameters from this calibration run ---
-  disease_df <- parameters_to_df(df$parameters$disease)
-  
-  # --- Store results, tagging by planting period ---
-  all_parameters[[length(all_parameters) + 1]] <- disease_df %>%
-    mutate(planting_period = pp)
+
+  all_parameters_crop[[length(all_parameters_crop) + 1]] <-
+    parameters_to_df(df$parameters$crop) |> mutate(planting_period = pp)
+  all_parameters_disease[[length(all_parameters_disease) + 1]] <-
+    parameters_to_df(df$parameters$disease) |> mutate(planting_period = pp)
 }
 
-# 6. Merge all planting period calibrations into one dataframe
-parameters_df <- dplyr::bind_rows(all_parameters, .id = "run_id")
-
-
+# 6. Merge the calibrations from all planting periods
+parameters_df_crop <- dplyr::bind_rows(all_parameters_crop,    .id = "run_id")
+parameters_df      <- dplyr::bind_rows(all_parameters_disease, .id = "run_id")
 ```
 
 We then average across planting periods:
 ```{r param-average, eval=TRUE, message=FALSE, warning=FALSE, results='hide'}
-# 7. Summarise across planting periods
-#    👉 take the mean value, plus standard deviation and sample size
-param_summary <- parameters_df %>%
-  group_by(Parameter) %>%
-  summarise(
-    value    = mean(as.numeric(Value), na.rm = TRUE),
-    sd_value = sd(as.numeric(Value),   na.rm = TRUE),
-    n        = sum(!is.na(Value)),
-    .groups  = "drop"
-  )
+# 7. Mean, standard deviation and sample size across planting periods
+summarise_params <- function(x) {
+  x %>%
+    group_by(Parameter) %>%
+    summarise(
+      value    = mean(as.numeric(Value), na.rm = TRUE),
+      sd_value = sd(as.numeric(Value),   na.rm = TRUE),
+      n        = sum(!is.na(Value)),
+      .groups  = "drop"
+    )
+}
+param_summary_crop <- summarise_params(parameters_df_crop)
+param_summary      <- summarise_params(parameters_df)
 
-# 8. Rebuild a parameter list suitable for FraNchEstYN
-#    👉 use the averaged values, with a ±20% range
-calibDisease <- FraNchEstYN::df_to_parameters(param_summary, range_pct = 0.2)
+# 8. Rebuild parameter lists with the averaged values (±20% range)
+#    and switch calibration off for the validation runs
+calibCrop    <- FraNchEstYN::df_to_parameters(param_summary_crop, range_pct = 0.2) |>
+  FraNchEstYN::disable_all_calibration()
+calibDisease <- FraNchEstYN::df_to_parameters(param_summary, range_pct = 0.2) |>
+  FraNchEstYN::disable_all_calibration()
 ```
 
 
-This is the calibDisease df
+Snapshot of the averaged disease parameters (`calibDisease`):
 ```{r calibDisease_df, eval=TRUE, echo=F, message=FALSE, warning=FALSE}
 
 # --------------------------------------------------------------
@@ -235,7 +249,7 @@ calibDisease_df %>%
   kableExtra::kable_styling(full_width = FALSE, bootstrap_options = c("striped","condensed"))
 
 ```
-At this stage, calibDisease contains the epidemiological parameters averaged across multiple sowing dates. This reduces noise from single calibrations and provides a robust baseline for validation on the remaining experiments.
+At this stage, calibCrop and calibDisease contain the crop and epidemiological parameters averaged across the calibration sowing dates. This reduces noise from single calibrations and provides a robust baseline for validation on the remaining experiments.
 
 ## 🌾 Step 2 — Batch validation
 
@@ -244,7 +258,7 @@ We validate the averaged parameters across all sowing periods and years.
 The procedure is straightforward:
 
 1. **Loop across planting periods** recorded in the dataset.  
-2. **Run FraNchEstYN without further calibration**, using the averaged disease parameters (`calibDisease`).  
+2. **Run FraNchEstYN without further calibration**, using the averaged crop and disease parameters (`calibCrop`, `calibDisease`).  
 3. **Collect simulation outputs** for each planting period.  
 4. **Bind everything into one tibble** for further analysis and plotting.  
 
@@ -275,7 +289,7 @@ for (pp in pps) {
     weather_data      = weather_data,
     management_data   = thisManagementData,
     reference_data    = thisReferenceData,
-    cropParameters    = cropParameters_brazil,
+    cropParameters    = calibCrop,        # <- averaged crop parameters from Step 1
     diseaseParameters = calibDisease,   # <- calibrated parameters from Step 1
     calibration       = "none",         # <- pure validation, no fitting
     start_end         = c(2011, 2020)
@@ -299,7 +313,7 @@ for (pp in pps) {
 final_outputs <- dplyr::bind_rows(all_outputs, .id = "run_id")
 ```
 
-## 📊Step 3 — Validation against experiments
+## 📊 Step 3 — Validation against experiments
 
 In this final step we bring together the model simulations and the field
 observations from EPAMIG.  
@@ -320,7 +334,8 @@ epamig_data_plot <- reference_brazil |>
   )
 
 final_outputs_joined <- final_outputs |>
-  left_join(epamig_data_plot)
+  left_join(epamig_data_plot |> ungroup() |> select(-variety),
+            by = c("Year" = "year", "planting_period"))
 
 cols_to_keep_last <- c("DisSev", "Yield")
 
@@ -335,7 +350,7 @@ final_outputs_joined <- final_outputs_joined %>%
 
 ```
 
-## 🎨Visualization
+## 🎨 Visualization
 
 To compare simulations with experiments, we rescale yield onto the same axis (by dividing by a scaling factor) and facet the plot by year × planting experiment.
 
@@ -343,10 +358,10 @@ The final plot shows:
 
 - Healthy light interception (green area)
 - Simulated light interception (dark green line)
-- Disease severity (blue line, points, and error bars)
-- Grain yield (black line, points, and error bars, rescaled)
+- Disease severity (blue line and points)
+- Grain yield (black line and points, rescaled)
 
-```{r last-plot, eval=TRUE, message=TRUE, warning=FALSE, echo=FALSE, fig.height=13, fig.width=8}
+```{r last-plot, eval=TRUE, message=TRUE, warning=FALSE, echo=FALSE, fig.height=13, fig.width=8, fig.alt="Simulated and observed wheat blast severity, light interception and grain yield of cultivar BRILHANTE in Brazil, one panel per year and sowing date"}
 
 yield_scale <- 4000
 
@@ -417,7 +432,7 @@ and twelve sowing dates of cultivar *BRILHANTE* in Brazil.
 
 - ✅ **Healthy light interception** (green area) provides the baseline without disease.  
 - ✅ **Simulated interception** (dark green line) captures crop canopy dynamics.  
-- ✅ **Disease severity** (blue) is both simulated (line) and observed (points with error bars).  
+- ✅ **Disease severity** (blue) is both simulated (line) and observed (points).  
 - ✅ **Yield** (black) shows observed vs simulated grain yield (scaled to fit).  
 
 Overall, the calibrated disease parameters reproduce the magnitude and seasonal
@@ -431,9 +446,9 @@ losses.
 
 This vignette illustrated the **full calibration–validation cycle**:
 
-1. **Calibrate disease parameters** on a subset of experiments.  
+1. **Calibrate crop and disease parameters** on a subset of experiments.  
 2. **Average** them into a robust epidemiological baseline.  
-3. **Validate** on independent experiments across years and sowing dates.  
+3. **Validate** on all experiments across years and sowing dates; the nine sowing dates not used for calibration provide the independent test.  
 
 This workflow can be extended to other crops, pathosystems, and datasets
 using the same FraNchEstYN framework.

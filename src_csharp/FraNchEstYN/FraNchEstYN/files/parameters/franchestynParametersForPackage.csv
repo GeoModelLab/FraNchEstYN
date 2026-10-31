@@ -134,8 +134,8 @@ disease,wheat_blast,AssimilateSappersDamage,damage mechanism of assimilate sappe
 disease,wheat_blast,OuterInoculumShapeRelease,shape of the primary inoculum release function,unitless,0,2,2,
 disease,wheat_blast,OuterInoculumShapeParameter,empirical parameter for inoculum bell shaped,unitless,0,1,1,x
 fungicide,protectant,InitialDose,initial fungicide dose,fraction,0,1,1,
-fungicide,protectant,DegradationRate,rate of degradation,unitless,0.01,0.15,0.01,
-fungicide,protectant,TenacityFactor,tenacity factor,unitless,0.1,0.25,0.25,
+fungicide,protectant,DegradationRate,rate of degradation,unitless,0.01,0.15,0.02,
+fungicide,protectant,TenacityFactor,tenacity factor,unitless,0.01,0.25,0.05,
 fungicide,protectant,InitialEfficacy,initial efficacy,unitless,0.5,1,1,
-fungicide,protectant,AShapeParameter,empirical parameter,unitless,3,5,4,
-fungicide,protectant,BShapeParameter,empirical parameter,unitless,7,10,8.5,
+fungicide,protectant,AShapeParameter,empirical parameter,unitless,3,5,3,
+fungicide,protectant,BShapeParameter,empirical parameter,unitless,7,10,8,

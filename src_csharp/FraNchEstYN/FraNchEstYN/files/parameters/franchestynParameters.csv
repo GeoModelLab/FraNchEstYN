@@ -34,8 +34,8 @@ disease,AssimilateSappersDamage,damage mechanism of assimilate sappers,kg ha-1,0
 disease,OuterInoculumShapeRelease,shape of the primary inoculum release function,unitless,0,1,2,
 disease,OuterInoculumShapeParameter,empirical parameter for inoculum bell shaped,unitless,0,1,1,x
 fungicide,InitialDose,initial fungicide dose,fraction,0,1,1,
-fungicide,DegradationRate,rate of degradation,unitless,0.01,0.15,0.01,
-fungicide,TenacityFactor,tenacity factor,unitless,0.1,0.25,0.25,
+fungicide,DegradationRate,rate of degradation,unitless,0.01,0.15,0.02,
+fungicide,TenacityFactor,tenacity factor,unitless,0.01,0.25,0.05,
 fungicide,InitialEfficacy,initial efficacy,unitless,0.5,1,1,
-fungicide,AShapeParameter,empirical parameter,unitless,3,5,4,
-fungicide,BShapeParameter,empirical parameter,unitless,7,10,8.5,
+fungicide,AShapeParameter,empirical parameter,unitless,3,5,3,
+fungicide,BShapeParameter,empirical parameter,unitless,7,10,8,

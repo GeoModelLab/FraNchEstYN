@@ -8,7 +8,7 @@
 </div>	  
 
 [![License: CC BY-NC 3.0](https://img.shields.io/badge/License-CC%20BY--NC%203.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/3.0/)
-[![Platform](https://img.shields.io/badge/platform-Windows--only-blue)](https://microsoft.com)  
+[![Platform](https://img.shields.io/badge/platform-.NET%208%20%7C%20Windows%20binary-blue)](https://dotnet.microsoft.com)  
 [![Language](https://img.shields.io/badge/language-R%20%7C%20C%23-purple)](https://cran.r-project.org/)  
 ![Status](https://img.shields.io/badge/status-active-brightgreen)
 
@@ -18,6 +18,7 @@
 **FraNchEstYN** is a **crop–disease–fungicide simulation and calibration framework**, designed to support **quantitative plant disease epidemiology and crop modeling research**.  
 
 It couples a **process-based crop–disease model in C#** with an **R interface** for:
+
 - input preparation,
 - experiment setup,
 - simulation and calibration,  
@@ -26,6 +27,7 @@ It couples a **process-based crop–disease model in C#** with an **R interface*
 FraNchEstYN can run **standalone crop–disease–fungicide simulations** or be **coupled to any external crop model** (e.g. APSIM, DSSAT, STICS, WOFOST), provided daily LAI or fInt is supplied.  
 
 The framework integrates:
+
 - 🌱 **Crop growth & yield formation** (internal or externally provided)  
 - 🦠 **Disease epidemiology and host–pathogen dynamics**  
 - 💊 **Fungicide effects** (timing, dose, decay, efficacy)  
@@ -33,7 +35,7 @@ The framework integrates:
 - 📊 **Diagnostics & metrics** (RMSE, R², Bias, NSE)  
 - 🧙 **Optional narrative summaries** via Large Language Models (LLMs) in **scientist**, **extensionist**, or **farmer** styles  
 
-> ⚠️ Currently **Windows-only** due to the C# core. Cross-platform support is planned.  
+> ℹ️ The C# core targets **.NET 8** and uses only standard .NET APIs, making it architecturally cross-platform (Windows, Linux, macOS). Pre-built binaries are currently provided for **Windows**; Linux and macOS support requires building from source.  
 
 ---
 
@@ -50,7 +52,7 @@ The framework integrates:
 
 ## Installation
 
-Install directly from GitHub (**Windows only**):
+Install directly from GitHub (pre-built binary for **Windows**; see above for other platforms):
 
 ```r
 install.packages("devtools")
@@ -60,19 +62,20 @@ devtools::install_github("GeoModelLab/FraNchEstYN")
 ## Getting Started
 
 Minimal run example:
-```
+
+```r
 library(FraNchEstYN)
 
 res <- franchestyn(
   weather_data        = weather_df,       # one site only
   management_data     = mgmt_df,          # crop/variety/sowing/treatments/year
   reference_data      = ref_df,           # required if calibration != "none"
-  cropParameters      = cropParameters$Wheat,
-  diseaseParameters   = diseaseParameters$Septoria,
+  cropParameters      = cropParameters$wheat,
+  diseaseParameters   = diseaseParameters$septoria,
   fungicideParameters = fungicideParameters$protectant,
   calibration         = "all",            # "none", "crop", "disease", "all"
   start_end           = c(2010, 2020),
-  iterations          = 200,              # Monte Carlo runs
+  iterations          = 200,              # optimisation (simplex) iterations
   apikey              = "sk-or-v1-xxxx",  # OpenRouter key
   franchy_message     = TRUE,             # enables LLM commentary
   personality         = "farmer"          # or "scientist" / "extensionist"
@@ -102,10 +105,7 @@ When coupling, you must provide a `cropModel_data` dataframe with at least:
 - `agb` — above-ground biomass (g/m²)  
 - `yield` — attainable/potential yield (kg/ha or g/m²)  
 - `fint` (fraction of intercepted radiation, 0–1) **or** `lai` (leaf area index, m²/m²)  
-  - If only `lai` is provided, FraNchEstYN converts it internally:  
-    \[
-    f_{int} = 1 - \exp(-k \times LAI), \quad k=0.6 \ (\text{default})
-    \]
+  - If only `lai` is provided, FraNchEstYN converts it internally as `fint = 1 - exp(-k × LAI)`, with `k = 0.6` by default (argument `k`).
 
 Optional: `gdd` (growing degree days), `thermaltime`
 
@@ -126,22 +126,20 @@ res <- franchestyn(
   cropModel_data    = wofost_out,           # external crop model coupling
   management_data   = mgmt_df,
   reference_data    = NULL,                 # no calibration
-  diseaseParameters = diseaseParameters$Septoria,
+  diseaseParameters = diseaseParameters$septoria,
   fungicideParameters = fungicideParameters$protectant,
   calibration       = "none",               # simulation only
   start_end         = c(2020, 2020),
-  iterations        = 1,
   franchy_message   = TRUE,
-  personality       = "extensionist"        # options: farmers/scientist/extensionist
+  personality       = "extensionist"        # options: farmer / scientist / extensionist
 )
+```
 
 👉 In this mode, no cropParameters are required — FraNchEstYN directly uses your crop model dynamics, while simulating disease progress and yield reduction.
 
-```
-
 ## 🩺 Example diagnostic output
 
-When franchy_message = TRUE, FraNchEstYN generates an LLM-based summary tailored to the selected persona.
+When `franchy_message = TRUE`, FraNchEstYN generates an LLM-based summary tailored to the selected persona.
 
 Example (persona = "farmer"):
 
@@ -175,7 +173,8 @@ Moisture at the wrong time invites disease to thrive.
 ```
 
 ## Documentation
-Full documentation and vignettes at:
+
+Full documentation, a quick-start tutorial and the case studies of the article are available at:
 📚 https://geomodellab.github.io/FraNchEstYN
 
 ## License

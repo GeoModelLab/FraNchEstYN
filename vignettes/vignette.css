@@ -1,12 +1,10 @@
-/* widen the vignette content */
+/* widen the vignette content (used when vignettes are built outside pkgdown) */
 .main-container {
-  max-width: 1200px;  /* default is ~800px */
+  max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
 }
 
-<style>
 .table {
   font-size: 85% !important;
 }
-</style>
