@@ -1,0 +1,156 @@
+# Calibration toggles for FraNchEstYN parameter sets
+
+Utilities to quickly disable all calibration flags, enable only a
+subset, or set calibration flags in bulk for nested parameter lists used
+by **FraNchEstYN** (e.g., \`cropParameters\$wheat\`,
+\`diseaseParameters\$septoria\`).
+
+These helpers enable or disable the \`calibration\` flag on \*\*leaf\*\*
+parameters in the nested lists used by FraNchEstYN (e.g.,
+\`cropParameters\$wheat\`, \`diseaseParameters\$septoria\`, or
+\`fungicideParameters\$protectant\`).
+
+## Usage
+
+``` r
+disable_all_calibration(params)
+
+enable_calibration_only(
+  params,
+  keys,
+  match = c("exact", "regex", "starts_with"),
+  ignore_case = TRUE,
+  warn_if_missing = TRUE
+)
+
+set_calibration_flags(params, enable = character(), disable = character())
+
+disable_all_calibration(params)
+
+enable_calibration(
+  params,
+  keys,
+  match = c("exact", "regex", "starts_with"),
+  ignore_case = TRUE,
+  warn_if_missing = TRUE
+)
+
+enable_calibration_only(
+  params,
+  keys,
+  match = c("exact", "regex", "starts_with"),
+  ignore_case = TRUE,
+  warn_if_missing = TRUE
+)
+```
+
+## Arguments
+
+- params:
+
+  A nested parameter list (one set), e.g. \`cropParameters\$wheat\`. You
+  may also pass an entire collection (e.g., \`cropParameters\`), in
+  which case the operation is applied to each set.
+
+- keys:
+
+  Character vector of parameter names to enable/disable. Matching occurs
+  against the \*\*leaf parameter name\*\* (e.g.,
+  \`"RelativeHumidityCritical"\`).
+
+- match:
+
+  One of \`"exact"\` (default), \`"regex"\`, or \`"starts_with"\`.
+  Controls how \`keys\` are matched to parameter names.
+
+- ignore_case:
+
+  Logical; ignore case during matching (default \`TRUE\`).
+
+- warn_if_missing:
+
+  Logical; if \`TRUE\` (default), emit a warning for keys that did not
+  match any parameter.
+
+- enable:
+
+  Character vector of leaf names to enable.
+
+- disable:
+
+  Character vector of leaf names to disable.
+
+## Value
+
+A modified parameter list with updated \`calibration\` flags.
+
+A modified copy of \`params\` with updated \`calibration\` flags.
+
+## Details
+
+Parameter lists are nested lists where each **leaf** has at least:
+\`description\`, \`unit\`, \`min\`, \`max\`, \`value\`, and
+\`calibration\` (logical).
+
+A leaf parameter is a list that contains the fields: \`min\`, \`max\`,
+\`value\`, and \`calibration\`.
+
+## Notes
+
+\- Functions traverse the list and only flip \`calibration\` at
+\*\*leaf\*\* nodes that contain that field. - Names are matched
+**exactly** at the leaf level (no partial matching).
+
+## Examples
+
+``` r
+# Disable all, then re-enable a few:
+p <- cropParameters$wheat
+p <- disable_all_calibration(p)
+p <- enable_calibration_only(
+  p,
+  keys = c("RadiationUseEfficiency", "PartitioningMaximum")
+)
+
+# Or set flags in one call:
+p <- set_calibration_flags(
+  p,
+  enable  = c("RadiationUseEfficiency"),
+  disable = c("CycleLength", "TmaxCrop")
+)
+
+# Non-running examples:
+if (FALSE) { # \dontrun{
+# Disable all parameters for calibration in a disease set
+d <- disable_all_calibration(diseaseParameters$septoria)
+
+# Re-enable a few by exact name
+d2 <- enable_calibration_only(
+  d,
+  keys = c("RelativeHumidityCritical", "Rain50Detachment")
+)
+
+# Enable an entire family of parameters using a regex pattern
+w <- cropParameters$wheat
+t_keys <- grep("^T(min|opt|max)Crop$", names(w), value = TRUE)
+w2 <- set_calibration_flags(w, enable = t_keys)
+} # }
+# Disable all parameters for calibration in a disease set (not run)
+# d <- disable_all_calibration(diseaseParameters$septoria)
+
+# Re-enable a few by exact name (not run)
+# d2 <- enable_calibration(d, c("RelativeHumidityCritical", "Rain50Detachment"))
+
+# Enable only a subset (disables all others) (not run)
+# d3 <- enable_calibration_only(
+#   diseaseParameters$septoria,
+#   keys = c("RelativeHumidityCritical", "Rain50Detachment")
+# )
+
+# Use regex to enable whole families (not run)
+# c2 <- enable_calibration(
+#   cropParameters$wheat,
+#   keys = c("^T(min|opt|max)Crop$"),
+#   match = "regex"
+# )
+```

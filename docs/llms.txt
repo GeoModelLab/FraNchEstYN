@@ -1,0 +1,280 @@
+**FraNchEstYN**\
+*Fra*mework for sy*Nch*ronous *Est*imates of *Y*ield reductio*N*
+
+![FraNchEstYN logo](reference/figures/logo.png)
+
+------------------------------------------------------------------------
+
+## 📖 Overview
+
+**FraNchEstYN** is a **crop–disease–fungicide simulation and calibration
+framework**, designed to support **quantitative plant disease
+epidemiology and crop modeling research**.
+
+It couples a **process-based crop–disease model in C#** with an **R
+interface** for:
+
+- input preparation,
+- experiment setup,
+- simulation and calibration,\
+- and automated post-analysis with optional AI-driven narratives.
+
+FraNchEstYN can run **standalone crop–disease–fungicide simulations** or
+be **coupled to any external crop model** (e.g. APSIM, DSSAT, STICS,
+WOFOST), provided daily LAI or fInt is supplied.
+
+The framework integrates:
+
+- 🌱 **Crop growth & yield formation** (internal or externally
+  provided)\
+- 🦠 **Disease epidemiology and host–pathogen dynamics**\
+- 💊 **Fungicide effects** (timing, dose, decay, efficacy)\
+- 🔬 **Calibration routines** for crop, disease, and fungicide
+  parameters\
+- 📊 **Diagnostics & metrics** (RMSE, R², Bias, NSE)\
+- 🧙 **Optional narrative summaries** via Large Language Models (LLMs)
+  in **scientist**, **extensionist**, or **farmer** styles
+
+> ℹ️ The C# core targets **.NET 8** and uses only standard .NET APIs,
+> making it architecturally cross-platform (Windows, Linux, macOS).
+> Pre-built binaries are currently provided for **Windows**; Linux and
+> macOS support requires building from source.
+
+------------------------------------------------------------------------
+
+## Highlights
+
+- Flexible: use FraNchEstYN **with or without an external crop model**\
+- Automated handling of weather, management, reference, and parameter
+  data\
+- Multiple **calibration modes** (`"crop"`, `"disease"`, `"all"`,
+  `"none"`)\
+- Integrated **fungicide programs** with multi-spray schedules\
+- Built-in **validation diagnostics** (summary tables, plots, and
+  metrics)\
+- 🔮 LLM-based summaries: context-aware **scientist**, **extensionist**,
+  or **farmer** commentary
+
+------------------------------------------------------------------------
+
+## Installation
+
+Install directly from GitHub (pre-built binary for **Windows**; see
+above for other platforms):
+
+``` r
+
+install.packages("devtools")
+devtools::install_github("GeoModelLab/FraNchEstYN")
+```
+
+## Getting Started
+
+Minimal run example:
+
+``` r
+
+library(FraNchEstYN)
+
+res <- franchestyn(
+  weather_data        = weather_df,       # one site only
+  management_data     = mgmt_df,          # crop/variety/sowing/treatments/year
+  reference_data      = ref_df,           # required if calibration != "none"
+  cropParameters      = cropParameters$wheat,
+  diseaseParameters   = diseaseParameters$septoria,
+  fungicideParameters = fungicideParameters$protectant,
+  calibration         = "all",            # "none", "crop", "disease", "all"
+  start_end           = c(2010, 2020),
+  iterations          = 200,              # optimisation (simplex) iterations
+  apikey              = "sk-or-v1-xxxx",  # OpenRouter key
+  franchy_message     = TRUE,             # enables LLM commentary
+  personality         = "farmer"          # or "scientist" / "extensionist"
+)
+
+str(res$outputs$summary)
+```
+
+## 🔬 Scientific Purpose
+
+FraNchEstYN is designed for research on:
+
+- Quantifying yield losses caused by plant diseases
+- Testing management strategies (sowing dates, fungicide timings, host
+  resistance)
+- Exploring climate impacts on epidemics and yield formation
+- Model calibration & validation using observed reference data
+- Decision-support narratives with audience-specific styles
+
+## 🔗 Coupling with External Crop Models
+
+FraNchEstYN can be run **standalone** (using its internal crop growth
+routines) or **coupled with any external crop model** (e.g., APSIM,
+DSSAT, STICS, WOFOST, CropSyst, etc.).
+
+When coupling, you must provide a `cropModel_data` dataframe with at
+least:
+
+- `year`, `doy` — growing season identifiers\
+- `agb` — above-ground biomass (g/m²)\
+- `yield` — attainable/potential yield (kg/ha or g/m²)\
+- `fint` (fraction of intercepted radiation, 0–1) **or** `lai` (leaf
+  area index, m²/m²)
+  - If only `lai` is provided, FraNchEstYN converts it internally as
+    `fint = 1 - exp(-k × LAI)`, with `k = 0.6` by default (argument
+    `k`).
+
+Optional: `gdd` (growing degree days), `thermaltime`
+
+``` r
+
+# External crop model outputs (simplified WOFOST run)
+wofost_out <- data.frame(
+  year = rep(2020, 5),
+  doy  = c(100, 120, 140, 160, 180),
+  lai  = c(0.5, 1.2, 3.5, 5.0, 3.8),
+  agb  = c(100, 350, 1200, 2500, 3800),
+  yield = c(0, 0, 0, 1000, 3000)
+)
+
+# Run FraNchEstYN with external LAI
+res <- franchestyn(
+  weather_data      = weather_df,
+  cropModel_data    = wofost_out,           # external crop model coupling
+  management_data   = mgmt_df,
+  reference_data    = NULL,                 # no calibration
+  diseaseParameters = diseaseParameters$septoria,
+  fungicideParameters = fungicideParameters$protectant,
+  calibration       = "none",               # simulation only
+  start_end         = c(2020, 2020),
+  franchy_message   = TRUE,
+  personality       = "extensionist"        # options: farmer / scientist / extensionist
+)
+```
+
+👉 In this mode, no cropParameters are required — FraNchEstYN directly
+uses your crop model dynamics, while simulating disease progress and
+yield reduction.
+
+## 🩺 Example diagnostic output
+
+When `franchy_message = TRUE`, FraNchEstYN generates an LLM-based
+summary tailored to the selected persona.
+
+Example (persona = “farmer”):
+
+    ==================== 📊 FraNchEstYN Decision-support diagnostic 📊 ====================
+    🧑‍🌾 OVERVIEW
+    In our fields, we’re seeing an average disease severity of about 4.3%, which isn’t too bad, while our crops are yielding around 8095 kg per hectare. With temperatures swinging between 10.8°C and 1.5°C, and rainfall at 617.8 mm, we’re keeping a close eye on leaf wetness, which has been around 1124.7 hours.
+
+    🌦️ WEATHER–DISEASE LINK
+    Rainfall (r=0.26), leaf-wetness (r=0.16), t max (r=0.13), t min (r=0.11), rh max (r=0.23), rh min (r=0.17).
+
+    🍄 DISEASE DYNAMICS
+    The growing season begins around 04/22, with a rapid rise in growth observed by 04/29, reaching its peak on 06/08. The overall length of the season is ~210 days.
+
+    💊 FUNGICIDE PROGRAM
+    On average 4.4 sprays. First spray near 04/22 (onset). 60% were preventive, 40% late.
+    Advice: Shift sprays closer to onset (≈04/22) and keep intervals tight around 04/29.
+
+    📈 MODEL PERFORMANCE
+    DisSev: RMSE≈0.32, R²≈0.84 (model underestimates)
+    LightInterception: insufficient validation signal
+
+    📅 YEARLY HIGHLIGHTS
+    • 1980: 9.9% severity; 7718 kg/ha (10.2% loss). Onset 04/17. First spray 04/14 (preventive) [highest severity]
+    • 1986: 0% severity; 8723 kg/ha (0% loss). No epidemic detected. First spray 04/15 [lowest severity]
+    ...
+
+    💬 PROVERB
+    Moisture at the wrong time invites disease to thrive.
+
+## Documentation
+
+Full documentation, a quick-start tutorial and the case studies of the
+article are available at: 📚 <https://geomodellab.github.io/FraNchEstYN>
+
+## License
+
+Creative Commons Attribution-NonCommercial 3.0 Unported (CC BY-NC 3.0)
+
+## Authors
+
+Roberto Ferrise & Simone Bregaglio
+
+# Package index
+
+## Main Function
+
+- [`franchestyn()`](https://geomodellab.github.io/FraNchEstYN/reference/franchestyn.md)
+  : Run the FraNchEstYN crop–disease simulation or calibration
+
+## Parameter Sets
+
+- [`cropParameters`](https://geomodellab.github.io/FraNchEstYN/reference/cropParameters.md)
+  : Crop parameter sets for FraNchEstYN
+- [`diseaseParameters`](https://geomodellab.github.io/FraNchEstYN/reference/diseaseParameters.md)
+  : Disease parameter sets for FraNchEstYN
+- [`fungicideParameters`](https://geomodellab.github.io/FraNchEstYN/reference/fungicideParameters.md)
+  : Fungicide parameter sets for FraNchEstYN
+
+## Utilities
+
+- [`disable_all_calibration()`](https://geomodellab.github.io/FraNchEstYN/reference/calibration_toggles.md)
+  [`enable_calibration_only()`](https://geomodellab.github.io/FraNchEstYN/reference/calibration_toggles.md)
+  [`set_calibration_flags()`](https://geomodellab.github.io/FraNchEstYN/reference/calibration_toggles.md)
+  [`enable_calibration()`](https://geomodellab.github.io/FraNchEstYN/reference/calibration_toggles.md)
+  : Calibration toggles for FraNchEstYN parameter sets
+- [`parameters_to_df()`](https://geomodellab.github.io/FraNchEstYN/reference/parameters_to_df.md)
+  : Convert a nested parameter list back into a tidy data.frame
+- [`df_to_parameters()`](https://geomodellab.github.io/FraNchEstYN/reference/df_to_parameters.md)
+  : Convert parameter summary dataframe to FraNchEstYN parameter list
+
+## Datasets
+
+- [`weather_indiana`](https://geomodellab.github.io/FraNchEstYN/reference/weather_indiana.md)
+  : Daily weather for Indiana
+- [`reference_indiana`](https://geomodellab.github.io/FraNchEstYN/reference/reference_indiana.md)
+  : Indiana reference disease observations
+- [`reference_egypt`](https://geomodellab.github.io/FraNchEstYN/reference/reference_egypt.md)
+  : Reference dataset for Egypt, yellow rust severity and yield loss on
+  seven wheat varieties (Sharkiya, 2013–2015)
+- [`weather_egypt`](https://geomodellab.github.io/FraNchEstYN/reference/weather_egypt.md)
+  : Daily weather dataset for Sharkiya, Egypt (2013–2015)
+- [`reference_brazil`](https://geomodellab.github.io/FraNchEstYN/reference/reference_brazil.md)
+  : Reference wheat data from Brazil (BRILHANTE cultivar, Sertaozinho
+  site)
+- [`reference_ethiopia`](https://geomodellab.github.io/FraNchEstYN/reference/reference_ethiopia.md)
+  : Ethiopia reference disease observations
+- [`weather_ethiopia`](https://geomodellab.github.io/FraNchEstYN/reference/weather_ethiopia.md)
+  : Daily weather for Ethiopia fungicide trial sites
+- [`management_indiana`](https://geomodellab.github.io/FraNchEstYN/reference/management_indiana.md)
+  : Indiana management practices
+- [`management_brazil`](https://geomodellab.github.io/FraNchEstYN/reference/management_brazil.md)
+  : Management information for BRILHANTE wheat trials in Brazil
+- [`management_ethiopia`](https://geomodellab.github.io/FraNchEstYN/reference/management_ethiopia.md)
+  : Ethiopia management practices
+- [`cropParameters_brazil`](https://geomodellab.github.io/FraNchEstYN/reference/cropParameters_brazil.md)
+  : Default crop parameters for BRILHANTE wheat (Brazil)
+
+## Internal Utilities
+
+- [`compute_error_metrics()`](https://geomodellab.github.io/FraNchEstYN/reference/compute_error_metrics.md)
+  : Compute error metrics for model vs reference variables (internal)
+
+# Articles
+
+### Quick start
+
+- [Quick
+  start](https://geomodellab.github.io/FraNchEstYN/case_studies/quick-start.md):
+
+### Case studies
+
+- [Septoria on wheat in
+  Indiana](https://geomodellab.github.io/FraNchEstYN/case_studies/case-study-indiana-septoria.md):
+- [Wheat blast on wheat in
+  Brazil](https://geomodellab.github.io/FraNchEstYN/case_studies/case-study-brazil-wheat-blast.md):
+- [Yellow rust on wheat in
+  Egypt](https://geomodellab.github.io/FraNchEstYN/case_studies/case-study-egypt-yellow-rust.md):
+- [Septoria fungicide trials in
+  Ethiopia](https://geomodellab.github.io/FraNchEstYN/case_studies/case-study-ethiopia-septoria-fungicide.md):
