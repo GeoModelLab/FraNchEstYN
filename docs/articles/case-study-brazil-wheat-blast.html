@@ -15,7 +15,8 @@
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Wheat blast on wheat in Brazil">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
+<meta property="og:title" content="Wheat blast on wheat in Brazil">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -37,9 +38,12 @@
 <li class="nav-item"><a class="nav-link" href="../index.html">Home</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="active nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/case-study-indiana-septoria.html">Septoria on wheat in Indiana</a></li>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-case-studies" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Case studies</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-case-studies">
+<li><a class="dropdown-item" href="../articles/quick-start.html">Quick start</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Case studies</h6></li>
+    <li><a class="dropdown-item" href="../articles/case-study-indiana-septoria.html">Septoria on wheat in Indiana</a></li>
     <li><a class="dropdown-item" href="../articles/case-study-brazil-wheat-blast.html">Wheat blast on wheat in Brazil</a></li>
     <li><a class="dropdown-item" href="../articles/case-study-egypt-yellow-rust.html">Yellow rust on wheat in Egypt</a></li>
     <li><a class="dropdown-item" href="../articles/case-study-ethiopia-septoria-fungicide.html">Septoria fungicide trials in Ethiopia</a></li>
@@ -82,20 +86,18 @@ estimate wheat yield losses from <em>wheat head blast</em> in
 Brazil.</p>
 <p>The workflow follows three progressive steps:</p>
 <ol style="list-style-type: decimal">
-<li>Disease calibration: fit epidemiological parameters on a subset of
-planting periods.</li>
-<li>Parameter averaging: derive robust mean disease parameters across
-planting periods.</li>
-<li>Validation: apply averaged disease parameters to all planting
-periods, and compare simulated vs observed disease severity and
-yield.</li>
+<li>Calibration: fit crop and disease parameters on a subset of planting
+periods (1, 5 and 10).</li>
+<li>Parameter averaging: derive robust mean crop and disease parameters
+across planting periods.</li>
+<li>Validation: apply the averaged parameters to all planting periods,
+and compare simulated vs observed disease severity and yield.</li>
 </ol>
-<p>We start from an already published Brazil wheat parameter set (Santos
-et al. 2023), use open access EPAMIG experimental data across 12 sowing
-dates × 6 years, and weather from NASA POWER.</p>
-<p>We use open access EPAMIG experiments (12 sowing dates × 6 years for
-cultivar <em>BRILHANTE</em>), weather data from NASA POWER, and a
-published Brazil wheat parameter set (Santos <em>et al.</em> 2023).</p>
+<p>We start from the Brazil wheat parameter set bundled with the package
+(<code>cropParameters_brazil</code>), and use open-access EPAMIG
+experimental data (dos Santos <em>et al.</em>, 2023; 12 sowing dates × 6
+years for cultivar <em>BRILHANTE</em>) with daily weather from NASA
+POWER.</p>
 </div>
 <div class="section level2">
 <h2 id="packages">📦 Packages<a class="anchor" aria-label="anchor" href="#packages"></a>
@@ -182,12 +184,19 @@ later filtering.</p>
 <p>For convenience, the package already includes the management and
 reference datasets, derived from the open-access EPAMIG wheat trials
 (cultivar BRILHANTE, multiple sowing dates and years). The original
-dataset is publicly available at <a href="https://doi.org/10.1007/s10658-022-02614-7" class="external-link">OSF repository</a></p>
+experiments are described in <a href="https://doi.org/10.1007/s10658-022-02614-7" class="external-link">dos Santos <em>et
+al.</em> (2023)</a>.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># comes with the package</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"reference_brazil"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"management_brazil"</span><span class="op">)</span></span></code></pre></div>
-A preview of their structure is shown in the vignette.
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"management_brazil"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># a single cultivar (BRILHANTE) is simulated: label it "Generic" so that</span></span>
+<span><span class="co"># management, reference and crop parameters refer to the same variety</span></span>
+<span><span class="va">reference_brazil</span>  <span class="op">&lt;-</span> <span class="va">reference_brazil</span>  <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>variety <span class="op">=</span> <span class="st">"Generic"</span><span class="op">)</span></span>
+<span><span class="va">management_brazil</span> <span class="op">&lt;-</span> <span class="va">management_brazil</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>variety <span class="op">=</span> <span class="st">"Generic"</span>,</span>
+<span>                                                 site    <span class="op">=</span> <span class="st">"Sertaozinho"</span><span class="op">)</span></span></code></pre></div>
+A preview of their structure:
 <table class="table table table-striped table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <caption>
 reference_brazil — structure preview (first 6 rows)
@@ -224,7 +233,7 @@ fint
 2013
 </td>
 <td style="text-align:left;">
-BRILHANTE
+Generic
 </td>
 <td style="text-align:right;">
 1
@@ -250,7 +259,7 @@ Sertaozinho
 2013
 </td>
 <td style="text-align:left;">
-BRILHANTE
+Generic
 </td>
 <td style="text-align:right;">
 2
@@ -276,7 +285,7 @@ Sertaozinho
 2013
 </td>
 <td style="text-align:left;">
-BRILHANTE
+Generic
 </td>
 <td style="text-align:right;">
 3
@@ -302,7 +311,7 @@ Sertaozinho
 2013
 </td>
 <td style="text-align:left;">
-BRILHANTE
+Generic
 </td>
 <td style="text-align:right;">
 4
@@ -328,7 +337,7 @@ Sertaozinho
 2013
 </td>
 <td style="text-align:left;">
-BRILHANTE
+Generic
 </td>
 <td style="text-align:right;">
 5
@@ -354,7 +363,7 @@ Sertaozinho
 2013
 </td>
 <td style="text-align:left;">
-BRILHANTE
+Generic
 </td>
 <td style="text-align:right;">
 6
@@ -397,6 +406,9 @@ year
 <th style="text-align:right;">
 planting_period
 </th>
+<th style="text-align:left;">
+site
+</th>
 </tr></thead>
 <tbody>
 <tr>
@@ -404,7 +416,7 @@ planting_period
 wheat
 </td>
 <td style="text-align:left;">
-BRILHANTE
+Generic
 </td>
 <td style="text-align:right;">
 49
@@ -415,13 +427,16 @@ BRILHANTE
 <td style="text-align:right;">
 1
 </td>
+<td style="text-align:left;">
+Sertaozinho
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 wheat
 </td>
 <td style="text-align:left;">
-BRILHANTE
+Generic
 </td>
 <td style="text-align:right;">
 56
@@ -432,13 +447,16 @@ BRILHANTE
 <td style="text-align:right;">
 2
 </td>
+<td style="text-align:left;">
+Sertaozinho
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 wheat
 </td>
 <td style="text-align:left;">
-BRILHANTE
+Generic
 </td>
 <td style="text-align:right;">
 63
@@ -449,13 +467,16 @@ BRILHANTE
 <td style="text-align:right;">
 3
 </td>
+<td style="text-align:left;">
+Sertaozinho
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 wheat
 </td>
 <td style="text-align:left;">
-BRILHANTE
+Generic
 </td>
 <td style="text-align:right;">
 70
@@ -466,13 +487,16 @@ BRILHANTE
 <td style="text-align:right;">
 4
 </td>
+<td style="text-align:left;">
+Sertaozinho
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 wheat
 </td>
 <td style="text-align:left;">
-BRILHANTE
+Generic
 </td>
 <td style="text-align:right;">
 77
@@ -483,13 +507,16 @@ BRILHANTE
 <td style="text-align:right;">
 5
 </td>
+<td style="text-align:left;">
+Sertaozinho
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 wheat
 </td>
 <td style="text-align:left;">
-BRILHANTE
+Generic
 </td>
 <td style="text-align:right;">
 84
@@ -500,96 +527,117 @@ BRILHANTE
 <td style="text-align:right;">
 6
 </td>
+<td style="text-align:left;">
+Sertaozinho
+</td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section level2">
-<h2 id="step-1-disease-calibration-on-selected-sowing-dates">🦠 Step 1 – Disease calibration on selected sowing dates<a class="anchor" aria-label="anchor" href="#step-1-disease-calibration-on-selected-sowing-dates"></a>
+<h2 id="step-1-crop-and-disease-calibration-on-selected-sowing-dates">🦠 Step 1 — Crop and disease calibration on selected sowing
+dates<a class="anchor" aria-label="anchor" href="#step-1-crop-and-disease-calibration-on-selected-sowing-dates"></a>
 </h2>
-<p>We start from already optimized crop parameters and disable crop
-calibration so only disease parameters are adjusted.</p>
+<p>As in the published analysis, crop and disease parameters are
+calibrated together (<code>calibration = "all"</code>) on three sowing
+dates, and the remaining sowing dates are kept for validation.</p>
 <p>👉 The idea is:</p>
 <ul>
-<li>Select a subset of sowing dates (here planting periods 1, 3, 5, 7,
-9, 11) for calibration.</li>
+<li>Select a subset of sowing dates (planting periods 1, 5 and 10, as in
+the article) for calibration.</li>
+<li>For the crop, calibrate only cycle length, flowering start and
+radiation use efficiency.</li>
+<li>For wheat blast, start from the default parameters with the same
+settings used in the article.</li>
 <li>Run franchestyn separately for each planting period.</li>
-<li>Collect the estimated disease parameters from each run.</li>
-<li>Compute mean and standard deviation across experiments.</li>
-<li>Rebuild a consistent list-of-lists parameter set using the averaged
-values using the custom function in the package.</li>
+<li>Collect the estimated crop and disease parameters from each
+run.</li>
+<li>Average them across planting periods and rebuild consistent
+parameter sets.</li>
 </ul>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># --------------------------------------------------------------</span></span>
-<span><span class="co"># 📌 Step 1: Disease calibration on selected sowing dates</span></span>
+<span><span class="co"># 📌 Step 1: Crop + disease calibration on selected sowing dates</span></span>
 <span><span class="co"># --------------------------------------------------------------</span></span>
 <span></span>
-<span><span class="co"># 1. Load a baseline crop parameter set for Brazil</span></span>
-<span><span class="co">#    (already calibrated from literature, bundled as an .rds)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"cropParameters_brazil.rda"</span><span class="op">)</span></span>
+<span><span class="co"># 1. Load the Brazil wheat parameter set bundled with the package</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"cropParameters_brazil"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># 2. Disable calibration for crop parameters</span></span>
-<span><span class="co">#    👉 we want to calibrate ONLY the disease model</span></span>
-<span><span class="va">cropParameters_brazil</span> <span class="op">&lt;-</span> <span class="fu">FraNchEstYN</span><span class="fu">::</span><span class="fu"><a href="../reference/calibration_toggles.html">disable_all_calibration</a></span><span class="op">(</span><span class="va">cropParameters_brazil</span><span class="op">)</span></span>
+<span><span class="co"># 2. Crop: calibrate only phenology and radiation use efficiency</span></span>
+<span><span class="va">thisCropParam</span> <span class="op">&lt;-</span> <span class="fu">FraNchEstYN</span><span class="fu">::</span><span class="fu"><a href="../reference/calibration_toggles.html">disable_all_calibration</a></span><span class="op">(</span><span class="va">cropParameters_brazil</span><span class="op">)</span></span>
+<span><span class="va">thisCropParam</span><span class="op">$</span><span class="va">CycleLength</span><span class="op">$</span><span class="va">calibration</span>            <span class="op">&lt;-</span> <span class="cn">TRUE</span></span>
+<span><span class="va">thisCropParam</span><span class="op">$</span><span class="va">CycleLength</span><span class="op">$</span><span class="va">min</span>                    <span class="op">&lt;-</span> <span class="fl">1500</span></span>
+<span><span class="va">thisCropParam</span><span class="op">$</span><span class="va">CycleLength</span><span class="op">$</span><span class="va">max</span>                    <span class="op">&lt;-</span> <span class="fl">2500</span></span>
+<span><span class="va">thisCropParam</span><span class="op">$</span><span class="va">RadiationUseEfficiency</span><span class="op">$</span><span class="va">calibration</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span>
+<span><span class="va">thisCropParam</span><span class="op">$</span><span class="va">FloweringStart</span><span class="op">$</span><span class="va">calibration</span>         <span class="op">&lt;-</span> <span class="cn">TRUE</span></span>
 <span></span>
-<span><span class="co">#we load default parameters for wheat blast</span></span>
-<span><span class="va">thisDiseaseParam</span><span class="op">&lt;-</span><span class="va">diseaseParameters</span><span class="op">$</span><span class="va">wheat_blast</span></span>
-<span><span class="va">thisDiseaseParam</span><span class="op">$</span><span class="va">AssimilateSappersDamage</span><span class="op">$</span><span class="va">calibration</span> <span class="op">&lt;-</span> <span class="cn">F</span></span>
-<span><span class="va">thisDiseaseParam</span><span class="op">$</span><span class="va">AssimilateSappersDamage</span><span class="op">$</span><span class="va">value</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span><span class="co"># 3. Disease: default wheat blast parameters, with the settings used in the article</span></span>
+<span><span class="va">thisDiseaseParam</span> <span class="op">&lt;-</span> <span class="va">diseaseParameters</span><span class="op">$</span><span class="va">wheat_blast</span></span>
+<span><span class="va">thisDiseaseParam</span><span class="op">$</span><span class="va">SenescenceAcceleratorDamage</span><span class="op">$</span><span class="va">calibration</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
+<span><span class="va">thisDiseaseParam</span><span class="op">$</span><span class="va">SenescenceAcceleratorDamage</span><span class="op">$</span><span class="va">value</span>       <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span><span class="va">thisDiseaseParam</span><span class="op">$</span><span class="va">SenescenceAcceleratorDamage</span><span class="op">$</span><span class="va">max</span>         <span class="op">&lt;-</span> <span class="fl">0.5</span></span>
+<span><span class="va">thisDiseaseParam</span><span class="op">$</span><span class="va">LightStealerDamage</span><span class="op">$</span><span class="va">calibration</span>          <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
+<span><span class="va">thisDiseaseParam</span><span class="op">$</span><span class="va">LightStealerDamage</span><span class="op">$</span><span class="va">value</span>                <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span><span class="va">thisDiseaseParam</span><span class="op">$</span><span class="va">AssimilateSappersDamage</span><span class="op">$</span><span class="va">value</span>           <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span><span class="va">thisDiseaseParam</span><span class="op">$</span><span class="va">AssimilateSappersDamage</span><span class="op">$</span><span class="va">calibration</span>     <span class="op">&lt;-</span> <span class="cn">TRUE</span></span>
+<span><span class="va">thisDiseaseParam</span><span class="op">$</span><span class="va">CyclePercentageOnset</span><span class="op">$</span><span class="va">min</span>                <span class="op">&lt;-</span> <span class="fl">20</span></span>
+<span><span class="va">thisDiseaseParam</span><span class="op">$</span><span class="va">OuterInoculumShapeRelease</span><span class="op">$</span><span class="va">value</span>         <span class="op">&lt;-</span> <span class="fl">1</span></span>
+<span><span class="va">thisDiseaseParam</span><span class="op">$</span><span class="va">OuterInoculumShapeParameter</span><span class="op">$</span><span class="va">value</span>       <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span><span class="va">thisDiseaseParam</span><span class="op">$</span><span class="va">IsSplashBorne</span><span class="op">$</span><span class="va">value</span>                     <span class="op">&lt;-</span> <span class="fl">0</span></span>
 <span></span>
-<span></span>
-<span><span class="co"># 3. Define the study period</span></span>
+<span><span class="co"># 4. Study period and calibration sowing dates</span></span>
 <span><span class="va">start_end</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2011</span>, <span class="fl">2020</span><span class="op">)</span></span>
+<span><span class="va">pps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">5</span>, <span class="fl">10</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># 4. Choose a subset of sowing dates ("planting periods") for calibration</span></span>
-<span><span class="co">#    These are representative experiments used to estimate disease parameters.</span></span>
-<span><span class="va">pps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">5</span>, <span class="fl">7</span>, <span class="fl">9</span>, <span class="fl">11</span><span class="op">)</span></span>
+<span><span class="va">all_parameters_crop</span>    <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">all_parameters_disease</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Container for disease parameters from each planting period</span></span>
-<span><span class="va">all_parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># 5. Loop over each planting period in the calibration set</span></span>
+<span><span class="co"># 5. Calibrate on each planting period</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">pp</span> <span class="kw">in</span> <span class="va">pps</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  </span>
-<span>  <span class="co"># --- Run the model ---</span></span>
+<span></span>
 <span>  <span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">FraNchEstYN</span><span class="fu">::</span><span class="fu"><a href="../reference/franchestyn.html">franchestyn</a></span><span class="op">(</span></span>
 <span>    weather_data      <span class="op">=</span> <span class="va">weather_data</span>,</span>
 <span>    management_data   <span class="op">=</span> <span class="va">management_brazil</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">planting_period</span> <span class="op">==</span> <span class="va">pp</span><span class="op">)</span>,</span>
-<span>    reference_data    <span class="op">=</span> <span class="va">reference_brazil</span><span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">planting_period</span> <span class="op">==</span> <span class="va">pp</span><span class="op">)</span>,</span>
-<span>    cropParameters    <span class="op">=</span> <span class="va">cropParameters_brazil</span>,</span>
+<span>    reference_data    <span class="op">=</span> <span class="va">reference_brazil</span>  <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">planting_period</span> <span class="op">==</span> <span class="va">pp</span><span class="op">)</span>,</span>
+<span>    cropParameters    <span class="op">=</span> <span class="va">thisCropParam</span>,</span>
 <span>    diseaseParameters <span class="op">=</span> <span class="va">thisDiseaseParam</span>,</span>
-<span>    calibration       <span class="op">=</span> <span class="st">"disease"</span>,  <span class="co"># focus calibration on epidemiology</span></span>
+<span>    calibration       <span class="op">=</span> <span class="st">"all"</span>,     <span class="co"># crop + disease</span></span>
 <span>    start_end         <span class="op">=</span> <span class="va">start_end</span>,</span>
-<span>    iterations        <span class="op">=</span> <span class="fl">555</span>         <span class="co"># MCMC iterations</span></span>
+<span>    iterations        <span class="op">=</span> <span class="fl">999</span>        <span class="co"># simplex iterations</span></span>
 <span>  <span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="co"># --- Extract disease parameters from this calibration run ---</span></span>
-<span>  <span class="va">disease_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/parameters_to_df.html">parameters_to_df</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">parameters</span><span class="op">$</span><span class="va">disease</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="co"># --- Store results, tagging by planting period ---</span></span>
-<span>  <span class="va">all_parameters</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">all_parameters</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">disease_df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>planting_period <span class="op">=</span> <span class="va">pp</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="va">all_parameters_crop</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">all_parameters_crop</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span></span>
+<span>    <span class="fu"><a href="../reference/parameters_to_df.html">parameters_to_df</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">parameters</span><span class="op">$</span><span class="va">crop</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>planting_period <span class="op">=</span> <span class="va">pp</span><span class="op">)</span></span>
+<span>  <span class="va">all_parameters_disease</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">all_parameters_disease</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span></span>
+<span>    <span class="fu"><a href="../reference/parameters_to_df.html">parameters_to_df</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">parameters</span><span class="op">$</span><span class="va">disease</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>planting_period <span class="op">=</span> <span class="va">pp</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="co"># 6. Merge all planting period calibrations into one dataframe</span></span>
-<span><span class="va">parameters_df</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">all_parameters</span>, .id <span class="op">=</span> <span class="st">"run_id"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># 6. Merge the calibrations from all planting periods</span></span>
+<span><span class="va">parameters_df_crop</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">all_parameters_crop</span>,    .id <span class="op">=</span> <span class="st">"run_id"</span><span class="op">)</span></span>
+<span><span class="va">parameters_df</span>      <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">all_parameters_disease</span>, .id <span class="op">=</span> <span class="st">"run_id"</span><span class="op">)</span></span></code></pre></div>
 <p>We then average across planting periods:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># 7. Summarise across planting periods</span></span>
-<span><span class="co">#    👉 take the mean value, plus standard deviation and sample size</span></span>
-<span><span class="va">param_summary</span> <span class="op">&lt;-</span> <span class="va">parameters_df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">Parameter</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span></span>
-<span>    value    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">Value</span><span class="op">)</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span>    sd_value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">Value</span><span class="op">)</span>,   na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span>    n        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">Value</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    .groups  <span class="op">=</span> <span class="st">"drop"</span></span>
-<span>  <span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># 7. Mean, standard deviation and sample size across planting periods</span></span>
+<span><span class="va">summarise_params</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">x</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">Parameter</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span></span>
+<span>      value    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">Value</span><span class="op">)</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>      sd_value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">Value</span><span class="op">)</span>,   na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>      n        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">Value</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>      .groups  <span class="op">=</span> <span class="st">"drop"</span></span>
+<span>    <span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="va">param_summary_crop</span> <span class="op">&lt;-</span> <span class="fu">summarise_params</span><span class="op">(</span><span class="va">parameters_df_crop</span><span class="op">)</span></span>
+<span><span class="va">param_summary</span>      <span class="op">&lt;-</span> <span class="fu">summarise_params</span><span class="op">(</span><span class="va">parameters_df</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># 8. Rebuild a parameter list suitable for FraNchEstYN</span></span>
-<span><span class="co">#    👉 use the averaged values, with a ±20% range</span></span>
-<span><span class="va">calibDisease</span> <span class="op">&lt;-</span> <span class="fu">FraNchEstYN</span><span class="fu">::</span><span class="fu"><a href="../reference/df_to_parameters.html">df_to_parameters</a></span><span class="op">(</span><span class="va">param_summary</span>, range_pct <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span></code></pre></div>
-This is the calibDisease df
+<span><span class="co"># 8. Rebuild parameter lists with the averaged values (±20% range)</span></span>
+<span><span class="co">#    and switch calibration off for the validation runs</span></span>
+<span><span class="va">calibCrop</span>    <span class="op">&lt;-</span> <span class="fu">FraNchEstYN</span><span class="fu">::</span><span class="fu"><a href="../reference/df_to_parameters.html">df_to_parameters</a></span><span class="op">(</span><span class="va">param_summary_crop</span>, range_pct <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">FraNchEstYN</span><span class="fu">::</span><span class="fu"><a href="../reference/calibration_toggles.html">disable_all_calibration</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">calibDisease</span> <span class="op">&lt;-</span> <span class="fu">FraNchEstYN</span><span class="fu">::</span><span class="fu"><a href="../reference/df_to_parameters.html">df_to_parameters</a></span><span class="op">(</span><span class="va">param_summary</span>, range_pct <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">FraNchEstYN</span><span class="fu">::</span><span class="fu"><a href="../reference/calibration_toggles.html">disable_all_calibration</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+Snapshot of the averaged disease parameters (<code>calibDisease</code>):
 <table class="table table table-striped table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <caption>
 Snapshot of calibrated disease parameters
@@ -613,114 +661,114 @@ AssimilateSappersDamage
 AssimilateSappersDamage
 </td>
 <td style="text-align:right;">
+9.0201876
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+CyclePercentageOnset
+</td>
+<td style="text-align:left;">
+CyclePercentageOnset
+</td>
+<td style="text-align:right;">
+26.0343339
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DryCriticalInterruption
+</td>
+<td style="text-align:left;">
+DryCriticalInterruption
+</td>
+<td style="text-align:right;">
+33.6759877
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+HydroThermalTimeOnset
+</td>
+<td style="text-align:left;">
+HydroThermalTimeOnset
+</td>
+<td style="text-align:right;">
+15.9242244
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+IsSplashBorne
+</td>
+<td style="text-align:left;">
+IsSplashBorne
+</td>
+<td style="text-align:right;">
 0.0000000
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-CyclePercentageOnset
+LatencyDuration
 </td>
 <td style="text-align:left;">
-CyclePercentageOnset
+LatencyDuration
 </td>
 <td style="text-align:right;">
-18.4104861
+5.9185682
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-DryCriticalInterruption
+LightStealerDamage
 </td>
 <td style="text-align:left;">
-DryCriticalInterruption
+LightStealerDamage
 </td>
 <td style="text-align:right;">
-32.4454117
+0.0000000
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-HydroThermalTimeOnset
+OuterInoculumMax
 </td>
 <td style="text-align:left;">
-HydroThermalTimeOnset
+OuterInoculumMax
 </td>
 <td style="text-align:right;">
-11.3703817
+0.0541543
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-IsSplashBorne
+OuterInoculumShapeParameter
 </td>
 <td style="text-align:left;">
-IsSplashBorne
+OuterInoculumShapeParameter
+</td>
+<td style="text-align:right;">
+0.4246513
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+OuterInoculumShapeRelease
+</td>
+<td style="text-align:left;">
+OuterInoculumShapeRelease
 </td>
 <td style="text-align:right;">
 1.0000000
 </td>
 </tr>
-<tr>
-<td style="text-align:left;">
-LatencyDuration
-</td>
-<td style="text-align:left;">
-LatencyDuration
-</td>
-<td style="text-align:right;">
-7.4118591
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-LightStealerDamage
-</td>
-<td style="text-align:left;">
-LightStealerDamage
-</td>
-<td style="text-align:right;">
-0.7205040
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-OuterInoculumMax
-</td>
-<td style="text-align:left;">
-OuterInoculumMax
-</td>
-<td style="text-align:right;">
-0.0611214
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-OuterInoculumShapeParameter
-</td>
-<td style="text-align:left;">
-OuterInoculumShapeParameter
-</td>
-<td style="text-align:right;">
-0.4218695
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-OuterInoculumShapeRelease
-</td>
-<td style="text-align:left;">
-OuterInoculumShapeRelease
-</td>
-<td style="text-align:right;">
-2.0000000
-</td>
-</tr>
 </tbody>
 </table>
-<p>At this stage, calibDisease contains the epidemiological parameters
-averaged across multiple sowing dates. This reduces noise from single
-calibrations and provides a robust baseline for validation on the
-remaining experiments.</p>
+<p>At this stage, calibCrop and calibDisease contain the crop and
+epidemiological parameters averaged across the calibration sowing dates.
+This reduces noise from single calibrations and provides a robust
+baseline for validation on the remaining experiments.</p>
 </div>
 <div class="section level2">
 <h2 id="step-2-batch-validation">🌾 Step 2 — Batch validation<a class="anchor" aria-label="anchor" href="#step-2-batch-validation"></a>
@@ -735,7 +783,8 @@ dataset.<br>
 </li>
 <li>
 <strong>Run FraNchEstYN without further calibration</strong>, using
-the averaged disease parameters (<code>calibDisease</code>).<br>
+the averaged crop and disease parameters (<code>calibCrop</code>,
+<code>calibDisease</code>).<br>
 </li>
 <li>
 <strong>Collect simulation outputs</strong> for each planting
@@ -747,7 +796,7 @@ analysis and plotting.</li>
 </ol>
 </div>
 <div class="section level2">
-<h2 id="step-3-validation-against-experiments">📊Step 3 — Validation against experiments<a class="anchor" aria-label="anchor" href="#step-3-validation-against-experiments"></a>
+<h2 id="step-3-validation-against-experiments">📊 Step 3 — Validation against experiments<a class="anchor" aria-label="anchor" href="#step-3-validation-against-experiments"></a>
 </h2>
 <p>In this final step we bring together the model simulations and the
 field observations from EPAMIG.<br>
@@ -757,11 +806,10 @@ sure that only the last record of each experimental group retains
 observed values (all intermediate time steps are set to
 <code>NA</code>).</p>
 <pre><code><span><span class="co">#&gt; `summarise()` has grouped output by 'year', 'planting_period'. You can override</span></span>
-<span><span class="co">#&gt; using the `.groups` argument.</span></span>
-<span><span class="co">#&gt; Joining with `by = join_by(planting_period)`</span></span></code></pre>
+<span><span class="co">#&gt; using the `.groups` argument.</span></span></code></pre>
 </div>
 <div class="section level2">
-<h2 id="visualization">🎨Visualization<a class="anchor" aria-label="anchor" href="#visualization"></a>
+<h2 id="visualization">🎨 Visualization<a class="anchor" aria-label="anchor" href="#visualization"></a>
 </h2>
 <p>To compare simulations with experiments, we rescale yield onto the
 same axis (by dividing by a scaling factor) and facet the plot by year ×
@@ -770,10 +818,10 @@ planting experiment.</p>
 <ul>
 <li>Healthy light interception (green area)</li>
 <li>Simulated light interception (dark green line)</li>
-<li>Disease severity (blue line, points, and error bars)</li>
-<li>Grain yield (black line, points, and error bars, rescaled)</li>
+<li>Disease severity (blue line and points)</li>
+<li>Grain yield (black line and points, rescaled)</li>
 </ul>
-<p><img src="case-study-brazil-wheat-blast_files/figure-html/last-plot-1.png" width="768"></p>
+<p><img src="case-study-brazil-wheat-blast_files/figure-html/last-plot-1.png" class="r-plt" alt="Simulated and observed wheat blast severity, light interception and grain yield of cultivar BRILHANTE in Brazil, one panel per year and sowing date" width="768"></p>
 </div>
 <div class="section level2">
 <h2 id="interpretation-and-conclusion">🌍 Interpretation and conclusion<a class="anchor" aria-label="anchor" href="#interpretation-and-conclusion"></a>
@@ -789,7 +837,7 @@ the baseline without disease.<br>
 captures crop canopy dynamics.<br>
 </li>
 <li>✅ <strong>Disease severity</strong> (blue) is both simulated (line)
-and observed (points with error bars).<br>
+and observed (points).<br>
 </li>
 <li>✅ <strong>Yield</strong> (black) shows observed vs simulated grain
 yield (scaled to fit).</li>
@@ -807,16 +855,17 @@ can provide robust estimates of yield losses.</p>
 cycle</strong>:</p>
 <ol style="list-style-type: decimal">
 <li>
-<strong>Calibrate disease parameters</strong> on a subset of
-experiments.<br>
+<strong>Calibrate crop and disease parameters</strong> on a subset
+of experiments.<br>
 </li>
 <li>
 <strong>Average</strong> them into a robust epidemiological
 baseline.<br>
 </li>
 <li>
-<strong>Validate</strong> on independent experiments across years
-and sowing dates.</li>
+<strong>Validate</strong> on all experiments across years and sowing
+dates; the nine sowing dates not used for calibration provide the
+independent test.</li>
 </ol>
 <p>This workflow can be extended to other crops, pathosystems, and
 datasets using the same FraNchEstYN framework.</p>
@@ -832,7 +881,7 @@ datasets using the same FraNchEstYN framework.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

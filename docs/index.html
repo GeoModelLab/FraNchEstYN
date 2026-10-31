@@ -15,7 +15,8 @@
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="FraNchEstYN">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><link href="extra.css" rel="stylesheet">
+<meta property="og:title" content="FraNchEstYN">
 <meta name="description" content="Framework for synchronous estimation of crop–disease yield reduction">
 <meta property="og:description" content="Framework for synchronous estimation of crop–disease yield reduction">
 <meta property="og:image" content="https://geomodellab.github.io/FraNchEstYN/logo.png">
@@ -40,9 +41,12 @@
 <li class="active nav-item"><a class="nav-link" href="index.html">Home</a></li>
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/case-study-indiana-septoria.html">Septoria on wheat in Indiana</a></li>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-case-studies" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Case studies</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-case-studies">
+<li><a class="dropdown-item" href="articles/quick-start.html">Quick start</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Case studies</h6></li>
+    <li><a class="dropdown-item" href="articles/case-study-indiana-septoria.html">Septoria on wheat in Indiana</a></li>
     <li><a class="dropdown-item" href="articles/case-study-brazil-wheat-blast.html">Wheat blast on wheat in Brazil</a></li>
     <li><a class="dropdown-item" href="articles/case-study-egypt-yellow-rust.html">Yellow rust on wheat in Egypt</a></li>
     <li><a class="dropdown-item" href="articles/case-study-ethiopia-septoria-fungicide.html">Septoria fungicide trials in Ethiopia</a></li>
@@ -68,12 +72,31 @@
 <h2 id="open_book-overview">📖 Overview<a class="anchor" aria-label="anchor" href="#open_book-overview"></a>
 </h2>
 <p><strong>FraNchEstYN</strong> is a <strong>crop–disease–fungicide simulation and calibration framework</strong>, designed to support <strong>quantitative plant disease epidemiology and crop modeling research</strong>.</p>
-<p>It combines a <strong>process-based crop–disease model in C#</strong> with an <strong>R interface</strong> for data preprocessing, experiment setup, and automated post-analysis.</p>
-<p>The framework integrates: - <strong>Phenology-driven crop growth and yield formation</strong> - <strong>Disease epidemiology and plant–pathogen interactions through damage mechanisms</strong> - <strong>Fungicide dynamics and efficacy modeling</strong> - <strong>Calibration routines</strong> for crop, disease, and fungicide parameters<br>
-- 🔮 <em>Optional</em>: a <strong>Large Language Model (LLM) post-processor</strong> that generates <strong>narrative summaries</strong> of outputs (<code>franchy_message = TRUE</code>), using an API key from <a href="https://openrouter.ai/" class="external-link">OpenRouter</a></p>
-<p>The result is a flexible tool for <strong>dynamic simulation of disease severity to quantify yield losses</strong> caused by plant diseases under different management and climatic scenarios.</p>
+<p>It couples a <strong>process-based crop–disease model in C#</strong> with an <strong>R interface</strong> for:</p>
+<ul>
+<li>input preparation,</li>
+<li>experiment setup,</li>
+<li>simulation and calibration,<br>
+</li>
+<li>and automated post-analysis with optional AI-driven narratives.</li>
+</ul>
+<p>FraNchEstYN can run <strong>standalone crop–disease–fungicide simulations</strong> or be <strong>coupled to any external crop model</strong> (e.g. APSIM, DSSAT, STICS, WOFOST), provided daily LAI or fInt is supplied.</p>
+<p>The framework integrates:</p>
+<ul>
+<li>🌱 <strong>Crop growth &amp; yield formation</strong> (internal or externally provided)<br>
+</li>
+<li>🦠 <strong>Disease epidemiology and host–pathogen dynamics</strong><br>
+</li>
+<li>💊 <strong>Fungicide effects</strong> (timing, dose, decay, efficacy)<br>
+</li>
+<li>🔬 <strong>Calibration routines</strong> for crop, disease, and fungicide parameters<br>
+</li>
+<li>📊 <strong>Diagnostics &amp; metrics</strong> (RMSE, R², Bias, NSE)<br>
+</li>
+<li>🧙 <strong>Optional narrative summaries</strong> via Large Language Models (LLMs) in <strong>scientist</strong>, <strong>extensionist</strong>, or <strong>farmer</strong> styles</li>
+</ul>
 <blockquote>
-<p><strong>Note:</strong> FraNchEstYN is currently <strong>Windows-only</strong> due to its C# computation core. Cross-platform support is in progress.</p>
+<p>ℹ️ The C# core targets <strong>.NET 8</strong> and uses only standard .NET APIs, making it architecturally cross-platform (Windows, Linux, macOS). Pre-built binaries are currently provided for <strong>Windows</strong>; Linux and macOS support requires building from source.</p>
 </blockquote>
 <hr>
 </div>
@@ -81,26 +104,24 @@
 <h2 id="highlights">Highlights<a class="anchor" aria-label="anchor" href="#highlights"></a>
 </h2>
 <ul>
-<li>🌱 <strong>Crop growth &amp; yield dynamics</strong> with environmental drivers and “genetic” modulators (parameters)<br>
+<li>Flexible: use FraNchEstYN <strong>with or without an external crop model</strong><br>
 </li>
-<li>🦠 <strong>Epidemic development</strong> driven by weather variables, pathogen characteristics and host resistance<br>
+<li>Automated handling of weather, management, reference, and parameter data<br>
 </li>
-<li>💊 <strong>Fungicide modeling</strong> (timing, dose, decay, efficacy classes)<br>
+<li>Multiple <strong>calibration modes</strong> (<code>"crop"</code>, <code>"disease"</code>, <code>"all"</code>, <code>"none"</code>)<br>
 </li>
-<li>🔬 <strong>Parameter calibration</strong> (<code>"crop"</code>, <code>"disease"</code>, or <code>"all"</code>) with automated optimization<br>
+<li>Integrated <strong>fungicide programs</strong> with multi-spray schedules<br>
 </li>
-<li>📊 <strong>Performance metrics</strong> (RMSE, MAE, NSE, R²) calculated automatically<br>
+<li>Built-in <strong>validation diagnostics</strong> (summary tables, plots, and metrics)<br>
 </li>
-<li>🖥 <strong>Hybrid architecture</strong>: R handles inputs/outputs, C# runs simulations<br>
-</li>
-<li>🧙 <strong>LLM narrative summaries</strong> for results interpretation (optional)</li>
+<li>🔮 LLM-based summaries: context-aware <strong>scientist</strong>, <strong>extensionist</strong>, or <strong>farmer</strong> commentary</li>
 </ul>
 <hr>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>Install directly from GitHub (<strong>Windows only</strong>):</p>
+<p>Install directly from GitHub (pre-built binary for <strong>Windows</strong>; see above for other platforms):</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"GeoModelLab/FraNchEstYN"</span><span class="op">)</span></span></code></pre></div>
@@ -109,69 +130,122 @@
 <h2 id="getting-started">Getting Started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
 </h2>
 <p>Minimal run example:</p>
-<pre><code><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://geomodellab.github.io/FraNchEstYN">FraNchEstYN</a></span><span class="op">)</span></span>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://geomodellab.github.io/FraNchEstYN">FraNchEstYN</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/franchestyn.html">franchestyn</a></span><span class="op">(</span></span>
-<span>  weather_data        <span class="op">=</span> <span class="va">weather_df</span>,      <span class="co"># one site only</span></span>
-<span>  management_data     <span class="op">=</span> <span class="va">mgmt_df</span>,         <span class="co"># crop/variety/sowing/treatments/year</span></span>
-<span>  reference_data      <span class="op">=</span> <span class="va">ref_df</span>,          <span class="co"># required if calibration != "none"</span></span>
-<span>  cropParameters      <span class="op">=</span> <span class="va">cropParameters</span><span class="op">$</span><span class="va">Wheat</span>,</span>
-<span>  diseaseParameters   <span class="op">=</span> <span class="va">diseaseParameters</span><span class="op">$</span><span class="va">Septoria</span>,</span>
+<span>  weather_data        <span class="op">=</span> <span class="va">weather_df</span>,       <span class="co"># one site only</span></span>
+<span>  management_data     <span class="op">=</span> <span class="va">mgmt_df</span>,          <span class="co"># crop/variety/sowing/treatments/year</span></span>
+<span>  reference_data      <span class="op">=</span> <span class="va">ref_df</span>,           <span class="co"># required if calibration != "none"</span></span>
+<span>  cropParameters      <span class="op">=</span> <span class="va">cropParameters</span><span class="op">$</span><span class="va">wheat</span>,</span>
+<span>  diseaseParameters   <span class="op">=</span> <span class="va">diseaseParameters</span><span class="op">$</span><span class="va">septoria</span>,</span>
 <span>  fungicideParameters <span class="op">=</span> <span class="va">fungicideParameters</span><span class="op">$</span><span class="va">protectant</span>,</span>
-<span>  calibration         <span class="op">=</span> <span class="st">"all"</span>,           <span class="co"># "none", "crop", "disease", "fungicide", or "all"</span></span>
+<span>  calibration         <span class="op">=</span> <span class="st">"all"</span>,            <span class="co"># "none", "crop", "disease", "all"</span></span>
 <span>  start_end           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2010</span>, <span class="fl">2020</span><span class="op">)</span>,</span>
-<span>  api_key             <span class="op">=</span> <span class="st">"your-openrouter-api-key"</span>, <span class="co">#start with sk-or-v1-xxxxxxxxxxxxxxxxxxx....</span></span>
-<span>  franchy_message     <span class="op">=</span> <span class="cn">TRUE</span>, <span class="co"># enables the LLM message</span></span>
-<span>  iterations          <span class="op">=</span> <span class="fl">200</span></span>
+<span>  iterations          <span class="op">=</span> <span class="fl">200</span>,              <span class="co"># optimisation (simplex) iterations</span></span>
+<span>  apikey              <span class="op">=</span> <span class="st">"sk-or-v1-xxxx"</span>,  <span class="co"># OpenRouter key</span></span>
+<span>  franchy_message     <span class="op">=</span> <span class="cn">TRUE</span>,             <span class="co"># enables LLM commentary</span></span>
+<span>  personality         <span class="op">=</span> <span class="st">"farmer"</span>          <span class="co"># or "scientist" / "extensionist"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">outputs</span><span class="op">$</span><span class="va">summary</span><span class="op">)</span></span></code></pre>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">outputs</span><span class="op">$</span><span class="va">summary</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="microscope-scientific-purpose">🔬 Scientific Purpose<a class="anchor" aria-label="anchor" href="#microscope-scientific-purpose"></a>
 </h2>
-<p>FraNchEstYN is developed as a research framework for:</p>
+<p>FraNchEstYN is designed for research on:</p>
 <ul>
-<li>Assessing disease-induced yield reduction across environments</li>
-<li>Supporting epidemiological and crop modeling experiments</li>
-<li>Testing management strategies (e.g., sowing dates, fungicide timings, resistance levels)</li>
-<li>Providing a transparent and reproducible modeling environment for the scientific community</li>
+<li>Quantifying yield losses caused by plant diseases</li>
+<li>Testing management strategies (sowing dates, fungicide timings, host resistance)</li>
+<li>Exploring climate impacts on epidemics and yield formation</li>
+<li>Model calibration &amp; validation using observed reference data</li>
+<li>Decision-support narratives with audience-specific styles</li>
 </ul>
+</div>
+<div class="section level2">
+<h2 id="link-coupling-with-external-crop-models">🔗 Coupling with External Crop Models<a class="anchor" aria-label="anchor" href="#link-coupling-with-external-crop-models"></a>
+</h2>
+<p>FraNchEstYN can be run <strong>standalone</strong> (using its internal crop growth routines) or <strong>coupled with any external crop model</strong> (e.g., APSIM, DSSAT, STICS, WOFOST, CropSyst, etc.).</p>
+<p>When coupling, you must provide a <code>cropModel_data</code> dataframe with at least:</p>
+<ul>
+<li>
+<code>year</code>, <code>doy</code> — growing season identifiers<br>
+</li>
+<li>
+<code>agb</code> — above-ground biomass (g/m²)<br>
+</li>
+<li>
+<code>yield</code> — attainable/potential yield (kg/ha or g/m²)<br>
+</li>
+<li>
+<code>fint</code> (fraction of intercepted radiation, 0–1) <strong>or</strong> <code>lai</code> (leaf area index, m²/m²)
+<ul>
+<li>If only <code>lai</code> is provided, FraNchEstYN converts it internally as <code>fint = 1 - exp(-k × LAI)</code>, with <code>k = 0.6</code> by default (argument <code>k</code>).</li>
+</ul>
+</li>
+</ul>
+<p>Optional: <code>gdd</code> (growing degree days), <code>thermaltime</code></p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># External crop model outputs (simplified WOFOST run)</span></span>
+<span><span class="va">wofost_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  year <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">2020</span>, <span class="fl">5</span><span class="op">)</span>,</span>
+<span>  doy  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">120</span>, <span class="fl">140</span>, <span class="fl">160</span>, <span class="fl">180</span><span class="op">)</span>,</span>
+<span>  lai  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">1.2</span>, <span class="fl">3.5</span>, <span class="fl">5.0</span>, <span class="fl">3.8</span><span class="op">)</span>,</span>
+<span>  agb  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">350</span>, <span class="fl">1200</span>, <span class="fl">2500</span>, <span class="fl">3800</span><span class="op">)</span>,</span>
+<span>  yield <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">1000</span>, <span class="fl">3000</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Run FraNchEstYN with external LAI</span></span>
+<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/franchestyn.html">franchestyn</a></span><span class="op">(</span></span>
+<span>  weather_data      <span class="op">=</span> <span class="va">weather_df</span>,</span>
+<span>  cropModel_data    <span class="op">=</span> <span class="va">wofost_out</span>,           <span class="co"># external crop model coupling</span></span>
+<span>  management_data   <span class="op">=</span> <span class="va">mgmt_df</span>,</span>
+<span>  reference_data    <span class="op">=</span> <span class="cn">NULL</span>,                 <span class="co"># no calibration</span></span>
+<span>  diseaseParameters <span class="op">=</span> <span class="va">diseaseParameters</span><span class="op">$</span><span class="va">septoria</span>,</span>
+<span>  fungicideParameters <span class="op">=</span> <span class="va">fungicideParameters</span><span class="op">$</span><span class="va">protectant</span>,</span>
+<span>  calibration       <span class="op">=</span> <span class="st">"none"</span>,               <span class="co"># simulation only</span></span>
+<span>  start_end         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2020</span>, <span class="fl">2020</span><span class="op">)</span>,</span>
+<span>  franchy_message   <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  personality       <span class="op">=</span> <span class="st">"extensionist"</span>        <span class="co"># options: farmer / scientist / extensionist</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>👉 In this mode, no cropParameters are required — FraNchEstYN directly uses your crop model dynamics, while simulating disease progress and yield reduction.</p>
 </div>
 <div class="section level2">
 <h2 id="stethoscope-example-diagnostic-output">🩺 Example diagnostic output<a class="anchor" aria-label="anchor" href="#stethoscope-example-diagnostic-output"></a>
 </h2>
-<p>Running <code><a href="reference/franchestyn.html">franchestyn()</a></code> with weather, management, and crop–disease parameter inputs will produce a structured decision-support report.<br>
-Below is an illustrative excerpt:</p>
+<p>When <code>franchy_message = TRUE</code>, FraNchEstYN generates an LLM-based summary tailored to the selected persona.</p>
+<p>Example (persona = “farmer”):</p>
 <pre><code>==================== 📊 FraNchEstYN Decision-support diagnostic 📊 ====================
-🧐 OVERVIEW
-The crop-disease dataset reveals an average severity of approximately 65% and a mean yield of about 2905 kg/ha, with temperature ranges of Tx/Tn approximately 13.5/4.2 °C, total rainfall of around 798.6 mm, and cumulative leaf wetness of approximately 1603.8 hours, indicating critical infection windows conducive to disease development. These factors collectively inform the understanding of disease dynamics and potential
+🧑‍🌾 OVERVIEW
+In our fields, we’re seeing an average disease severity of about 4.3%, which isn’t too bad, while our crops are yielding around 8095 kg per hectare. With temperatures swinging between 10.8°C and 1.5°C, and rainfall at 617.8 mm, we’re keeping a close eye on leaf wetness, which has been around 1124.7 hours.
 
-🌧️ WEATHER–DISEASE ASSOCIATIONS
-Weather–disease associations: rainfall (r= 0.83 ); leaf-wetness (r= 0.71 ); t max (r= -0.03 ); t min (r= 0.11 ); rh max (r= 0.42 ); rh min (r= 0.45 ).
+🌦️ WEATHER–DISEASE LINK
+Rainfall (r=0.26), leaf-wetness (r=0.16), t max (r=0.13), t min (r=0.11), rh max (r=0.23), rh min (r=0.17).
 
-🍄 DISEASE DYNAMICS (CALENDAR DATES)
-The median timings for the observed season are as follows: onset on 05/26, rapid-rise on 06/09, and peak on 07/16. The total season length is approximately 280 days.
+🍄 DISEASE DYNAMICS
+The growing season begins around 04/22, with a rapid rise in growth observed by 04/29, reaching its peak on 06/08. The overall length of the season is ~210 days.
 
-⚕️ FUNGICIDE PROGRAM &amp; TIMING
-Apply the first spray by 05/26 to align with the onset of disease. Given the late application pattern, ensure subsequent sprays are administered every 7–10 days, with the next application by 06/09.
-Applications often lagged the epidemic; advance the first spray to just before onset (≈ 05/26) and avoid long gaps during the rapid increase window (≈ 06/09).
+💊 FUNGICIDE PROGRAM
+On average 4.4 sprays. First spray near 04/22 (onset). 60% were preventive, 40% late.
+Advice: Shift sprays closer to onset (≈04/22) and keep intervals tight around 04/29.
 
-🤖 MODEL PERFORMANCE
-Model–observation performance:
-• DisSev: RMSE≈0.22, R²≈0.89 (model underestimates)
-• LightInterception: RMSE≈0.13, R²≈0.95 (model underestimates)
+📈 MODEL PERFORMANCE
+DisSev: RMSE≈0.32, R²≈0.84 (model underestimates)
+LightInterception: insufficient validation signal
 
 📅 YEARLY HIGHLIGHTS
-• 1973: 85.8% severity; 840.6 kg/ha (87.4% loss). Onset 05/17, rapid rise ~05/23, peak 07/07 (85.8%). First spray 12/12 (late) [highest severity]
-• 1986: 19.3% severity; 7794.5 kg/ha (1.8% loss). Onset 06/28, rapid rise ~06/28, peak 07/28 (19.3%). First spray 12/12 (late) [lowest severity]
-• 1989: 83.3% severity; 710.3 kg/ha (90.9% loss). Onset 05/22, rapid rise ~05/25, peak 07/15 (83.3%). First spray 12/12 (late)
-• 1990: 51.5% severity; 3713.1 kg/ha (50.6% loss). Onset 05/09, rapid rise ~06/09, peak 07/09 (51.5%). First spray 12/12 (late)</code></pre>
+• 1980: 9.9% severity; 7718 kg/ha (10.2% loss). Onset 04/17. First spray 04/14 (preventive) [highest severity]
+• 1986: 0% severity; 8723 kg/ha (0% loss). No epidemic detected. First spray 04/15 [lowest severity]
+...
+
+💬 PROVERB
+Moisture at the wrong time invites disease to thrive.
+</code></pre>
 </div>
 <div class="section level2">
 <h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>
 </h2>
-<p>Full documentation and vignettes at: 📚 <a href="https://geomodellab.github.io/FraNchEstYN" class="uri">https://geomodellab.github.io/FraNchEstYN</a></p>
+<p>Full documentation, a quick-start tutorial and the case studies of the article are available at: 📚 <a href="https://geomodellab.github.io/FraNchEstYN" class="uri">https://geomodellab.github.io/FraNchEstYN</a></p>
 </div>
 <div class="section level2">
 <h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
@@ -222,7 +296,7 @@ Model–observation performance:
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
 <li><a href="https://creativecommons.org/licenses/by-nc/3.0/" class="external-link"><img src="https://img.shields.io/badge/License-CC%20BY--NC%203.0-lightgrey.svg" alt="License: CC BY-NC 3.0"></a></li>
-<li><a href="https://microsoft.com" class="external-link"><img src="https://img.shields.io/badge/platform-Windows--only-blue" alt="Platform"></a></li>
+<li><a href="https://dotnet.microsoft.com" class="external-link"><img src="https://img.shields.io/badge/platform-.NET%208%20%7C%20Windows%20binary-blue" alt="Platform"></a></li>
 <li><a href="https://cran.r-project.org/" class="external-link"><img src="https://img.shields.io/badge/language-R%20%7C%20C%23-purple" alt="Language"></a></li>
 </ul>
 </div>
@@ -236,7 +310,7 @@ Model–observation performance:
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

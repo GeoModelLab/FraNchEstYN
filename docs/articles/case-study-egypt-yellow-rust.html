@@ -15,7 +15,8 @@
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Yellow rust on wheat in Egypt">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
+<meta property="og:title" content="Yellow rust on wheat in Egypt">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -37,9 +38,12 @@
 <li class="nav-item"><a class="nav-link" href="../index.html">Home</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="active nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/case-study-indiana-septoria.html">Septoria on wheat in Indiana</a></li>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-case-studies" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Case studies</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-case-studies">
+<li><a class="dropdown-item" href="../articles/quick-start.html">Quick start</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Case studies</h6></li>
+    <li><a class="dropdown-item" href="../articles/case-study-indiana-septoria.html">Septoria on wheat in Indiana</a></li>
     <li><a class="dropdown-item" href="../articles/case-study-brazil-wheat-blast.html">Wheat blast on wheat in Brazil</a></li>
     <li><a class="dropdown-item" href="../articles/case-study-egypt-yellow-rust.html">Yellow rust on wheat in Egypt</a></li>
     <li><a class="dropdown-item" href="../articles/case-study-ethiopia-septoria-fungicide.html">Septoria fungicide trials in Ethiopia</a></li>
@@ -95,8 +99,8 @@ parameters on the most susceptible variety (<em>Sids12</em>).<br>
 varieties, adjusting only <em>Radiation Use Efficiency</em> and
 <em>Varietal Resistance</em>.</li>
 </ol>
-<p>Data sources include digitized observations from <a href="https://www.researchgate.net/publication/324014576_Losses_Assessment_in_some_Egyptian_Wheat_Cultivars_caused_by_Stripe_Rust_Pathogen_Puccinia_striiformis" class="external-link">Omara
-et al. (2018)</a>.</p>
+<p>Data sources include digitized observations from <a href="https://doi.org/10.21608/ejp.2016.92381" class="external-link">Omara et
+al. (2016)</a>.</p>
 </div>
 <div class="section level2">
 <h2 id="packages">📦 Packages<a class="anchor" aria-label="anchor" href="#packages"></a>
@@ -116,51 +120,47 @@ visualization, and reproducible tables.</p>
 </h2>
 <p>We use three inputs:</p>
 <ul>
-<li>weather_data: daily NASA POWER weather for Sharkiya, Egypt</li>
+<li>weather_data: daily weather records for Sharkiya, Egypt (bundled as
+<code>weather_egypt</code>)</li>
 <li>management_data: basic agronomic metadata (crop, sowing DOY,
 etc.)</li>
 <li>reference_data: measured yields and disease severity for several
 cultivars</li>
 </ul>
-<p>We rely on <a href="https://github.com/ropensci/nasapower" class="external-link"><strong>NASAPOWER</strong></a>
-package (maintained by Adam Sparks 🙏) to directly query daily weather
-data for Sharkiya, Egypt.</p>
+<p>Alternatively, daily weather can be queried with the <a href="https://github.com/ropensci/nasapower" class="external-link"><strong>nasapower</strong></a>
+package (maintained by Adam Sparks 🙏), as shown below.</p>
 <div class="section level3">
-<h3 id="nasa-power-data">🛰 NASA Power data<a class="anchor" aria-label="anchor" href="#nasa-power-data"></a>
+<h3 id="weather-data">🌦 Weather data<a class="anchor" aria-label="anchor" href="#weather-data"></a>
 </h3>
-<p>We request maximum and minimum temperature and precipitation from
-2013–2015. Data are tagged with location and date components to simplify
-later filtering.</p>
+<p>The analysis in the article uses the daily weather bundled with the
+package (<code>weather_egypt</code>, daily weather records for
+Sharkiya), which we load here:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">weather_data</span> <span class="op">&lt;-</span> <span class="fu">nasapower</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/nasapower/reference/get_power.html" class="external-link">get_power</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">weather_egypt</span><span class="op">)</span></span>
+<span><span class="va">weather_data</span> <span class="op">&lt;-</span> <span class="va">weather_egypt</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">weather_data</span><span class="op">)</span></span>
+<span><span class="co">#&gt;       Site  TMAX TMIN RAIN year month day      lat</span></span>
+<span><span class="co">#&gt; 1 Sharkiya 20.49 7.10 0.00 2013     1   1 30.61502</span></span>
+<span><span class="co">#&gt; 2 Sharkiya 21.39 6.21 0.00 2013     1   2 30.61502</span></span>
+<span><span class="co">#&gt; 3 Sharkiya 22.32 9.08 0.07 2013     1   3 30.61502</span></span>
+<span><span class="co">#&gt; 4 Sharkiya 20.83 8.06 0.05 2013     1   4 30.61502</span></span>
+<span><span class="co">#&gt; 5 Sharkiya 18.65 8.09 0.81 2013     1   5 30.61502</span></span>
+<span><span class="co">#&gt; 6 Sharkiya 18.66 7.34 0.01 2013     1   6 30.61502</span></span></code></pre></div>
+<p>The same kind of data can be downloaded directly from NASA POWER.
+Note that the precipitation column returned by the API
+(<code>PRECTOTCORR</code>) must be renamed to <code>RAIN</code>,
+otherwise it is not recognised by the daily weather reader:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">weather_nasa</span> <span class="op">&lt;-</span> <span class="fu">nasapower</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/nasapower/reference/get_power.html" class="external-link">get_power</a></span><span class="op">(</span></span>
 <span>  community    <span class="op">=</span> <span class="st">"ag"</span>,</span>
 <span>  lonlat       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">31.5145167</span>, <span class="fl">30.6150167</span><span class="op">)</span>,</span>
-<span>  dates        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2013-01-01"</span>, <span class="st">"2015-12-31"</span><span class="op">)</span>,</span>
+<span>  dates        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2012-01-01"</span>, <span class="st">"2015-12-31"</span><span class="op">)</span>,</span>
 <span>  temporal_api <span class="op">=</span> <span class="st">"daily"</span>,</span>
-<span>  pars         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"T2M_MAX"</span>, <span class="st">"T2M_MIN"</span>, <span class="st">"PRECTOTCORR"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>DATE <span class="op">=</span> <span class="va">YYYYMMDD</span><span class="op">)</span>  <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
-<span>    year  <span class="op">=</span> <span class="fu"><a href="https://lubridate.tidyverse.org/reference/year.html" class="external-link">year</a></span><span class="op">(</span><span class="va">DATE</span><span class="op">)</span>,</span>
-<span>    month <span class="op">=</span> <span class="fu"><a href="https://lubridate.tidyverse.org/reference/month.html" class="external-link">month</a></span><span class="op">(</span><span class="va">DATE</span><span class="op">)</span>,</span>
-<span>    day   <span class="op">=</span> <span class="fu"><a href="https://lubridate.tidyverse.org/reference/day.html" class="external-link">day</a></span><span class="op">(</span><span class="va">DATE</span><span class="op">)</span>,</span>
-<span>    Site  <span class="op">=</span> <span class="st">"Sharkiya"</span>,</span>
-<span>    lat   <span class="op">=</span> <span class="fl">30.6150167</span></span>
-<span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">Site</span>, <span class="va">T2M_MAX</span>, <span class="va">T2M_MIN</span>, <span class="va">PRECTOTCORR</span>, <span class="va">year</span>, <span class="va">month</span>, <span class="va">day</span>, <span class="va">lat</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">weather_data</span><span class="op">)</span></span>
-<span><span class="co">#&gt; ────────────────────────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; ────────────────────────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; ────────────────────────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 8</span></span></span>
-<span><span class="co">#&gt;   Site     T2M_MAX T2M_MIN PRECTOTCORR  year month   day   lat</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Sharkiya    20.5    7.1         0     <span style="text-decoration: underline;">2</span>013     1     1  30.6</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Sharkiya    21.4    6.21        0     <span style="text-decoration: underline;">2</span>013     1     2  30.6</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Sharkiya    22.3    9.08        0.07  <span style="text-decoration: underline;">2</span>013     1     3  30.6</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Sharkiya    20.8    8.06        0.05  <span style="text-decoration: underline;">2</span>013     1     4  30.6</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> Sharkiya    18.6    8.09        0.81  <span style="text-decoration: underline;">2</span>013     1     5  30.6</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> Sharkiya    18.7    7.34        0.01  <span style="text-decoration: underline;">2</span>013     1     6  30.6</span></span></code></pre></div>
+<span>  pars         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"T2M_MAX"</span>, <span class="st">"T2M_MIN"</span>, <span class="st">"PRECTOTCORR"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>DATE <span class="op">=</span> <span class="va">YYYYMMDD</span>, RAIN <span class="op">=</span> <span class="va">PRECTOTCORR</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>year <span class="op">=</span> <span class="fu"><a href="https://lubridate.tidyverse.org/reference/year.html" class="external-link">year</a></span><span class="op">(</span><span class="va">DATE</span><span class="op">)</span>, month <span class="op">=</span> <span class="fu"><a href="https://lubridate.tidyverse.org/reference/month.html" class="external-link">month</a></span><span class="op">(</span><span class="va">DATE</span><span class="op">)</span>, day <span class="op">=</span> <span class="fu"><a href="https://lubridate.tidyverse.org/reference/day.html" class="external-link">day</a></span><span class="op">(</span><span class="va">DATE</span><span class="op">)</span>,</span>
+<span>         Site <span class="op">=</span> <span class="st">"Sharkiya"</span>, lat <span class="op">=</span> <span class="fl">30.6150167</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">Site</span>, <span class="va">T2M_MAX</span>, <span class="va">T2M_MIN</span>, <span class="va">RAIN</span>, <span class="va">year</span>, <span class="va">month</span>, <span class="va">day</span>, <span class="va">lat</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="disease-and-yield-data">📑 Disease and yield data<a class="anchor" aria-label="anchor" href="#disease-and-yield-data"></a>
@@ -168,10 +168,10 @@ later filtering.</p>
 <p>The dataset reference_egypt is included in the package. It contains
 observations of disease severity, final yield, and attainable yield for
 several wheat varieties.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># comes with the package</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">reference_egypt</span><span class="op">)</span></span></code></pre></div>
-A preview of its structure is shown in the vignette.
+A preview of its structure:
 <table class="table table table-striped table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <caption>
 reference_egypt — structure preview (first 6 rows)
@@ -368,7 +368,7 @@ NA
 <p>We build a minimal management dataset “on the fly”, assuming a sowing
 date of DOY 300 (≈ October 27). This provides the necessary metadata to
 drive the crop model.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">management_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  crop        <span class="op">=</span> <span class="st">"wheat"</span>,</span>
 <span>  variety     <span class="op">=</span> <span class="st">"Generic"</span>,</span>
@@ -425,17 +425,20 @@ All
 <h2 id="step-1-crop-calibration">🌾 Step 1 — Crop calibration<a class="anchor" aria-label="anchor" href="#step-1-crop-calibration"></a>
 </h2>
 <p>We first calibrate crop parameters only, with disease processes
-disabled. This minimal calibration aligns field intensity (FINT) and
-attainable yield with observations.</p>
+disabled. This minimal calibration aligns the fraction of intercepted
+radiation (FINT) and attainable yield with observations.</p>
 <p>➡️ Goal: adjust cycle length (harvest ≈ mid-May) and attainable yield
 formation.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Select crop parameters for wheat</span></span>
 <span><span class="va">thisCropParam</span> <span class="op">&lt;-</span> <span class="fu">FraNchEstYN</span><span class="fu">::</span><span class="va"><a href="../reference/cropParameters.html">cropParameters</a></span><span class="op">$</span><span class="va">wheat</span></span>
 <span></span>
-<span><span class="co"># Adjust cycle length to harvest around mid-May (~DOY 135)</span></span>
-<span><span class="va">thisCropParam</span><span class="op">$</span><span class="va">CycleLength</span><span class="op">$</span><span class="va">min</span> <span class="op">&lt;-</span> <span class="fl">3000</span></span>
-<span><span class="va">thisCropParam</span><span class="op">$</span><span class="va">CycleLength</span><span class="op">$</span><span class="va">max</span> <span class="op">&lt;-</span> <span class="fl">4500</span></span>
+<span><span class="co"># Crop parameter bounds for the Egyptian environment (as in the article):</span></span>
+<span><span class="co"># cycle length to harvest around mid-May (~DOY 135), canopy growth and senescence slopes</span></span>
+<span><span class="va">thisCropParam</span><span class="op">$</span><span class="va">CycleLength</span><span class="op">$</span><span class="va">min</span>     <span class="op">&lt;-</span> <span class="fl">3500</span></span>
+<span><span class="va">thisCropParam</span><span class="op">$</span><span class="va">CycleLength</span><span class="op">$</span><span class="va">max</span>     <span class="op">&lt;-</span> <span class="fl">4000</span></span>
+<span><span class="va">thisCropParam</span><span class="op">$</span><span class="va">SlopeGrowth</span><span class="op">$</span><span class="va">max</span>     <span class="op">&lt;-</span> <span class="fl">0.005</span></span>
+<span><span class="va">thisCropParam</span><span class="op">$</span><span class="va">SlopeSenescence</span><span class="op">$</span><span class="va">max</span> <span class="op">&lt;-</span> <span class="fl">0.02</span></span>
 <span></span>
 <span><span class="co"># We select the data from the most susceptible variety</span></span>
 <span><span class="va">thisReference_egypt</span><span class="op">&lt;-</span><span class="va">reference_egypt</span> <span class="op">|&gt;</span> </span>
@@ -449,13 +452,13 @@ formation.</p>
 <span>  cropParameters    <span class="op">=</span> <span class="va">thisCropParam</span>,</span>
 <span>  diseaseParameters <span class="op">=</span> <span class="fu">FraNchEstYN</span><span class="fu">::</span><span class="va"><a href="../reference/diseaseParameters.html">diseaseParameters</a></span><span class="op">$</span><span class="va">yellow_rust</span>,</span>
 <span>  calibration       <span class="op">=</span> <span class="st">"crop"</span>,</span>
-<span>  start_end         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2013</span>, <span class="fl">2015</span><span class="op">)</span>,</span>
-<span>  iterations        <span class="op">=</span> <span class="fl">999</span>,</span>
+<span>  start_end         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2012</span>, <span class="fl">2015</span><span class="op">)</span>,</span>
+<span>  iterations        <span class="op">=</span> <span class="fl">333</span>,</span>
 <span>  franchy_message   <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>The resulting chart shows canopy light interception and attainable
 yield dynamics compared with measured values.</p>
-<p><img src="case-study-egypt-yellow-rust_files/figure-html/crop-calibration-chart-1.png" width="672"></p>
+<p><img src="case-study-egypt-yellow-rust_files/figure-html/crop-calibration-chart-1.png" class="r-plt" alt="Simulated canopy light interception and attainable yield against observations for cultivar Sids12 in Sharkiya, Egypt, after crop calibration" width="672"></p>
 </div>
 <div class="section level2">
 <h2 id="step-2-calibrating-disease-on-the-susceptible-variety-sids12">🦠 Step 2 — Calibrating disease on the susceptible variety
@@ -463,36 +466,45 @@ yield dynamics compared with measured values.</p>
 </h2>
 <p>We now keep the calibrated crop parameters fixed, and calibrate the
 epidemiology of yellow rust using Sids12. We want to reproduce the
-observed disease progress curves without over-fitting yield damage.
-Therefore:</p>
+observed disease progress curves without over-fitting yield damage.</p>
 <p>To avoid overparameterization of the damage mechanisms, we:</p>
 <ul>
-<li>Disable assimilate sappers, RUE reducers, and senescence
-accelerators.</li>
-<li>Keep active the light stealer mechanism (the main pathway for rust
-damage).</li>
+<li>Disable assimilate sappers and senescence accelerators.</li>
+<li>Keep active the light stealer (the main pathway for rust damage) and
+RUE reducer mechanisms, as in the article.</li>
 </ul>
 <p>This ensures the model matches observed disease severity while
 keeping yield linked to light interception.</p>
-<p>The output chart overlays simulated vs observed disease severity,
-canopy states, and actual yield.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># --- use calibrated crop from Step 1 ---</span></span>
 <span><span class="va">calibCrop</span> <span class="op">&lt;-</span> <span class="va">df_crop</span><span class="op">$</span><span class="va">parameters</span><span class="op">$</span><span class="va">crop</span></span>
 <span></span>
 <span><span class="co"># --- start from yellow rust defaults ---</span></span>
 <span><span class="va">calibDisease</span> <span class="op">&lt;-</span> <span class="fu">FraNchEstYN</span><span class="fu">::</span><span class="va"><a href="../reference/diseaseParameters.html">diseaseParameters</a></span><span class="op">$</span><span class="va">yellow_rust</span></span>
 <span></span>
-<span><span class="co"># disable yield-loss pathways</span></span>
-<span><span class="va">calibDisease</span><span class="op">$</span><span class="va">AssimilateSappersDamage</span><span class="op">$</span><span class="va">calibration</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
-<span><span class="va">calibDisease</span><span class="op">$</span><span class="va">AssimilateSappersDamage</span><span class="op">$</span><span class="va">value</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
-<span><span class="va">calibDisease</span><span class="op">$</span><span class="va">RUEreducerDamage</span><span class="op">$</span><span class="va">calibration</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
-<span><span class="va">calibDisease</span><span class="op">$</span><span class="va">RUEreducerDamage</span><span class="op">$</span><span class="va">value</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span><span class="co"># settings used in the article</span></span>
+<span><span class="co"># damage mechanisms: assimilate sapping and senescence acceleration off,</span></span>
+<span><span class="co"># RUE reduction and light stealing calibrated</span></span>
+<span><span class="va">calibDisease</span><span class="op">$</span><span class="va">AssimilateSappersDamage</span><span class="op">$</span><span class="va">calibration</span>     <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
+<span><span class="va">calibDisease</span><span class="op">$</span><span class="va">AssimilateSappersDamage</span><span class="op">$</span><span class="va">value</span>           <span class="op">&lt;-</span> <span class="fl">0</span></span>
 <span><span class="va">calibDisease</span><span class="op">$</span><span class="va">SenescenceAcceleratorDamage</span><span class="op">$</span><span class="va">calibration</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
-<span><span class="va">calibDisease</span><span class="op">$</span><span class="va">SenescenceAcceleratorDamage</span><span class="op">$</span><span class="va">value</span><span class="op">&lt;-</span><span class="fl">0</span></span>
+<span><span class="va">calibDisease</span><span class="op">$</span><span class="va">RUEreducerDamage</span><span class="op">$</span><span class="va">calibration</span>            <span class="op">&lt;-</span> <span class="cn">TRUE</span></span>
+<span><span class="va">calibDisease</span><span class="op">$</span><span class="va">RUEreducerDamage</span><span class="op">$</span><span class="va">value</span>                  <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span><span class="va">calibDisease</span><span class="op">$</span><span class="va">RUEreducerDamage</span><span class="op">$</span><span class="va">max</span>                    <span class="op">&lt;-</span> <span class="fl">1</span></span>
+<span><span class="va">calibDisease</span><span class="op">$</span><span class="va">LightStealerDamage</span><span class="op">$</span><span class="va">min</span>                  <span class="op">&lt;-</span> <span class="fl">0.1</span></span>
+<span><span class="va">calibDisease</span><span class="op">$</span><span class="va">LightStealerDamage</span><span class="op">$</span><span class="va">max</span>                  <span class="op">&lt;-</span> <span class="fl">0.5</span></span>
 <span></span>
-<span><span class="co"># adjust inoculum shape</span></span>
+<span><span class="co"># epidemiological parameters: fixed values and bounds</span></span>
+<span><span class="va">calibDisease</span><span class="op">$</span><span class="va">Rain50Detachment</span><span class="op">$</span><span class="va">calibration</span>  <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
 <span><span class="va">calibDisease</span><span class="op">$</span><span class="va">OuterInoculumShapeRelease</span><span class="op">$</span><span class="va">value</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
+<span><span class="va">calibDisease</span><span class="op">$</span><span class="va">DryCriticalInterruption</span><span class="op">$</span><span class="va">min</span>   <span class="op">&lt;-</span> <span class="fl">16</span></span>
+<span><span class="va">calibDisease</span><span class="op">$</span><span class="va">CyclePercentageOnset</span><span class="op">$</span><span class="va">min</span>      <span class="op">&lt;-</span> <span class="fl">15</span></span>
+<span><span class="va">calibDisease</span><span class="op">$</span><span class="va">WetnessDurationMinimum</span><span class="op">$</span><span class="va">min</span>    <span class="op">&lt;-</span> <span class="fl">1</span></span>
+<span><span class="va">calibDisease</span><span class="op">$</span><span class="va">WetnessDurationOptimum</span><span class="op">$</span><span class="va">min</span>    <span class="op">&lt;-</span> <span class="fl">15</span></span>
+<span><span class="va">calibDisease</span><span class="op">$</span><span class="va">WetnessDurationOptimum</span><span class="op">$</span><span class="va">max</span>    <span class="op">&lt;-</span> <span class="fl">24</span></span>
+<span><span class="va">calibDisease</span><span class="op">$</span><span class="va">RelativeHumidityCritical</span><span class="op">$</span><span class="va">min</span>  <span class="op">&lt;-</span> <span class="fl">45</span></span>
+<span><span class="va">calibDisease</span><span class="op">$</span><span class="va">HydroThermalTimeOnset</span><span class="op">$</span><span class="va">max</span>     <span class="op">&lt;-</span> <span class="fl">50</span></span>
+<span><span class="va">calibDisease</span><span class="op">$</span><span class="va">PathogenSpread</span><span class="op">$</span><span class="va">min</span>            <span class="op">&lt;-</span> <span class="fl">0.35</span></span>
 <span></span>
 <span><span class="co"># --- run disease calibration ---</span></span>
 <span><span class="va">dfDisease</span> <span class="op">&lt;-</span> <span class="fu">FraNchEstYN</span><span class="fu">::</span><span class="fu"><a href="../reference/franchestyn.html">franchestyn</a></span><span class="op">(</span></span>
@@ -502,15 +514,15 @@ canopy states, and actual yield.</p>
 <span>  cropParameters    <span class="op">=</span> <span class="va">calibCrop</span>,</span>
 <span>  diseaseParameters <span class="op">=</span> <span class="va">calibDisease</span>,</span>
 <span>  calibration       <span class="op">=</span> <span class="st">"disease"</span>,</span>
-<span>  start_end         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2013</span>, <span class="fl">2015</span><span class="op">)</span>,</span>
+<span>  start_end         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2012</span>, <span class="fl">2015</span><span class="op">)</span>,</span>
 <span>  iterations        <span class="op">=</span> <span class="fl">999</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>The output chart overlays simulated vs observed disease severity,
 canopy states, and actual yield.</p>
-<p><img src="case-study-egypt-yellow-rust_files/figure-html/disease-calibration-chart-1.png" width="672"></p>
+<p><img src="case-study-egypt-yellow-rust_files/figure-html/disease-calibration-chart-1.png" class="r-plt" alt="Simulated and observed yellow rust severity, canopy light interception and yield for cultivar Sids12 in Sharkiya, Egypt, after disease calibration" width="672"></p>
 </div>
 <div class="section level2">
-<h2 id="step-3-extending-to-multiple-varieties">🌾 Step 3 – Extending to multiple varieties<a class="anchor" aria-label="anchor" href="#step-3-extending-to-multiple-varieties"></a>
+<h2 id="step-3-extending-to-multiple-varieties">🌾 Step 3 — Extending to multiple varieties<a class="anchor" aria-label="anchor" href="#step-3-extending-to-multiple-varieties"></a>
 </h2>
 <p>Finally, we extend calibration to all wheat varieties in the
 dataset.</p>
@@ -522,8 +534,8 @@ Resistance.</li>
 <li>Run the calibration loop for each variety.</li>
 </ul>
 <p>This allows varietal comparisons while keeping the disease model
-unvaried.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+unchanged.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#0. take the calibrated disease parameters</span></span>
 <span><span class="va">calibDisease</span><span class="op">&lt;-</span><span class="va">dfDisease</span><span class="op">$</span><span class="va">parameters</span><span class="op">$</span><span class="va">disease</span></span>
 <span></span>
@@ -551,7 +563,7 @@ unvaried.</p>
 <span>    cropParameters    <span class="op">=</span> <span class="va">calibCrop</span>,</span>
 <span>    diseaseParameters <span class="op">=</span> <span class="va">calibDisease</span>,</span>
 <span>    calibration       <span class="op">=</span> <span class="st">"all"</span>,</span>
-<span>    start_end         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2013</span>,<span class="fl">2015</span><span class="op">)</span>,</span>
+<span>    start_end         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2012</span>, <span class="fl">2015</span><span class="op">)</span>,</span>
 <span>    iterations        <span class="op">=</span> <span class="fl">999</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
@@ -569,7 +581,7 @@ unvaried.</p>
 <span><span class="va">outputs_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">all_outputs</span><span class="op">)</span></span></code></pre></div>
 <p>We display results in an interactive Plotly chart, enabling zooming,
 tooltips, and toggling of variables for clearer interpretation.</p>
-<p><img src="case-study-egypt-yellow-rust_files/figure-html/variety-calibration-chart-1.png" width="960"></p>
+<p><img src="case-study-egypt-yellow-rust_files/figure-html/variety-calibration-chart-1.png" class="r-plt" alt="Simulated and observed yellow rust severity and yield for seven wheat cultivars in Sharkiya, Egypt, by growing season" width="960"></p>
 </div>
 <div class="section level2">
 <h2 id="key-take-home-messages">📝 Key take-home messages<a class="anchor" aria-label="anchor" href="#key-take-home-messages"></a>
@@ -578,8 +590,8 @@ tooltips, and toggling of variables for clearer interpretation.</p>
 <li><p>FraNchEstYN successfully reproduced yellow rust severity and
 yield losses in Egypt using published trial data.</p></li>
 <li><p>Crop calibration (Step 1) focused on cycle length and attainable
-yield, while disease calibration (Step 2) relied mainly on the light
-stealer mechanism to match canopy-level impacts.</p></li>
+yield, while disease calibration (Step 2) relied on the light stealer
+and RUE reducer mechanisms to match canopy-level impacts.</p></li>
 <li><p>Extending calibration to multiple varieties (Step 3) required
 adjusting only Radiation Use Efficiency and Varietal Resistance, keeping
 epidemiology consistent across cultivars.</p></li>
@@ -598,8 +610,13 @@ datasets from different sites or years.</p>
 <p>🌾 Test other crops or pathogens: explore parameter sets in
 cropParameters and diseaseParameters.</p>
 <p>🎛️ Experiment with calibration scope:</p>
-<p>“all” → crop + disease jointly</p>
-<p>“crop” or “disease” → focus on one component</p>
+<ul>
+<li>
+<code>"all"</code> → crop + disease jointly</li>
+<li>
+<code>"crop"</code> or <code>"disease"</code> → focus on one
+component</li>
+</ul>
 <p>📊 Assess uncertainty: run more iterations or replicate calibrations
 to check stability of parameter estimates.</p>
 <p>🛠️ Extend the workflow: integrate with your own management practices,
@@ -616,7 +633,7 @@ local trial data, or yield-loss models for impact assessment.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>
