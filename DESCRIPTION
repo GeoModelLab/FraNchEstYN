@@ -1,43 +1,48 @@
-Package: FraNchEstYN
 Type: Package
+Package: FraNchEstYN
 Title: Crop-Disease Simulation and Calibration
 Version: 0.1.0
 Authors@R: c(
-    person("Simone", "Bregaglio", email = "simone.bregaglio@crea.gov.it", role = c("aut", "cre")),
-    person("Roberto", "Ferrise", email = "roberto.ferrise@unifi.it", role = "aut"))
-Description: Provides an interface to run the FraNchEstYN C# crop–disease model 
-    from R. The package prepares inputs, executes simulations or calibrations,
-    and collects outputs in tidy data frames for further analysis.
+    person("Simone", "Bregaglio", , "simone.bregaglio@crea.gov.it", role = c("aut", "cre")),
+    person("Roberto", "Ferrise", , "roberto.ferrise@unifi.it", role = "aut")
+  )
+Description: Provides an interface to run the FraNchEstYN C# crop–disease
+    model from R. The package prepares inputs, executes simulations or
+    calibrations, and collects outputs in tidy data frames for further
+    analysis.
 License: file LICENSE
-Encoding: UTF-8
-LazyData: true
+URL: https://geomodellab.github.io/FraNchEstYN,
+    https://github.com/GeoModelLab/FraNchEstYN
+BugReports: https://github.com/GeoModelLab/FraNchEstYN/issues
 Depends: 
     R (>= 3.5)
 Imports: 
     dplyr,
-    lubridate,
-    readr,
-    tibble,
     future,
     future.apply,
     ggplot2,
     httr2,
     jsonlite,
+    lubridate,
     processx,
-    rlang
+    readr,
+    rlang,
+    tibble
 Suggests: 
-    knitr,
-    rmarkdown,
-    pkgdown,
-    testthat (>= 3.0.0),
-    devtools,
-    usethis,
+    boot,
     desc,
+    devtools,
+    kableExtra,
+    knitr,
+    pkgdown,
+    plotly,
+    rmarkdown,
     survival,
-    boot
+    testthat (>= 3.0.0),
+    usethis
+VignetteBuilder: 
+    knitr
 Config/testthat/edition: 3
-VignetteBuilder: knitr
-URL: https://geomodellab.github.io/FraNchEstYN,
-    https://github.com/GeoModelLab/FraNchEstYN
-BugReports: https://github.com/GeoModelLab/FraNchEstYN/issues
+Encoding: UTF-8
+LazyData: true
 RoxygenNote: 7.3.3
